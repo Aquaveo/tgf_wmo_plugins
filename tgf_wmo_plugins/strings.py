@@ -1,16 +1,18 @@
-"""Every user-facing string, in English and Spanish.
+"""Every user-facing string, in English, Spanish and French.
 
-The plugins come in an `_en` and an `_es` variant. Keeping the text in one table
-rather than in two parallel sets of modules is what stops the pair drifting: a
-new string has to be added to both dictionaries or `check_parity()` fails, and
-nothing that computes a number lives here.
+The plugins come in an `_en`, an `_es` and an `_fr` variant. Keeping the text in
+one table rather than in parallel sets of modules is what stops the variants
+drifting: a new string has to be added to every dictionary or `check_parity()`
+fails, and nothing that computes a number lives here.
 
 Hazard levels and depth bands are keyed by their numeric class value, which is
 what the raster and the feature attributes actually carry, so a translation can
 never change a classification.
 """
 
-LANGUAGES = ("en", "es")
+import itertools
+
+LANGUAGES = ("en", "es", "fr")
 
 STRINGS = {
     "en": {
@@ -169,6 +171,83 @@ STRINGS = {
         "msg_at_risk": "{count:,} elementos en peligro",
         "msg_flooded": "{count:,} elementos inundados",
     },
+    "fr": {
+        "language": "Français",
+        "group": "Cartes d'Inondation (Français)",
+        "levels": {1: "Faible", 2: "Moyen", 3: "Élevé", 4: "Sévère"},
+        "bands": {
+            1: "0.05 - 0.3 m",
+            2: "0.3 - 1 m",
+            3: "1 - 2 m",
+            4: "2 m ou plus",
+        },
+        "buildings": "bâtiments",
+        "roads": "routes",
+        "col_level": "Niveau",
+        "col_depth": "Profondeur",
+        "col_buildings": "Bâtiments",
+        "col_population": "Population",
+        "col_area": "Superficie (m²)",
+        "col_roads_km": "Routes (km)",
+        "col_pop_share": "% de la population",
+        "row_total_hazard": "TOTAL en danger",
+        "row_total_flooded": "TOTAL affecté",
+        "out_of_range": "Hors limites",
+        "hazard_summary_title": "Impact par niveau d'aléa",
+        "hazard_summary_label": "Résumé d'Impact",
+        "hazard_summary_desc": (
+            "Personnes, bâtiments et routes dans chaque niveau d'aléa "
+            "d'inondation, classés selon les mêmes seuils de probabilité que "
+            "la carte d'aléa."
+        ),
+        "hazard_layer_name": "Classification de l'aléa",
+        "hazard_layer_label": "Couche d'Aléa",
+        "hazard_layer_desc": (
+            "Classification de l'aléa d'inondation à partir de quatre rasters "
+            "de probabilité de dépassement EF5, sous forme de polygones. "
+            "Reclassée lorsqu'un seuil change."
+        ),
+        "hazard_legend": "Aléa",
+        "impact_layer_name": "Bâtiments et routes en danger",
+        "impact_layer_label": "Couche d'Impact",
+        "impact_layer_desc": (
+            "Bâtiments et routes colorés par niveau d'aléa, selon les mêmes "
+            "seuils de probabilité que la carte d'aléa."
+        ),
+        "storm_summary_title": "Impact par profondeur — tempête {index}",
+        "storm_summary_label": "Résumé d'Impact par Tempête",
+        "storm_summary_desc": (
+            "Personnes, bâtiments et routes par profondeur d'inondation pour "
+            "une tempête de l'ensemble. Les bandes sont des profondeurs, "
+            "elles se lisent donc sans référence à un seuil."
+        ),
+        "storm_layer_name": "Bâtiments et routes inondés",
+        "storm_layer_label": "Couche d'Impact par Tempête",
+        "storm_layer_desc": (
+            "Bâtiments et routes colorés selon la profondeur que l'eau "
+            "atteint sur eux lors d'une tempête de l'ensemble."
+        ),
+        "depth_legend": "Profondeur",
+        "storm_card_label": "Résumé de Tempête",
+        "storm_card_desc": (
+            "Magnitude, superficie inondée et profondeur d'une tempête de "
+            "l'ensemble."
+        ),
+        "card_magnitude": "Magnitude",
+        "card_flooded_area": "Superficie inondée",
+        "card_max_depth": "Profondeur maximale",
+        "card_mean_depth": "Profondeur moyenne (mouillé)",
+        "card_flooding": "Inondation",
+        "card_no_flooding": "Aucune à cette magnitude",
+        "msg_reading": "Lecture des couches de probabilité...",
+        "msg_classifying": "Classification de l'aléa...",
+        "msg_polygons": "Génération des polygones...",
+        "msg_loading_features": "Chargement des bâtiments et des routes...",
+        "msg_sampling": "Échantillonnage de la profondeur...",
+        "msg_done": "Terminé",
+        "msg_at_risk": "{count:,} éléments en danger",
+        "msg_flooded": "{count:,} éléments inondés",
+    },
 }
 
 
@@ -192,6 +271,12 @@ THRESHOLD_ARGS = {
         3: "umbral_alto",
         4: "umbral_severo",
     },
+    "fr": {
+        1: "seuil_faible",
+        2: "seuil_moyen",
+        3: "seuil_eleve",
+        4: "seuil_severe",
+    },
 }
 
 
@@ -201,22 +286,28 @@ def threshold_args(lang):
 
 
 def check_parity():
-    """Raise if the two dictionaries have drifted apart.
+    """Raise if the language dictionaries have drifted apart.
 
     Called at import so a missing translation is a hard failure at install time
-    rather than a KeyError in front of a room of trainees.
+    rather than a KeyError in front of a room of trainees. English is the
+    reference every other language is compared against.
     """
-    en, es = set(STRINGS["en"]), set(STRINGS["es"])
-    if en != es:
-        missing_es = sorted(en - es)
-        missing_en = sorted(es - en)
-        raise ValueError(
-            f"strings out of sync -- missing from es: {missing_es}, "
-            f"missing from en: {missing_en}"
-        )
-    for key in ("levels", "bands"):
-        if set(STRINGS["en"][key]) != set(STRINGS["es"][key]):
-            raise ValueError(f"{key} class values differ between languages")
+    if set(STRINGS) != set(LANGUAGES):
+        raise ValueError("STRINGS does not cover every language")
+
+    en = set(STRINGS["en"])
+    for lang in LANGUAGES:
+        if lang == "en":
+            continue
+        other = set(STRINGS[lang])
+        if en != other:
+            raise ValueError(
+                f"strings out of sync -- missing from {lang}: "
+                f"{sorted(en - other)}, missing from en: {sorted(other - en)}"
+            )
+        for key in ("levels", "bands"):
+            if set(STRINGS["en"][key]) != set(STRINGS[lang][key]):
+                raise ValueError(f"{key} class values differ in {lang}")
 
     if set(THRESHOLD_ARGS) != set(LANGUAGES):
         raise ValueError("THRESHOLD_ARGS does not cover every language")
@@ -224,14 +315,13 @@ def check_parity():
     if any(v != set(STRINGS["en"]["levels"]) for v in values):
         raise ValueError("THRESHOLD_ARGS class values differ from levels")
     # A name shared between languages would make one dashboard silently valid
-    # against the other language's plugin.
-    en_names = set(THRESHOLD_ARGS["en"].values())
-    es_names = set(THRESHOLD_ARGS["es"].values())
-    if en_names & es_names:
-        raise ValueError(
-            f"argument names shared between languages: "
-            f"{sorted(en_names & es_names)}"
-        )
+    # against another language's plugin.
+    for a, b in itertools.combinations(sorted(THRESHOLD_ARGS), 2):
+        shared = set(THRESHOLD_ARGS[a].values()) & set(THRESHOLD_ARGS[b].values())
+        if shared:
+            raise ValueError(
+                f"argument names shared between {a} and {b}: {sorted(shared)}"
+            )
 
 
 check_parity()

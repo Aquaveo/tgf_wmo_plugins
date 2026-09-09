@@ -19,11 +19,13 @@ dependencies = [
     "zarr",
     "fsspec",
     "aiohttp",
+    "pyogrio"
 ]
 
 [project.entry-points."intake.drivers"]
-wmo_impact_summary_en = "tgf_wmo_plugins.impact_summary:ImpactSummaryEN"
-wmo_impact_summary_es = "tgf_wmo_plugins.impact_summary:ImpactSummaryES"
+uffis_impact_summary_barbados = "tgf_wmo_plugins.impact_summary:ImpactSummaryBarbados"
+uffis_impact_summary_guatemala = "tgf_wmo_plugins.impact_summary:ImpactSummaryGuatemala"
+uffis_impact_summary_haiti = "tgf_wmo_plugins.impact_summary:ImpactSummaryHaiti"
 wmo_hazard_layer_en = "tgf_wmo_plugins.hazard_layer:HazardLayerEN"
 wmo_hazard_layer_es = "tgf_wmo_plugins.hazard_layer:HazardLayerES"
 wmo_impact_layer_en = "tgf_wmo_plugins.impact_layer:ImpactLayerEN"

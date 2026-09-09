@@ -43,7 +43,7 @@ class BaseStormImpactSummary(TethysDashPlugin):
             s["col_area"]: f"{group.area_m2.sum():,.0f}",
             s["col_roads_km"]: f"{group.longitud_m.sum() / 1000:,.1f}",
             s["col_pop_share"]: (
-                f"{100 * group.poblacion.sum() / TOTAL_POPULATION:.2f}%"
+                f"{100 * group.poblacion.sum() / TOTAL_POPULATION['guatemala']:.2f}%"
             ),
         }
 
