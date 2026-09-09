@@ -304,6 +304,11 @@ HAITI_FEATURES_CSV_URL = (
     "Haiti%20training/outputs/impact_features.gpkg"
 )
 
+ANTIGUA_BARBUDA_FEATURES_CSV_URL = (
+    "https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/"
+    "antigua_barbuda_IBF/AntiguaBarbuda_Jerry_cycle_10151010_IBF_outputs.gpkg"
+)
+
 # Layer feeding each hazard level, shallowest first -- the pairing the notebook
 # uses, and the order the escalation depends on.
 PROB_FIELDS = {
@@ -319,8 +324,14 @@ PROB_FIELDS = {
         "probability_high",
         "probability_severe",
     ],
+    "antigua_barbuda": [
+        "probability_low",
+        "probability_med",
+        "probability_high",
+        "probability_severe",
+    ],
 }
-TYPE_FIELD = {"guatemala": "tipo", "haiti": "type"}
+TYPE_FIELD = {"guatemala": "tipo", "haiti": "type", "antigua_barbuda": "type"}
 
 HAITI_LAYERS = {
     "batiment": (
@@ -339,10 +350,21 @@ HAITI_LAYERS = {
     ),
 }
 
+AB_LAYERS = {
+    "buildings": (
+        "AntiguaBarbuda_Jerry_cycle_10151010_bldgs",
+        {
+            "probability_30cm": "probability_severe",
+        },
+    ),
+    "route": ("AntiguaBarbuda_Jerry_cycle_10151010_roads", {}),
+}
+
 # Population across every building in the country's geopackage, so exposure can
 # be given as a share. Guatemala from notebooks/precompute_impact_table.py;
 # Haiti summed the same way over the `population_per_building` field.
 TOTAL_POPULATION = {
     "guatemala": 290868,
     "haiti": 336473,
+    "antigua_barbuda": 93839,
 }

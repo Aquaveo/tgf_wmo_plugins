@@ -18,9 +18,11 @@ from tgf_wmo_plugins.classification import LEVELS, ThresholdGates
 from tgf_wmo_plugins.common import (
     GUATEMALA_FEATURES_CSV_URL,
     HAITI_FEATURES_CSV_URL,
+    ANTIGUA_BARBUDA_FEATURES_CSV_URL,
     PROB_FIELDS,
     TOTAL_POPULATION,
     HAITI_LAYERS,
+    AB_LAYERS,
 )
 from tgf_wmo_plugins.strings import STRINGS, threshold_args
 
@@ -29,19 +31,23 @@ from tgf_wmo_plugins.strings import STRINGS, threshold_args
 def _load(url, country):
     if country == "guatemala":
         return pd.read_csv(url)
-    elif country == "haiti":
+    else:
+        if country == "haiti":
+            layers = HAITI_LAYERS
+        elif country == "antigua_barbuda":
+            layers = AB_LAYERS
+
         path = Path(tempfile.gettempdir()) / url.rsplit("/", 1)[-1]
         if not path.exists():
             urllib.request.urlretrieve(url, path)
 
         parts = []
-        for type_, (layer, renames) in HAITI_LAYERS.items():
+        for type_, (layer, renames) in layers.items():
             # Fields already carrying their final name, plus the ones to rename.
-            columns = [f for f in PROB_FIELDS["haiti"] if f not in renames.values()]
+            columns = [f for f in PROB_FIELDS[country] if f not in renames.values()]
             part = pyogrio.read_dataframe(
                 path,
                 layer=layer,
-                columns=columns + list(renames),
                 read_geometry=False,
                 use_arrow=True,
             )
@@ -63,26 +69,31 @@ class BaseImpactSummary(ThresholdGates, TethysDashPlugin):
         gates = self.gates()
 
         if country == "guatemala":
-            df = _load(GUATEMALA_FEATURES_CSV_URL, self.country).copy()
+            csv_url = GUATEMALA_FEATURES_CSV_URL
         elif country == "haiti":
-            df = _load(HAITI_FEATURES_CSV_URL, self.country).copy()
+            csv_url = HAITI_FEATURES_CSV_URL
+        elif country == "antigua_barbuda":
+            csv_url = ANTIGUA_BARBUDA_FEATURES_CSV_URL
 
+        df = _load(csv_url, self.country).copy()
+
+        if country == "haiti":
             for col in ["population", "surface_m2", "longueur_m"]:
                 df[col] = df[col].fillna(0.0) if col in df else 0.0
-                
+
         # Escalating assignment: the deepest threshold a feature clears wins,
-        # exactly as clasificar_peligro does for pixels.
-        df["danger"] = 0
+        # exactly as classify_hazard does for pixels.
+        df["hazard"] = 0
         for field, (value, _color) in zip(PROB_FIELDS[country], LEVELS):
-            df.loc[df[field] >= gates[value], "danger"] = value
+            df.loc[df[field] >= gates[value], "hazard"] = value
 
         # Deepest level first. Normal is left out: it is everything the gates did
         # not catch, so it carries no exposure and only pads the table.
         rows = [
-            self._row(s, s["levels"][value], df[df.danger == value])
+            self._row(s, s["levels"][value], df[df.hazard == value])
             for value, _color in reversed(LEVELS)
         ]
-        rows.append(self._row(s, s["row_total_hazard"], df[df.danger > 0]))
+        rows.append(self._row(s, s["row_total_hazard"], df[df.hazard > 0]))
         return {"title": s["hazard_summary_title"], "data": rows}
 
     def _row(self, s, name, group):
@@ -109,6 +120,18 @@ class BaseImpactSummary(ThresholdGates, TethysDashPlugin):
                 s["col_roads_km"]: f"{group.longueur_m.sum() / 1000:,.1f}",
                 s["col_pop_share"]: (
                     f"{100 * group.population.sum() / TOTAL_POPULATION['haiti']:.2f}%"
+                ),
+            }
+        elif self.country == "antigua_barbuda":
+            buildings = group[group.type == "building"]
+            return {
+                s["col_level"]: name,
+                s["col_buildings"]: f"{len(buildings):,}",
+                s["col_population"]: f"{group.population_per_building.sum():,.0f}",
+                s["col_area"]: f"{group.building_area_m2.sum():,.0f}",
+                s["col_roads_km"]: f"{group.road_length_m.sum() / 1000:,.1f}",
+                s["col_pop_share"]: (
+                    f"{100 * group.population_per_building.sum() / TOTAL_POPULATION['antigua_barbuda']:.2f}%"
                 ),
             }
 
@@ -143,4 +166,15 @@ class ImpactSummaryHaiti(BaseImpactSummary):
     label = f"{STRINGS[LANG]['hazard_summary_label']} (Haiti)"
     group = STRINGS[LANG]["group"]
     tags = ["inondation", "impact", "IBF", "exposition", "tableau", "français"]
+    description = STRINGS[LANG]["hazard_summary_desc"]
+
+
+class ImpactSummaryAntiguaBarbuda(BaseImpactSummary):
+    LANG = "en"
+    country = "antigua_barbuda"
+    args = threshold_args(LANG)
+    name = "UFFIS_impact_summary_antigua_barbuda"
+    label = f"{STRINGS[LANG]['hazard_summary_label']} (Antigua and Barbuda)"
+    group = STRINGS[LANG]["group"]
+    tags = ["flood", "impact", "IBF", "exposure", "table", "english"]
     description = STRINGS[LANG]["hazard_summary_desc"]
