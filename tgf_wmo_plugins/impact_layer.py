@@ -14,6 +14,8 @@ import json
 from functools import lru_cache
 
 import geopandas as gpd
+import pandas as pd
+import pyogrio
 from shapely import set_precision
 from tethysapp.tethysdash.plugin_helpers import (
     LayerConfigurationBuilder,
@@ -21,7 +23,13 @@ from tethysapp.tethysdash.plugin_helpers import (
 )
 
 from tgf_wmo_plugins.classification import LEVELS, ThresholdGates
-from tgf_wmo_plugins.common import FEATURES_URL, PROB_FIELDS
+from tgf_wmo_plugins.common import (
+    FEATURES_URL,
+    HAITI_FEATURES_CSV_URL,
+    HAITI_LAYERS,
+    PROB_FIELDS,
+    cached_download,
+)
 from tgf_wmo_plugins.strings import STRINGS, threshold_args
 
 # The frontend does not bundle proj4, so OpenLayers only resolves EPSG:4326 and
@@ -32,21 +40,70 @@ OUTPUT_CRS = "EPSG:4326"
 # without visibly moving them.
 PRECISION_DEG = 1e-6
 
+# Geometry source per country. Guatemala ships one GeoJSON; Haiti ships a
+# geopackage whose buildings and roads are separate layers.
+FEATURES_URLS = {
+    "guatemala": FEATURES_URL,
+    "haiti": HAITI_FEATURES_CSV_URL,
+}
+
+# Attributes carried through to the GeoJSON, per country. `peligro` drives the
+# styling rules and `nivel` is its translated label, so both are always present.
+FEATURE_COLUMNS = {
+    "guatemala": ["tipo", "nivel", "peligro", "poblacion", "area_m2", "longitud_m"],
+    "haiti": ["type", "nivel", "peligro", "population", "surface_m2", "longueur_m"],
+}
+
+# Measures each Haiti layer does not carry -- a road has no population, a
+# building no length -- filled so the styling and the popup can read every row.
+HAITI_MEASURES = ["population", "surface_m2", "longueur_m"]
+
+
+def _read_haiti(url):
+    """Both geopackage layers, stacked, with the probability fields aligned.
+
+    The buildings layer stores its severe extraction under `probability_30cm`,
+    misnamed upstream, so the renames put it back before the gates are applied.
+    """
+    path = cached_download(url)
+    parts = []
+    for type_, (layer, renames) in HAITI_LAYERS.items():
+        # Fields already carrying their final name, plus the ones to rename.
+        columns = [f for f in PROB_FIELDS["haiti"] if f not in renames.values()]
+        part = pyogrio.read_dataframe(
+            path,
+            layer=layer,
+            columns=columns + list(renames),
+            read_geometry=True,
+            use_arrow=True,
+        )
+        part = part.rename(columns=renames)
+        part["type"] = type_
+        parts.append(part)
+
+    stacked = gpd.GeoDataFrame(pd.concat(parts, ignore_index=True), crs=parts[0].crs)
+    for col in HAITI_MEASURES:
+        stacked[col] = stacked[col].fillna(0.0) if col in stacked else 0.0
+    return stacked
+
 
 @lru_cache(maxsize=4)
-def _load(url):
-    """Source features, already in the output CRS.
+def _load(country):
+    """Source features for `country`, already in the output CRS.
 
     Cached: only the gates change between requests, and both the download and
     the reprojection are wasted work to repeat.
     """
-    gdf = gpd.read_file(url).to_crs(OUTPUT_CRS)
+    url = FEATURES_URLS[country]
+    gdf = _read_haiti(url) if country == "haiti" else gpd.read_file(url)
+    gdf = gdf.to_crs(OUTPUT_CRS)
     gdf["geometry"] = set_precision(gdf.geometry.values, PRECISION_DEG)
     return gdf[~gdf.geometry.is_empty]
 
 
 class BaseImpactLayer(ThresholdGates, TethysDashPlugin):
     LANG = None
+    country = None
     type = "map_layer"
     dynamic_map_layer = True
 
@@ -68,14 +125,15 @@ class BaseImpactLayer(ThresholdGates, TethysDashPlugin):
 
     def fetch_features(self):
         s = STRINGS[self.LANG]
+        country = self.country
         gates = self.gates()
 
         self.send_update(s["msg_loading_features"], percentage_complete=20)
-        gdf = _load(FEATURES_URL).copy()
+        gdf = _load(country).copy()
 
         self.send_update(s["msg_classifying"], percentage_complete=60)
         gdf["peligro"] = 0
-        for field, (value, _color) in zip(PROB_FIELDS, LEVELS):
+        for field, (value, _color) in zip(PROB_FIELDS[country], LEVELS):
             gdf.loc[gdf[field] >= gates[value], "peligro"] = value
 
         exposed = gdf[gdf.peligro > 0].copy()
@@ -84,7 +142,7 @@ class BaseImpactLayer(ThresholdGates, TethysDashPlugin):
         self.send_update(
             s["msg_at_risk"].format(count=len(exposed)), percentage_complete=100
         )
-        columns = ["tipo", "nivel", "peligro", "poblacion", "area_m2", "longitud_m"]
+        columns = FEATURE_COLUMNS[country]
         collection = json.loads(exposed[columns + ["geometry"]].to_json())
         collection["crs"] = {"type": "name", "properties": {"name": OUTPUT_CRS}}
         return collection
@@ -130,21 +188,23 @@ class BaseImpactLayer(ThresholdGates, TethysDashPlugin):
         }
 
 
-class ImpactLayerEN(BaseImpactLayer):
-    LANG = "en"
-    args = threshold_args("en")
-    name = "wmo_impact_layer_en"
-    label = f"{STRINGS['en']['impact_layer_label']} ({STRINGS['en']['language']})"
-    group = STRINGS["en"]["group"]
-    tags = ["flood", "impact", "IBF", "map_layer", "dynamic", "english"]
-    description = STRINGS["en"]["impact_layer_desc"]
-
-
-class ImpactLayerES(BaseImpactLayer):
+class ImpactLayerGuatemala(BaseImpactLayer):
     LANG = "es"
-    args = threshold_args("es")
-    name = "wmo_impact_layer_es"
-    label = f"{STRINGS['es']['impact_layer_label']} ({STRINGS['es']['language']})"
-    group = STRINGS["es"]["group"]
+    country = "guatemala"
+    args = threshold_args(LANG)
+    name = "UFFIS_impact_layer_guatemala"
+    label = f"{STRINGS[LANG]['impact_layer_label']} (Guatemala)"
+    group = STRINGS[LANG]["group"]
     tags = ["inundación", "impacto", "IBF", "map_layer", "dinámico", "español"]
-    description = STRINGS["es"]["impact_layer_desc"]
+    description = STRINGS[LANG]["impact_layer_desc"]
+
+
+class ImpactLayerHaiti(BaseImpactLayer):
+    LANG = "fr"
+    country = "haiti"
+    args = threshold_args(LANG)
+    name = "UFFIS_impact_layer_haiti"
+    label = f"{STRINGS[LANG]['impact_layer_label']} (Haiti)"
+    group = STRINGS[LANG]["group"]
+    tags = ["inondation", "impact", "IBF", "map_layer", "dynamique", "français"]
+    description = STRINGS[LANG]["impact_layer_desc"]

@@ -27,16 +27,8 @@ uffis_impact_summary_barbados = "tgf_wmo_plugins.impact_summary:ImpactSummaryBar
 uffis_impact_summary_guatemala = "tgf_wmo_plugins.impact_summary:ImpactSummaryGuatemala"
 uffis_impact_summary_haiti = "tgf_wmo_plugins.impact_summary:ImpactSummaryHaiti"
 uffis_impact_summary_antigua_barbuda = "tgf_wmo_plugins.impact_summary:ImpactSummaryAntiguaBarbuda"
-wmo_hazard_layer_en = "tgf_wmo_plugins.hazard_layer:HazardLayerEN"
-wmo_hazard_layer_es = "tgf_wmo_plugins.hazard_layer:HazardLayerES"
-wmo_impact_layer_en = "tgf_wmo_plugins.impact_layer:ImpactLayerEN"
-wmo_impact_layer_es = "tgf_wmo_plugins.impact_layer:ImpactLayerES"
-wmo_storm_card_en = "tgf_wmo_plugins.storm_card:StormCardEN"
-wmo_storm_card_es = "tgf_wmo_plugins.storm_card:StormCardES"
-wmo_storm_impact_summary_en = "tgf_wmo_plugins.storm_impact_summary:StormImpactSummaryEN"
-wmo_storm_impact_summary_es = "tgf_wmo_plugins.storm_impact_summary:StormImpactSummaryES"
-wmo_storm_impact_layer_en = "tgf_wmo_plugins.storm_impact_layer:StormImpactLayerEN"
-wmo_storm_impact_layer_es = "tgf_wmo_plugins.storm_impact_layer:StormImpactLayerES"
+uffis_impact_layer_guatemala = "tgf_wmo_plugins.impact_layer:ImpactLayerGuatemala"
+uffis_impact_layer_haiti = "tgf_wmo_plugins.impact_layer:ImpactLayerHaiti"
 
 [tool.setuptools.packages.find]
 include = ["tgf_wmo_plugins*"]

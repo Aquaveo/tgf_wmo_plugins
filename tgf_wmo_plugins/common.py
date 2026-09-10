@@ -6,6 +6,10 @@ store, because computing it live means reading every storm's depth array -- abou
 reads a single chunk.
 """
 
+import tempfile
+import urllib.request
+from pathlib import Path
+
 import pandas as pd
 
 DEFAULT_STORE = (
@@ -368,3 +372,16 @@ TOTAL_POPULATION = {
     "haiti": 336473,
     "antigua_barbuda": 93839,
 }
+
+
+def cached_download(url):
+    """Fetch `url` into the temp dir once and return the local path.
+
+    Reading a geopackage straight off https goes through GDAL's /vsicurl, which
+    range-requests the whole 56 MB file once per layer: minutes against about
+    12 s for a single download.
+    """
+    path = Path(tempfile.gettempdir()) / url.rsplit("/", 1)[-1]
+    if not path.exists():
+        urllib.request.urlretrieve(url, path)
+    return path
