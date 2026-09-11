@@ -25,8 +25,8 @@ interactive.
 ### Country variants
 
 The hazard family also ships per-country variants under the `UFFIS_` prefix.
-Each one is a subclass that sets `LANG` and `country` and nothing else; the
-country selects the data (`PROB_URLS`, `FEATURES_URLS`, `PROB_FIELDS`,
+Each one is a subclass that sets `LANG`, `country` and `name` and nothing
+else; the country selects the data (`PROB_URLS`, `FEATURES_URLS`, `PROB_FIELDS`,
 `GPKG_LAYERS`) and the language selects the strings.
 
 | entry point | language | data |

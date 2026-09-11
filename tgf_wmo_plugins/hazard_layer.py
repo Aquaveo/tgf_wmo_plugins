@@ -32,6 +32,12 @@ from tgf_wmo_plugins.strings import STRINGS, threshold_args
 # Warn loudly rather than silently shipping megabytes of geometry.
 POLYGON_WARN_LIMIT = 20000
 
+# Display name of each country, for the plugin label. Keys match PROB_URLS.
+COUNTRY_NAMES = {
+    "guatemala": "Guatemala",
+    "antigua_barbuda": "Antigua and Barbuda",
+}
+
 
 @lru_cache(maxsize=16)
 def _read_raster(url):
@@ -46,10 +52,34 @@ def _read_raster(url):
 
 
 class BaseHazardLayer(ThresholdGates, TethysDashPlugin):
+    """One hazard layer per (country, language); subclasses set only those.
+
+    TethysDash reads `label`, `args`, `tags` and `description` off the class
+    at discovery time, not off an instance, so they cannot be computed in
+    `__init__`. `__init_subclass__` fills them in from LANG and country the
+    moment a subclass is defined, which is what makes a new variant three
+    lines and one entry point.
+    """
+
     LANG = None
     country = None
     type = "map_layer"
     dynamic_map_layer = True
+
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        s = STRINGS[cls.LANG]
+        cls.args = threshold_args(cls.LANG)
+        cls.group = s["group"]
+        cls.tags = list(s["hazard_layer_tags"])
+        cls.description = s["hazard_layer_desc"]
+        # A subclass may pin its own label -- the two legacy Guatemala plugins
+        # keep the "(English)" / "(Español)" they were published with.
+        if "label" not in cls.__dict__:
+            cls.label = (
+                f"{s['hazard_layer_label']} "
+                f"({COUNTRY_NAMES[cls.country]}, {s['language']})"
+            )
 
     def run(self):
         """Configure-time scaffold: source binding, style and legend."""
@@ -168,31 +198,18 @@ class BaseHazardLayer(ThresholdGates, TethysDashPlugin):
 class HazardLayerEN(BaseHazardLayer):
     LANG = "en"
     country = "guatemala"
-    args = threshold_args("en")
     name = "wmo_hazard_layer_en"
     label = f"{STRINGS['en']['hazard_layer_label']} ({STRINGS['en']['language']})"
-    group = STRINGS["en"]["group"]
-    tags = ["flood", "hazard", "EF5", "map_layer", "dynamic", "english"]
-    description = STRINGS["en"]["hazard_layer_desc"]
 
 
 class HazardLayerES(BaseHazardLayer):
     LANG = "es"
     country = "guatemala"
-    args = threshold_args("es")
     name = "wmo_hazard_layer_es"
     label = f"{STRINGS['es']['hazard_layer_label']} ({STRINGS['es']['language']})"
-    group = STRINGS["es"]["group"]
-    tags = ["inundación", "peligro", "EF5", "map_layer", "dinámico", "español"]
-    description = STRINGS["es"]["hazard_layer_desc"]
 
 
 class HazardLayerAntiguaBarbuda(BaseHazardLayer):
     LANG = "en"
     country = "antigua_barbuda"
-    args = threshold_args(LANG)
     name = "UFFIS_hazard_layer_antigua_barbuda"
-    label = f"{STRINGS[LANG]['hazard_layer_label']} (Antigua and Barbuda)"
-    group = STRINGS[LANG]["group"]
-    tags = ["flood", "hazard", "EF5", "map_layer", "dynamic", "english"]
-    description = STRINGS[LANG]["hazard_layer_desc"]
