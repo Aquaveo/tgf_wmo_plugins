@@ -24,9 +24,10 @@ from tethysapp.tethysdash.plugin_helpers import (
 
 from tgf_wmo_plugins.classification import LEVELS, ThresholdGates
 from tgf_wmo_plugins.common import (
+    ANTIGUA_BARBUDA_FEATURES_CSV_URL,
     FEATURES_URL,
+    GPKG_LAYERS,
     HAITI_FEATURES_CSV_URL,
-    HAITI_LAYERS,
     PROB_FIELDS,
     cached_download,
 )
@@ -40,40 +41,56 @@ OUTPUT_CRS = "EPSG:4326"
 # without visibly moving them.
 PRECISION_DEG = 1e-6
 
-# Geometry source per country. Guatemala ships one GeoJSON; Haiti ships a
-# geopackage whose buildings and roads are separate layers.
+# Geometry source per country. Guatemala ships one GeoJSON; Haiti and Antigua
+# and Barbuda ship a geopackage whose buildings and roads are separate layers.
 FEATURES_URLS = {
     "guatemala": FEATURES_URL,
     "haiti": HAITI_FEATURES_CSV_URL,
+    "antigua_barbuda": ANTIGUA_BARBUDA_FEATURES_CSV_URL,
+}
+
+# Measures the popup shows, per country. A geopackage layer only carries the
+# ones that apply to it -- a road has no population, a building no length -- so
+# the reader fills the rest with zero and every row reads the same way.
+MEASURES = {
+    "guatemala": ["poblacion", "area_m2", "longitud_m"],
+    "haiti": ["population", "surface_m2", "longueur_m"],
+    "antigua_barbuda": [
+        "population_per_building",
+        "building_area_m2",
+        "road_length_m",
+    ],
 }
 
 # Attributes carried through to the GeoJSON, per country. `peligro` drives the
 # styling rules and `nivel` is its translated label, so both are always present.
 FEATURE_COLUMNS = {
-    "guatemala": ["tipo", "nivel", "peligro", "poblacion", "area_m2", "longitud_m"],
-    "haiti": ["type", "nivel", "peligro", "population", "surface_m2", "longueur_m"],
+    "guatemala": ["tipo", "nivel", "peligro", *MEASURES["guatemala"]],
+    "haiti": ["type", "nivel", "peligro", *MEASURES["haiti"]],
+    "antigua_barbuda": ["type", "nivel", "peligro", *MEASURES["antigua_barbuda"]],
 }
 
-# Measures each Haiti layer does not carry -- a road has no population, a
-# building no length -- filled so the styling and the popup can read every row.
-HAITI_MEASURES = ["population", "surface_m2", "longueur_m"]
 
-
-def _read_haiti(url):
+def _read_geopackage(url, country):
     """Both geopackage layers, stacked, with the probability fields aligned.
 
-    The buildings layer stores its severe extraction under `probability_30cm`,
+    The buildings layers store their severe extraction under `probability_30cm`,
     misnamed upstream, so the renames put it back before the gates are applied.
+    Only the fields the plugin uses are read; the rest of the layer stays on
+    disk.
     """
     path = cached_download(url)
     parts = []
-    for type_, (layer, renames) in HAITI_LAYERS.items():
-        # Fields already carrying their final name, plus the ones to rename.
-        columns = [f for f in PROB_FIELDS["haiti"] if f not in renames.values()]
+    for type_, (layer, renames) in GPKG_LAYERS[country].items():
+        # Fields already carrying their final name, plus the ones to rename,
+        # plus whichever measures this layer actually has.
+        available = set(pyogrio.read_info(path, layer=layer)["fields"])
+        wanted = [f for f in PROB_FIELDS[country] if f not in renames.values()]
+        wanted += list(renames) + MEASURES[country]
         part = pyogrio.read_dataframe(
             path,
             layer=layer,
-            columns=columns + list(renames),
+            columns=[f for f in wanted if f in available],
             read_geometry=True,
             use_arrow=True,
         )
@@ -82,7 +99,7 @@ def _read_haiti(url):
         parts.append(part)
 
     stacked = gpd.GeoDataFrame(pd.concat(parts, ignore_index=True), crs=parts[0].crs)
-    for col in HAITI_MEASURES:
+    for col in MEASURES[country]:
         stacked[col] = stacked[col].fillna(0.0) if col in stacked else 0.0
     return stacked
 
@@ -95,7 +112,10 @@ def _load(country):
     the reprojection are wasted work to repeat.
     """
     url = FEATURES_URLS[country]
-    gdf = _read_haiti(url) if country == "haiti" else gpd.read_file(url)
+    if country in GPKG_LAYERS:
+        gdf = _read_geopackage(url, country)
+    else:
+        gdf = gpd.read_file(url)
     gdf = gdf.to_crs(OUTPUT_CRS)
     gdf["geometry"] = set_precision(gdf.geometry.values, PRECISION_DEG)
     return gdf[~gdf.geometry.is_empty]
@@ -207,4 +227,15 @@ class ImpactLayerHaiti(BaseImpactLayer):
     label = f"{STRINGS[LANG]['impact_layer_label']} (Haiti)"
     group = STRINGS[LANG]["group"]
     tags = ["inondation", "impact", "IBF", "map_layer", "dynamique", "français"]
+    description = STRINGS[LANG]["impact_layer_desc"]
+
+
+class ImpactLayerAntiguaBarbuda(BaseImpactLayer):
+    LANG = "en"
+    country = "antigua_barbuda"
+    args = threshold_args(LANG)
+    name = "UFFIS_impact_layer_antigua_barbuda"
+    label = f"{STRINGS[LANG]['impact_layer_label']} (Antigua and Barbuda)"
+    group = STRINGS[LANG]["group"]
+    tags = ["flood", "impact", "IBF", "map_layer", "dynamic", "english"]
     description = STRINGS[LANG]["impact_layer_desc"]

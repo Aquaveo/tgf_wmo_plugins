@@ -2,13 +2,15 @@
 
 A map layer config can only point at a URL, and there is no endpoint that serves
 a computed raster, so the classified grid is vectorized: each connected run of
-equal class becomes one polygon carrying a `peligro` attribute. On this dataset
-that comes to roughly 600 polygons.
+equal class becomes one polygon carrying a `peligro` attribute. Guatemala comes
+to roughly 600 polygons at the default gates, Antigua and Barbuda to about 3,400.
 
 Being a dynamic map_layer, `fetch_features` re-runs whenever a bound variable
 input changes, so wiring the four gates to variable inputs makes the
 classification interactive.
 """
+
+from functools import lru_cache
 
 import rasterio
 from rasterio.features import shapes
@@ -31,8 +33,21 @@ from tgf_wmo_plugins.strings import STRINGS, threshold_args
 POLYGON_WARN_LIMIT = 20000
 
 
+@lru_cache(maxsize=16)
+def _read_raster(url):
+    """First band as a masked array, with the grid it sits on.
+
+    Cached: the rasters never change between requests, only the gates do, and
+    re-fetching four multi-megabyte files on every slider move is what would
+    make the layer feel slow.
+    """
+    with rasterio.open(url) as ds:
+        return ds.read(1, masked=True), ds.transform, ds.crs
+
+
 class BaseHazardLayer(ThresholdGates, TethysDashPlugin):
     LANG = None
+    country = None
     type = "map_layer"
     dynamic_map_layer = True
 
@@ -59,7 +74,7 @@ class BaseHazardLayer(ThresholdGates, TethysDashPlugin):
     def fetch_features(self):
         """Runtime features: re-run on load and on variable-input change."""
         s = STRINGS[self.LANG]
-        urls = [PROB_URLS[k] for k in ("7p62", "10cm", "30cm", "76cm")]
+        urls = PROB_URLS[self.country]
         gates = self.gates()
 
         self.send_update(s["msg_reading"], percentage_complete=10)
@@ -82,10 +97,10 @@ class BaseHazardLayer(ThresholdGates, TethysDashPlugin):
     def _read(urls):
         layers, transform, crs = [], None, None
         for url in urls:
-            with rasterio.open(url) as ds:
-                layers.append(ds.read(1, masked=True))
-                if transform is None:
-                    transform, crs = ds.transform, ds.crs
+            layer, layer_transform, layer_crs = _read_raster(url)
+            layers.append(layer)
+            if transform is None:
+                transform, crs = layer_transform, layer_crs
         shapes_seen = {layer.shape for layer in layers}
         if len(shapes_seen) != 1:
             raise ValueError(
@@ -152,6 +167,7 @@ class BaseHazardLayer(ThresholdGates, TethysDashPlugin):
 
 class HazardLayerEN(BaseHazardLayer):
     LANG = "en"
+    country = "guatemala"
     args = threshold_args("en")
     name = "wmo_hazard_layer_en"
     label = f"{STRINGS['en']['hazard_layer_label']} ({STRINGS['en']['language']})"
@@ -162,9 +178,21 @@ class HazardLayerEN(BaseHazardLayer):
 
 class HazardLayerES(BaseHazardLayer):
     LANG = "es"
+    country = "guatemala"
     args = threshold_args("es")
     name = "wmo_hazard_layer_es"
     label = f"{STRINGS['es']['hazard_layer_label']} ({STRINGS['es']['language']})"
     group = STRINGS["es"]["group"]
     tags = ["inundación", "peligro", "EF5", "map_layer", "dinámico", "español"]
     description = STRINGS["es"]["hazard_layer_desc"]
+
+
+class HazardLayerAntiguaBarbuda(BaseHazardLayer):
+    LANG = "en"
+    country = "antigua_barbuda"
+    args = threshold_args(LANG)
+    name = "UFFIS_hazard_layer_antigua_barbuda"
+    label = f"{STRINGS[LANG]['hazard_layer_label']} (Antigua and Barbuda)"
+    group = STRINGS[LANG]["group"]
+    tags = ["flood", "hazard", "EF5", "map_layer", "dynamic", "english"]
+    description = STRINGS[LANG]["hazard_layer_desc"]

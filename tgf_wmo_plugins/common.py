@@ -354,15 +354,24 @@ HAITI_LAYERS = {
     ),
 }
 
+# The type keys must match what the readers compare against ("building" for
+# the summary's building count), and the buildings layer misnames its severe
+# probability `probability_30cm`, like Haiti's. The measures already carry the
+# names the plugins read (`population_per_building`, `building_area_m2`,
+# `road_length_m`), so nothing else is renamed.
 AB_LAYERS = {
-    "buildings": (
+    "building": (
         "AntiguaBarbuda_Jerry_cycle_10151010_bldgs",
         {
             "probability_30cm": "probability_severe",
         },
     ),
-    "route": ("AntiguaBarbuda_Jerry_cycle_10151010_roads", {}),
+    "road": ("AntiguaBarbuda_Jerry_cycle_10151010_roads", {}),
 }
+
+# Geopackage layout per country, for the readers that stack buildings and
+# roads into one frame. Guatemala is absent: it ships a flat GeoJSON/CSV.
+GPKG_LAYERS = {"haiti": HAITI_LAYERS, "antigua_barbuda": AB_LAYERS}
 
 # Population across every building in the country's geopackage, so exposure can
 # be given as a share. Guatemala from notebooks/precompute_impact_table.py;

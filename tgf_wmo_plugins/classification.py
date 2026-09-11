@@ -24,23 +24,29 @@ import rasterio
 
 from tgf_wmo_plugins.strings import THRESHOLD_ARGS
 
-BUCKET = (
-    "https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/"
-    "PBI_Actividad_2"
-)
+BUCKET = "https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com"
 
-# The four rasters this classification is defined over. Fixed rather than
+# The four rasters the classification is defined over, per country, shallowest
+# threshold first -- the order LEVELS escalates through. Fixed rather than
 # exposed as args: the gates are the only thing worth varying, and four URL
 # boxes in the editor invite mismatched or misordered grids.
 #
-# Note the depth labels come from the source filenames and are wrong -- three of
-# the four are 15.24/30.48/60.96 cm, not 7.62/10/30 cm. Kept as-is so the keys
-# still match the data everyone else refers to.
+# Guatemala's depth labels come from the source filenames and are wrong -- three
+# of the four are 15.24/30.48/60.96 cm, not 7.62/10/30 cm. Kept as-is so the
+# names still match the data everyone else refers to.
+#
+# Antigua and Barbuda's rasters are EPSG:4326 (unlike Guatemala's EPSG:3857
+# copies), which OpenLayers also resolves without proj4, so they are read as-is.
 PROB_URLS = {
-    "7p62": f"{BUCKET}/prob_7p62.tif",
-    "10cm": f"{BUCKET}/prob_10cm.tif",
-    "30cm": f"{BUCKET}/prob_30cm.tif",
-    "76cm": f"{BUCKET}/prob_76cm.tif",
+    "guatemala": [
+        f"{BUCKET}/PBI_Actividad_2/prob_{depth}.tif"
+        for depth in ("7p62", "10cm", "30cm", "76cm")
+    ],
+    "antigua_barbuda": [
+        f"{BUCKET}/antigua_barbuda_IBF/depth_prob/"
+        f"antiguabarbuda_prob_depth_ge_{depth}_overbank.tif"
+        for depth in ("10cm", "30cm", "70cm", "100cm")
+    ],
 }
 
 # Level -> (class value, display label, colour). Ordered shallow to deep, which
