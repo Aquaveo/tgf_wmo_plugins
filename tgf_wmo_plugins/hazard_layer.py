@@ -195,14 +195,7 @@ class BaseHazardLayer(ThresholdGates, TethysDashPlugin):
         }
 
 
-class HazardLayerEN(BaseHazardLayer):
-    LANG = "en"
-    country = "guatemala"
-    name = "wmo_hazard_layer_en"
-    label = f"{STRINGS['en']['hazard_layer_label']} ({STRINGS['en']['language']})"
-
-
-class HazardLayerES(BaseHazardLayer):
+class HazardLayerGuatemala(BaseHazardLayer):
     LANG = "es"
     country = "guatemala"
     name = "wmo_hazard_layer_es"
