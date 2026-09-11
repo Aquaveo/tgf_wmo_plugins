@@ -22,6 +22,29 @@ The three map layers are `dynamic_map_layer`s: they re-fetch whenever a bound
 variable input changes, which is what makes the thresholds and the storm slider
 interactive.
 
+### Country variants
+
+The hazard family also ships per-country variants under the `UFFIS_` prefix.
+Each one is a subclass that sets `LANG`, `country` and `name` and nothing
+else; the country selects the data (`PROB_URLS`, `FEATURES_URLS`, `PROB_FIELDS`,
+`GPKG_LAYERS`) and the language selects the strings.
+
+| entry point | language | data |
+|---|---|---|
+| `UFFIS_impact_summary_guatemala` | es | `Guatemala_IBF/impact_features.csv` |
+| `UFFIS_impact_layer_guatemala` | es | `Guatemala_IBF/impact_features.geojson` |
+| `UFFIS_impact_summary_haiti` / `UFFIS_impact_layer_haiti` | fr | `Haiti training/outputs/impact_features.gpkg` |
+| `UFFIS_impact_summary_antigua_barbuda` / `UFFIS_impact_layer_antigua_barbuda` | en | `antigua_barbuda_IBF/AntiguaBarbuda_Jerry_cycle_10151010_IBF_outputs.gpkg` |
+| `UFFIS_hazard_layer_antigua_barbuda` | en | `antigua_barbuda_IBF/depth_prob/antiguabarbuda_prob_depth_ge_*_overbank.tif` |
+
+Haiti and Antigua and Barbuda ship geopackages with buildings and roads as
+separate layers, which are stacked into one frame with a `type` column; in
+both, the buildings layer misnames its severe probability `probability_30cm`,
+and `GPKG_LAYERS` renames it back before the gates apply. The Antigua and
+Barbuda probability rasters are EPSG:4326 at 1 arc-second (2658×921), unlike
+Guatemala's EPSG:3857 copies, and are served in that CRS since OpenLayers
+resolves it natively.
+
 ## Two products, two questions
 
 The plugins split into two families that answer different questions, and the

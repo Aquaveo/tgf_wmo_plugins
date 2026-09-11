@@ -94,6 +94,10 @@ STRINGS = {
         "msg_done": "Done",
         "msg_at_risk": "{count:,} elements at risk",
         "msg_flooded": "{count:,} elements flooded",
+        # Search tags for the hazard layer; the plugin adds nothing else.
+        "hazard_layer_tags": [
+            "flood", "hazard", "EF5", "map_layer", "dynamic", "english"
+        ],
     },
     "es": {
         "language": "Español",
@@ -170,6 +174,9 @@ STRINGS = {
         "msg_done": "Listo",
         "msg_at_risk": "{count:,} elementos en peligro",
         "msg_flooded": "{count:,} elementos inundados",
+        "hazard_layer_tags": [
+            "inundación", "peligro", "EF5", "map_layer", "dinámico", "español"
+        ],
     },
     "fr": {
         "language": "Français",
@@ -247,6 +254,9 @@ STRINGS = {
         "msg_done": "Terminé",
         "msg_at_risk": "{count:,} éléments en danger",
         "msg_flooded": "{count:,} éléments inondés",
+        "hazard_layer_tags": [
+            "inondation", "aléa", "EF5", "map_layer", "dynamique", "français"
+        ],
     },
 }
 

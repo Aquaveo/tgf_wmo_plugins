@@ -6,6 +6,7 @@ store, because computing it live means reading every storm's depth array -- abou
 reads a single chunk.
 """
 
+import os
 import tempfile
 import urllib.request
 from pathlib import Path
@@ -354,15 +355,24 @@ HAITI_LAYERS = {
     ),
 }
 
+# The type keys must match what the readers compare against ("building" for
+# the summary's building count), and the buildings layer misnames its severe
+# probability `probability_30cm`, like Haiti's. The measures already carry the
+# names the plugins read (`population_per_building`, `building_area_m2`,
+# `road_length_m`), so nothing else is renamed.
 AB_LAYERS = {
-    "buildings": (
+    "building": (
         "AntiguaBarbuda_Jerry_cycle_10151010_bldgs",
         {
             "probability_30cm": "probability_severe",
         },
     ),
-    "route": ("AntiguaBarbuda_Jerry_cycle_10151010_roads", {}),
+    "road": ("AntiguaBarbuda_Jerry_cycle_10151010_roads", {}),
 }
+
+# Geopackage layout per country, for the readers that stack buildings and
+# roads into one frame. Guatemala is absent: it ships a flat GeoJSON/CSV.
+GPKG_LAYERS = {"haiti": HAITI_LAYERS, "antigua_barbuda": AB_LAYERS}
 
 # Population across every building in the country's geopackage, so exposure can
 # be given as a share. Guatemala from notebooks/precompute_impact_table.py;
@@ -380,8 +390,23 @@ def cached_download(url):
     Reading a geopackage straight off https goes through GDAL's /vsicurl, which
     range-requests the whole 56 MB file once per layer: minutes against about
     12 s for a single download.
+
+    The transfer lands on a staging name and is moved into place only once it is
+    complete. Downloading onto `path` directly publishes the name the moment the
+    transfer starts, and the plugins sharing a dashboard read concurrently: the
+    second one opens a half-written geopackage and GDAL reports "database disk
+    image is malformed". A transfer that died midway left that truncated file
+    cached for good, so every later request failed the same way.
     """
     path = Path(tempfile.gettempdir()) / url.rsplit("/", 1)[-1]
     if not path.exists():
-        urllib.request.urlretrieve(url, path)
+        fd, staged = tempfile.mkstemp(
+            dir=path.parent, prefix=f"{path.name}.", suffix=".part"
+        )
+        os.close(fd)
+        try:
+            urllib.request.urlretrieve(url, staged)
+            os.replace(staged, path)
+        finally:
+            Path(staged).unlink(missing_ok=True)
     return path
