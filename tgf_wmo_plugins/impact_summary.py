@@ -6,9 +6,6 @@ escalating gates classify a feature directly.
 """
 
 from functools import lru_cache
-import tempfile
-import urllib
-from pathlib import Path
 
 import pandas as pd
 import pyogrio
@@ -16,6 +13,7 @@ from tethysapp.tethysdash.plugin_helpers import TethysDashPlugin
 
 from tgf_wmo_plugins.classification import LEVELS, ThresholdGates
 from tgf_wmo_plugins.common import (
+    cached_download,
     GUATEMALA_FEATURES_CSV_URL,
     HAITI_FEATURES_CSV_URL,
     ANTIGUA_BARBUDA_FEATURES_CSV_URL,
@@ -37,14 +35,10 @@ def _load(url, country):
         elif country == "antigua_barbuda":
             layers = AB_LAYERS
 
-        path = Path(tempfile.gettempdir()) / url.rsplit("/", 1)[-1]
-        if not path.exists():
-            urllib.request.urlretrieve(url, path)
+        path = cached_download(url)
 
         parts = []
         for type_, (layer, renames) in layers.items():
-            # Fields already carrying their final name, plus the ones to rename.
-            columns = [f for f in PROB_FIELDS[country] if f not in renames.values()]
             part = pyogrio.read_dataframe(
                 path,
                 layer=layer,

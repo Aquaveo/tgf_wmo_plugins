@@ -199,10 +199,11 @@ class HazardLayerGuatemala(BaseHazardLayer):
     LANG = "es"
     country = "guatemala"
     name = "wmo_hazard_layer_es"
-    label = f"{STRINGS['es']['hazard_layer_label']} ({STRINGS['es']['language']})"
+    label = f"{STRINGS['es']['hazard_layer_label']} (Guatemala)"
 
 
 class HazardLayerAntiguaBarbuda(BaseHazardLayer):
     LANG = "en"
     country = "antigua_barbuda"
     name = "UFFIS_hazard_layer_antigua_barbuda"
+    label = f"{STRINGS['en']['hazard_layer_label']} (Antigua and Barbuda)"

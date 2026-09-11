@@ -6,6 +6,7 @@ store, because computing it live means reading every storm's depth array -- abou
 reads a single chunk.
 """
 
+import os
 import tempfile
 import urllib.request
 from pathlib import Path
@@ -389,8 +390,23 @@ def cached_download(url):
     Reading a geopackage straight off https goes through GDAL's /vsicurl, which
     range-requests the whole 56 MB file once per layer: minutes against about
     12 s for a single download.
+
+    The transfer lands on a staging name and is moved into place only once it is
+    complete. Downloading onto `path` directly publishes the name the moment the
+    transfer starts, and the plugins sharing a dashboard read concurrently: the
+    second one opens a half-written geopackage and GDAL reports "database disk
+    image is malformed". A transfer that died midway left that truncated file
+    cached for good, so every later request failed the same way.
     """
     path = Path(tempfile.gettempdir()) / url.rsplit("/", 1)[-1]
     if not path.exists():
-        urllib.request.urlretrieve(url, path)
+        fd, staged = tempfile.mkstemp(
+            dir=path.parent, prefix=f"{path.name}.", suffix=".part"
+        )
+        os.close(fd)
+        try:
+            urllib.request.urlretrieve(url, staged)
+            os.replace(staged, path)
+        finally:
+            Path(staged).unlink(missing_ok=True)
     return path
