@@ -24,18 +24,18 @@ interactive.
 
 ### Country variants
 
-The hazard family also ships per-country variants under the `UFFIS_` prefix.
+The hazard family also ships per-country variants under the `uffis_` prefix.
 Each one is a subclass that sets `LANG`, `country` and `name` and nothing
 else; the country selects the data (`PROB_URLS`, `FEATURES_URLS`, `PROB_FIELDS`,
 `GPKG_LAYERS`) and the language selects the strings.
 
 | entry point | language | data |
 |---|---|---|
-| `UFFIS_impact_summary_guatemala` | es | `Guatemala_IBF/impact_features.csv` |
-| `UFFIS_impact_layer_guatemala` | es | `Guatemala_IBF/impact_features.geojson` |
-| `UFFIS_impact_summary_haiti` / `UFFIS_impact_layer_haiti` | fr | `Haiti training/outputs/impact_features.gpkg` |
-| `UFFIS_impact_summary_antigua_barbuda` / `UFFIS_impact_layer_antigua_barbuda` | en | `antigua_barbuda_IBF/AntiguaBarbuda_Jerry_cycle_10151010_IBF_outputs.gpkg` |
-| `UFFIS_hazard_layer_antigua_barbuda` | en | `antigua_barbuda_IBF/depth_prob/antiguabarbuda_prob_depth_ge_*_overbank.tif` |
+| `uffis_impact_summary_guatemala` | es | `Guatemala_IBF/impact_features.csv` |
+| `uffis_impact_layer_guatemala` | es | `Guatemala_IBF/impact_features.geojson` |
+| `uffis_impact_summary_haiti` / `uffis_impact_layer_haiti` | fr | `Haiti training/outputs/impact_features.gpkg` |
+| `uffis_impact_summary_antigua_barbuda` / `uffis_impact_layer_antigua_barbuda` | en | `antigua_barbuda_IBF/AntiguaBarbuda_Jerry_cycle_10151010_IBF_outputs.gpkg` |
+| `uffis_hazard_layer_antigua_barbuda` | en | `antigua_barbuda_IBF/depth_prob/antiguabarbuda_prob_depth_ge_*_overbank.tif` |
 
 Haiti and Antigua and Barbuda ship geopackages with buildings and roads as
 separate layers, which are stacked into one frame with a `type` column; in
@@ -75,10 +75,33 @@ exercises, each in both languages:
 | `Guatemala_Hands_On_2_Espanol.json` | Guatemala Práctica 2 (Español) |
 | `Guatemala_Hands_On_3_English.json` | Guatemala Hands On 3 (English) |
 | `Guatemala_Hands_On_3_Espanol.json` | Guatemala Práctica 3 (Español) |
+| `Antigua_Barbuda_Hands_On_1_English.json` | Antigua and Barbuda Hands On 1 (English) |
+| `Antigua_Barbuda_Hands_On_2_English.json` | Antigua and Barbuda Hands On 2 (English) |
+| `Antigua_Barbuda_Hands_On_3_English.json` | Antigua and Barbuda Hands On 3 (English) |
+| `Antigua_Barbuda_Hands_On_3_Depth_English.json` | Antigua and Barbuda Hands On 3 with Depth (English) |
 
 Import them from the landing page once the plugins are installed and the server
 has restarted. Exercise 1 uses no plugins at all; exercise 2 uses the storm
 family; exercise 3 uses the hazard family.
+
+The Antigua and Barbuda set follows the same three exercises on the Tropical
+Storm Jerry data. Exercise 1 shows the four `depth_prob` rasters with the GADM
+parish boundaries. Exercise 2 reads flood depth for one storm straight out of
+the Saint John's flood-map library (`AnB_IBF/AG04_SaintJohnS_v1.zarr`, 200
+storms) through a Zarr layer whose `index` is bound to a `Storm` number input;
+no storm plugin exists for these libraries yet, so there is no table or card.
+Exercise 3 binds the three `uffis_*_antigua_barbuda` plugins to four threshold
+inputs, preset to the plugin defaults. The step-by-step guides in `docs/` are
+written for Guatemala, but every step transfers with the layer names and URLs
+swapped.
+
+`Hands On 3 with Depth` is exercise 3 with exercise 2's depth layer added: a
+`Storm` slider drives a Zarr layer on the Saint John's flood-map library under
+the parish outlines and the buildings and roads at risk, so one dashboard shows
+how deep the water gets in one storm next to which features the probability
+gates classify. The hazard classification polygons are opaque and would cover
+the depth, so they start hidden; turn them on from the layer control. The map
+opens on Saint John's because the depth library covers only that parish.
 
 A dashboard is bound to the plugins of its own language, and not only through
 the `source` names. A variable input that draws its options from a plugin

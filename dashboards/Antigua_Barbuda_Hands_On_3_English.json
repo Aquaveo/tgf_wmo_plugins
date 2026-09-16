@@ -1,0 +1,1025 @@
+{
+ "name": "Antigua and Barbuda Hands On 3 (English)",
+ "description": "Solution for WMO Antigua and Barbuda Hands On Exercise #3",
+ "publicDashboard": false,
+ "userPermission": "admin",
+ "permissions": [
+  {
+   "username": "admin",
+   "permission": "admin"
+  }
+ ],
+ "unrestrictedPlacement": true,
+ "image": "/media/tethysdash/app/756cbca8-bc08-49ae-91a4-6a1e4e7b228c.png",
+ "owner": "admin",
+ "notes": "",
+ "tabs": [
+  {
+   "id": 303,
+   "name": "Main",
+   "gridItems": [
+    {
+     "i": "1",
+     "x": 0,
+     "y": 0,
+     "w": 99,
+     "h": 41,
+     "source": "Map",
+     "args_string": {
+      "baseMap": "${Base Map}",
+      "layerControl": true,
+      "layers": [
+       {
+        "configuration": {
+         "type": "WebGLTile",
+         "props": {
+          "name": "Flood Probability at 100 cm",
+          "source": {
+           "type": "GeoTIFF",
+           "props": {
+            "url": "https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/antigua_barbuda_IBF/depth_prob/antiguabarbuda_prob_depth_ge_100cm_overbank.tif",
+            "mask_below": "0",
+            "normalize": false
+           },
+           "rampName": "turbo",
+           "rampMin": "0",
+           "rampMax": "1"
+          }
+         },
+         "layerVisibility": false,
+         "style": {
+          "color": [
+           "case",
+           [
+            "==",
+            [
+             "band",
+             2
+            ],
+            0
+           ],
+           [
+            0,
+            0,
+            0,
+            0
+           ],
+           [
+            "<=",
+            [
+             "band",
+             1
+            ],
+            0
+           ],
+           [
+            0,
+            0,
+            0,
+            0
+           ],
+           [
+            "interpolate",
+            [
+             "linear"
+            ],
+            [
+             "band",
+             1
+            ],
+            0,
+            "#30123b",
+            0.03225806451612903,
+            "#362360",
+            0.06451612903225806,
+            "#3b3384",
+            0.0967741935483871,
+            "#4043a6",
+            0.12903225806451613,
+            "#4352bd",
+            0.16129032258064516,
+            "#4562d4",
+            0.1935483870967742,
+            "#4671e7",
+            0.22580645161290322,
+            "#447ff1",
+            0.25806451612903225,
+            "#438dfa",
+            0.2903225806451613,
+            "#3d9cfb",
+            0.3225806451612903,
+            "#34aaf4",
+            0.3548387096774194,
+            "#2bb8ed",
+            0.3870967741935484,
+            "#24c4e1",
+            0.41935483870967744,
+            "#1ed0d2",
+            0.45161290322580644,
+            "#18dcc4",
+            0.4838709677419355,
+            "#20e4b5",
+            0.5161290322580645,
+            "#2aeba5",
+            0.5483870967741935,
+            "#34f296",
+            0.5806451612903226,
+            "#49f683",
+            0.6129032258064516,
+            "#5efb70",
+            0.6451612903225806,
+            "#73fd5f",
+            0.6774193548387096,
+            "#88fc51",
+            0.7096774193548387,
+            "#9efb43",
+            0.7419354838709677,
+            "#b2f738",
+            0.7741935483870968,
+            "#c4ed32",
+            0.8064516129032258,
+            "#d6e42b",
+            0.8387096774193549,
+            "#e4d426",
+            0.8709677419354839,
+            "#eec222",
+            0.9032258064516129,
+            "#f8af1e",
+            0.9354838709677419,
+            "#d57b15",
+            0.967741935483871,
+            "#a83f0c",
+            1,
+            "#7a0403"
+           ]
+          ]
+         }
+        },
+        "legend": "default"
+       },
+       {
+        "configuration": {
+         "type": "WebGLTile",
+         "props": {
+          "name": "Flood Probability at 70 cm",
+          "source": {
+           "type": "GeoTIFF",
+           "props": {
+            "url": "https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/antigua_barbuda_IBF/depth_prob/antiguabarbuda_prob_depth_ge_70cm_overbank.tif",
+            "mask_below": "0",
+            "normalize": false
+           },
+           "rampName": "turbo",
+           "rampMin": "0",
+           "rampMax": "1"
+          }
+         },
+         "layerVisibility": false,
+         "style": {
+          "color": [
+           "case",
+           [
+            "==",
+            [
+             "band",
+             2
+            ],
+            0
+           ],
+           [
+            0,
+            0,
+            0,
+            0
+           ],
+           [
+            "<=",
+            [
+             "band",
+             1
+            ],
+            0
+           ],
+           [
+            0,
+            0,
+            0,
+            0
+           ],
+           [
+            "interpolate",
+            [
+             "linear"
+            ],
+            [
+             "band",
+             1
+            ],
+            0,
+            "#30123b",
+            0.03225806451612903,
+            "#362360",
+            0.06451612903225806,
+            "#3b3384",
+            0.0967741935483871,
+            "#4043a6",
+            0.12903225806451613,
+            "#4352bd",
+            0.16129032258064516,
+            "#4562d4",
+            0.1935483870967742,
+            "#4671e7",
+            0.22580645161290322,
+            "#447ff1",
+            0.25806451612903225,
+            "#438dfa",
+            0.2903225806451613,
+            "#3d9cfb",
+            0.3225806451612903,
+            "#34aaf4",
+            0.3548387096774194,
+            "#2bb8ed",
+            0.3870967741935484,
+            "#24c4e1",
+            0.41935483870967744,
+            "#1ed0d2",
+            0.45161290322580644,
+            "#18dcc4",
+            0.4838709677419355,
+            "#20e4b5",
+            0.5161290322580645,
+            "#2aeba5",
+            0.5483870967741935,
+            "#34f296",
+            0.5806451612903226,
+            "#49f683",
+            0.6129032258064516,
+            "#5efb70",
+            0.6451612903225806,
+            "#73fd5f",
+            0.6774193548387096,
+            "#88fc51",
+            0.7096774193548387,
+            "#9efb43",
+            0.7419354838709677,
+            "#b2f738",
+            0.7741935483870968,
+            "#c4ed32",
+            0.8064516129032258,
+            "#d6e42b",
+            0.8387096774193549,
+            "#e4d426",
+            0.8709677419354839,
+            "#eec222",
+            0.9032258064516129,
+            "#f8af1e",
+            0.9354838709677419,
+            "#d57b15",
+            0.967741935483871,
+            "#a83f0c",
+            1,
+            "#7a0403"
+           ]
+          ]
+         }
+        },
+        "legend": "default"
+       },
+       {
+        "configuration": {
+         "type": "WebGLTile",
+         "props": {
+          "name": "Flood Probability at 30 cm",
+          "source": {
+           "type": "GeoTIFF",
+           "props": {
+            "url": "https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/antigua_barbuda_IBF/depth_prob/antiguabarbuda_prob_depth_ge_30cm_overbank.tif",
+            "mask_below": "0",
+            "normalize": false
+           },
+           "rampName": "turbo",
+           "rampMin": "0",
+           "rampMax": "1"
+          }
+         },
+         "layerVisibility": false,
+         "style": {
+          "color": [
+           "case",
+           [
+            "==",
+            [
+             "band",
+             2
+            ],
+            0
+           ],
+           [
+            0,
+            0,
+            0,
+            0
+           ],
+           [
+            "<=",
+            [
+             "band",
+             1
+            ],
+            0
+           ],
+           [
+            0,
+            0,
+            0,
+            0
+           ],
+           [
+            "interpolate",
+            [
+             "linear"
+            ],
+            [
+             "band",
+             1
+            ],
+            0,
+            "#30123b",
+            0.03225806451612903,
+            "#362360",
+            0.06451612903225806,
+            "#3b3384",
+            0.0967741935483871,
+            "#4043a6",
+            0.12903225806451613,
+            "#4352bd",
+            0.16129032258064516,
+            "#4562d4",
+            0.1935483870967742,
+            "#4671e7",
+            0.22580645161290322,
+            "#447ff1",
+            0.25806451612903225,
+            "#438dfa",
+            0.2903225806451613,
+            "#3d9cfb",
+            0.3225806451612903,
+            "#34aaf4",
+            0.3548387096774194,
+            "#2bb8ed",
+            0.3870967741935484,
+            "#24c4e1",
+            0.41935483870967744,
+            "#1ed0d2",
+            0.45161290322580644,
+            "#18dcc4",
+            0.4838709677419355,
+            "#20e4b5",
+            0.5161290322580645,
+            "#2aeba5",
+            0.5483870967741935,
+            "#34f296",
+            0.5806451612903226,
+            "#49f683",
+            0.6129032258064516,
+            "#5efb70",
+            0.6451612903225806,
+            "#73fd5f",
+            0.6774193548387096,
+            "#88fc51",
+            0.7096774193548387,
+            "#9efb43",
+            0.7419354838709677,
+            "#b2f738",
+            0.7741935483870968,
+            "#c4ed32",
+            0.8064516129032258,
+            "#d6e42b",
+            0.8387096774193549,
+            "#e4d426",
+            0.8709677419354839,
+            "#eec222",
+            0.9032258064516129,
+            "#f8af1e",
+            0.9354838709677419,
+            "#d57b15",
+            0.967741935483871,
+            "#a83f0c",
+            1,
+            "#7a0403"
+           ]
+          ]
+         }
+        },
+        "legend": "default"
+       },
+       {
+        "configuration": {
+         "type": "WebGLTile",
+         "props": {
+          "name": "Flood Probability at 10 cm",
+          "source": {
+           "type": "GeoTIFF",
+           "props": {
+            "url": "https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/antigua_barbuda_IBF/depth_prob/antiguabarbuda_prob_depth_ge_10cm_overbank.tif",
+            "mask_below": "0",
+            "normalize": false
+           },
+           "rampName": "turbo",
+           "rampMin": "0",
+           "rampMax": "1"
+          }
+         },
+         "layerVisibility": false,
+         "style": {
+          "color": [
+           "case",
+           [
+            "==",
+            [
+             "band",
+             2
+            ],
+            0
+           ],
+           [
+            0,
+            0,
+            0,
+            0
+           ],
+           [
+            "<=",
+            [
+             "band",
+             1
+            ],
+            0
+           ],
+           [
+            0,
+            0,
+            0,
+            0
+           ],
+           [
+            "interpolate",
+            [
+             "linear"
+            ],
+            [
+             "band",
+             1
+            ],
+            0,
+            "#30123b",
+            0.03225806451612903,
+            "#362360",
+            0.06451612903225806,
+            "#3b3384",
+            0.0967741935483871,
+            "#4043a6",
+            0.12903225806451613,
+            "#4352bd",
+            0.16129032258064516,
+            "#4562d4",
+            0.1935483870967742,
+            "#4671e7",
+            0.22580645161290322,
+            "#447ff1",
+            0.25806451612903225,
+            "#438dfa",
+            0.2903225806451613,
+            "#3d9cfb",
+            0.3225806451612903,
+            "#34aaf4",
+            0.3548387096774194,
+            "#2bb8ed",
+            0.3870967741935484,
+            "#24c4e1",
+            0.41935483870967744,
+            "#1ed0d2",
+            0.45161290322580644,
+            "#18dcc4",
+            0.4838709677419355,
+            "#20e4b5",
+            0.5161290322580645,
+            "#2aeba5",
+            0.5483870967741935,
+            "#34f296",
+            0.5806451612903226,
+            "#49f683",
+            0.6129032258064516,
+            "#5efb70",
+            0.6451612903225806,
+            "#73fd5f",
+            0.6774193548387096,
+            "#88fc51",
+            0.7096774193548387,
+            "#9efb43",
+            0.7419354838709677,
+            "#b2f738",
+            0.7741935483870968,
+            "#c4ed32",
+            0.8064516129032258,
+            "#d6e42b",
+            0.8387096774193549,
+            "#e4d426",
+            0.8709677419354839,
+            "#eec222",
+            0.9032258064516129,
+            "#f8af1e",
+            0.9354838709677419,
+            "#d57b15",
+            0.967741935483871,
+            "#a83f0c",
+            1,
+            "#7a0403"
+           ]
+          ]
+         }
+        },
+        "legend": "default"
+       },
+       {
+        "configuration": {
+         "type": "VectorLayer",
+         "props": {
+          "name": "Parishes",
+          "source": {
+           "type": "Shapefile",
+           "props": {
+            "url": "https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/antigua_barbuda_IBF/gadm/ATG_gadm_adm1_pop.shp"
+           }
+          },
+          "layerId": "22fc7eba-8764-4af7-9144-e5b23cd4a0f1"
+         },
+         "style": {
+          "default": {
+           "polygon": {
+            "fill": "rgba(0, 0, 0, 0)",
+            "stroke": "#000000",
+            "strokeWidth": "1"
+           }
+          }
+         }
+        }
+       },
+       {
+        "configuration": {
+         "type": "VectorLayer",
+         "props": {
+          "name": "Hazard classification",
+          "source": {
+           "type": "GeoJSON",
+           "props": {},
+           "geojson": {
+            "type": "FeatureCollection",
+            "features": [],
+            "crs": {
+             "type": "name",
+             "properties": {
+              "name": "EPSG:4326"
+             }
+            }
+           }
+          },
+          "pluginSource": {
+           "source": "uffis_hazard_layer_antigua_barbuda",
+           "args": {
+            "low_threshold": "${Low Threshold (P(≥10 cm))}",
+            "medium_threshold": "${Medium Threshold (P(≥30 cm))}",
+            "high_threshold": "${High Threshold (P(≥70 cm))}",
+            "severe_threshold": "${Severe Threshold (P(≥100 cm))}"
+           }
+          },
+          "layerId": "fefea344-7556-4452-9b03-6eb9a38425ed"
+         },
+         "style": {
+          "default": {
+           "polygon": {
+            "fill": "#9e9e9e",
+            "stroke": "#9e9e9e",
+            "strokeWidth": "0"
+           }
+          },
+          "rules": [
+           {
+            "name": "Low",
+            "geometryType": "polygon",
+            "conditionField": "peligro",
+            "conditionType": "=",
+            "conditionValue": "1",
+            "fill": "green",
+            "stroke": "green",
+            "strokeWidth": "0"
+           },
+           {
+            "name": "Medium",
+            "geometryType": "polygon",
+            "conditionField": "peligro",
+            "conditionType": "=",
+            "conditionValue": "2",
+            "fill": "yellow",
+            "stroke": "yellow",
+            "strokeWidth": "0"
+           },
+           {
+            "name": "High",
+            "geometryType": "polygon",
+            "conditionField": "peligro",
+            "conditionType": "=",
+            "conditionValue": "3",
+            "fill": "red",
+            "stroke": "red",
+            "strokeWidth": "0"
+           },
+           {
+            "name": "Severe",
+            "geometryType": "polygon",
+            "conditionField": "peligro",
+            "conditionType": "=",
+            "conditionValue": "4",
+            "fill": "purple",
+            "stroke": "purple",
+            "strokeWidth": "0"
+           }
+          ]
+         }
+        },
+        "legend": {
+         "title": "Hazard",
+         "items": [
+          {
+           "label": "Low",
+           "color": "green",
+           "symbol": "square"
+          },
+          {
+           "label": "Medium",
+           "color": "yellow",
+           "symbol": "square"
+          },
+          {
+           "label": "High",
+           "color": "red",
+           "symbol": "square"
+          },
+          {
+           "label": "Severe",
+           "color": "purple",
+           "symbol": "square"
+          }
+         ]
+        }
+       },
+       {
+        "configuration": {
+         "type": "VectorLayer",
+         "props": {
+          "name": "Buildings and roads at risk",
+          "source": {
+           "type": "GeoJSON",
+           "props": {},
+           "geojson": {
+            "type": "FeatureCollection",
+            "features": [],
+            "crs": {
+             "type": "name",
+             "properties": {
+              "name": "EPSG:4326"
+             }
+            }
+           }
+          },
+          "pluginSource": {
+           "source": "uffis_impact_layer_antigua_barbuda",
+           "args": {
+            "low_threshold": "${Low Threshold (P(≥10 cm))}",
+            "medium_threshold": "${Medium Threshold (P(≥30 cm))}",
+            "high_threshold": "${High Threshold (P(≥70 cm))}",
+            "severe_threshold": "${Severe Threshold (P(≥100 cm))}"
+           }
+          },
+          "layerId": "b309060f-f14b-4fc3-9fe4-947ce6004013"
+         },
+         "style": {
+          "default": {
+           "polygon": {
+            "fill": "#9e9e9e",
+            "stroke": "#9e9e9e",
+            "strokeWidth": "0"
+           },
+           "linestring": {
+            "stroke": "#9e9e9e",
+            "strokeWidth": "1"
+           }
+          },
+          "rules": [
+           {
+            "name": "Low (buildings)",
+            "geometryType": "polygon",
+            "conditionField": "peligro",
+            "conditionType": "=",
+            "conditionValue": "1",
+            "fill": "green",
+            "stroke": "green",
+            "strokeWidth": "1"
+           },
+           {
+            "name": "Low (roads)",
+            "geometryType": "linestring",
+            "conditionField": "peligro",
+            "conditionType": "=",
+            "conditionValue": "1",
+            "stroke": "green",
+            "strokeWidth": "3"
+           },
+           {
+            "name": "Medium (buildings)",
+            "geometryType": "polygon",
+            "conditionField": "peligro",
+            "conditionType": "=",
+            "conditionValue": "2",
+            "fill": "yellow",
+            "stroke": "yellow",
+            "strokeWidth": "1"
+           },
+           {
+            "name": "Medium (roads)",
+            "geometryType": "linestring",
+            "conditionField": "peligro",
+            "conditionType": "=",
+            "conditionValue": "2",
+            "stroke": "yellow",
+            "strokeWidth": "3"
+           },
+           {
+            "name": "High (buildings)",
+            "geometryType": "polygon",
+            "conditionField": "peligro",
+            "conditionType": "=",
+            "conditionValue": "3",
+            "fill": "red",
+            "stroke": "red",
+            "strokeWidth": "1"
+           },
+           {
+            "name": "High (roads)",
+            "geometryType": "linestring",
+            "conditionField": "peligro",
+            "conditionType": "=",
+            "conditionValue": "3",
+            "stroke": "red",
+            "strokeWidth": "3"
+           },
+           {
+            "name": "Severe (buildings)",
+            "geometryType": "polygon",
+            "conditionField": "peligro",
+            "conditionType": "=",
+            "conditionValue": "4",
+            "fill": "purple",
+            "stroke": "purple",
+            "strokeWidth": "1"
+           },
+           {
+            "name": "Severe (roads)",
+            "geometryType": "linestring",
+            "conditionField": "peligro",
+            "conditionType": "=",
+            "conditionValue": "4",
+            "stroke": "purple",
+            "strokeWidth": "3"
+           }
+          ]
+         }
+        },
+        "legend": {
+         "title": "Hazard",
+         "items": [
+          {
+           "label": "Low",
+           "color": "green",
+           "symbol": "square"
+          },
+          {
+           "label": "Medium",
+           "color": "yellow",
+           "symbol": "square"
+          },
+          {
+           "label": "High",
+           "color": "red",
+           "symbol": "square"
+          },
+          {
+           "label": "Severe",
+           "color": "purple",
+           "symbol": "square"
+          }
+         ]
+        }
+       }
+      ],
+      "map_extent": {
+       "extent": "-6878431.34,1928974.98,11.6"
+      },
+      "mapDrawing": {}
+     },
+     "metadata_string": {
+      "fillViewport": true
+     }
+    },
+    {
+     "i": "2",
+     "x": 0,
+     "y": 0,
+     "w": 17,
+     "h": 6,
+     "source": "Variable Input",
+     "args_string": {
+      "variable_name": "Base Map",
+      "show_label": true,
+      "variable_options_source": "Base Map Layers",
+      "initial_value": "https://server.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer"
+     },
+     "metadata_string": {
+      "border": {
+       "border": "1px solid black"
+      },
+      "backgroundColor": "#ffffff"
+     }
+    },
+    {
+     "i": "3",
+     "x": 56,
+     "y": 7,
+     "w": 44,
+     "h": 21,
+     "source": "uffis_impact_summary_antigua_barbuda",
+     "args_string": {
+      "low_threshold": "${Low Threshold (P(≥10 cm))}",
+      "medium_threshold": "${Medium Threshold (P(≥30 cm))}",
+      "high_threshold": "${High Threshold (P(≥70 cm))}",
+      "severe_threshold": "${Severe Threshold (P(≥100 cm))}"
+     },
+     "metadata_string": {
+      "border": {
+       "border-bottom": "1px solid black",
+       "border-left": "1px solid black",
+       "border-right": "1px solid black"
+      },
+      "backgroundColor": "#ffffff"
+     }
+    },
+    {
+     "i": "4",
+     "x": 56,
+     "y": 0,
+     "w": 11,
+     "h": 7,
+     "source": "Variable Input",
+     "args_string": {
+      "variable_name": "Low Threshold (P(≥10 cm))",
+      "show_label": true,
+      "variable_options_source": "number",
+      "variable_options_source.metadata": {
+       "min": 0,
+       "max": 1,
+       "step": 0.05,
+       "dataType": "Number",
+       "outputFormat": "{{n}}",
+       "rangeMode": false,
+       "speedOptions": [
+        2000,
+        1000,
+        500,
+        250,
+        100
+       ],
+       "initialValue": 0.3
+      },
+      "initial_value": 0.3
+     },
+     "metadata_string": {
+      "border": {
+       "border-top": "1px solid black",
+       "border-left": "1px solid black"
+      },
+      "backgroundColor": "#ffffff"
+     }
+    },
+    {
+     "i": "5",
+     "x": 67,
+     "y": 0,
+     "w": 11,
+     "h": 7,
+     "source": "Variable Input",
+     "args_string": {
+      "variable_name": "Medium Threshold (P(≥30 cm))",
+      "show_label": true,
+      "variable_options_source": "number",
+      "variable_options_source.metadata": {
+       "min": 0,
+       "max": 1,
+       "step": 0.05,
+       "dataType": "Number",
+       "outputFormat": "{{n}}",
+       "rangeMode": false,
+       "speedOptions": [
+        2000,
+        1000,
+        500,
+        250,
+        100
+       ],
+       "initialValue": 0.2
+      },
+      "initial_value": 0.2
+     },
+     "metadata_string": {
+      "border": {
+       "border-top": "1px solid black"
+      },
+      "backgroundColor": "#ffffff"
+     }
+    },
+    {
+     "i": "6",
+     "x": 78,
+     "y": 0,
+     "w": 11,
+     "h": 7,
+     "source": "Variable Input",
+     "args_string": {
+      "variable_name": "High Threshold (P(≥70 cm))",
+      "show_label": true,
+      "variable_options_source": "number",
+      "variable_options_source.metadata": {
+       "min": 0,
+       "max": 1,
+       "step": 0.05,
+       "dataType": "Number",
+       "outputFormat": "{{n}}",
+       "rangeMode": false,
+       "speedOptions": [
+        2000,
+        1000,
+        500,
+        250,
+        100
+       ],
+       "initialValue": 0.1
+      },
+      "initial_value": 0.1
+     },
+     "metadata_string": {
+      "border": {
+       "border-top": "1px solid black"
+      },
+      "backgroundColor": "#ffffff"
+     }
+    },
+    {
+     "i": "7",
+     "x": 89,
+     "y": 0,
+     "w": 11,
+     "h": 7,
+     "source": "Variable Input",
+     "args_string": {
+      "variable_name": "Severe Threshold (P(≥100 cm))",
+      "show_label": true,
+      "variable_options_source": "number",
+      "variable_options_source.metadata": {
+       "min": 0,
+       "max": 1,
+       "step": 0.05,
+       "dataType": "Number",
+       "outputFormat": "{{n}}",
+       "rangeMode": false,
+       "speedOptions": [
+        2000,
+        1000,
+        500,
+        250,
+        100
+       ],
+       "initialValue": 0.15
+      },
+      "initial_value": 0.15
+     },
+     "metadata_string": {
+      "border": {
+       "border-top": "1px solid black",
+       "border-right": "1px solid black"
+      },
+      "backgroundColor": "#ffffff"
+     }
+    }
+   ]
+  }
+ ]
+}

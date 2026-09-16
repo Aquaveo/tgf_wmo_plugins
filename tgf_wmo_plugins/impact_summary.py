@@ -134,7 +134,7 @@ class ImpactSummaryBarbados(BaseImpactSummary):
     LANG = "en"
     country = "barbados"
     args = threshold_args(LANG)
-    name = "UFFIS_impact_summary_barbados"
+    name = "uffis_impact_summary_barbados"
     label = f"{STRINGS['en']['hazard_summary_label']} (Barbados)"
     group = STRINGS["en"]["group"]
     tags = ["flood", "impact", "IBF", "exposure", "table", "english"]
@@ -145,7 +145,7 @@ class ImpactSummaryGuatemala(BaseImpactSummary):
     LANG = "es"
     country = "guatemala"
     args = threshold_args(LANG)
-    name = "UFFIS_impact_summary_guatemala"
+    name = "uffis_impact_summary_guatemala"
     label = f"{STRINGS['es']['hazard_summary_label']} (Guatemala)"
     group = STRINGS["es"]["group"]
     tags = ["inundación", "impacto", "IBF", "exposición", "tabla", "español"]
@@ -156,7 +156,7 @@ class ImpactSummaryHaiti(BaseImpactSummary):
     LANG = "fr"
     country = "haiti"
     args = threshold_args(LANG)
-    name = "UFFIS_impact_summary_haiti"
+    name = "uffis_impact_summary_haiti"
     label = f"{STRINGS[LANG]['hazard_summary_label']} (Haiti)"
     group = STRINGS[LANG]["group"]
     tags = ["inondation", "impact", "IBF", "exposition", "tableau", "français"]
@@ -167,7 +167,7 @@ class ImpactSummaryAntiguaBarbuda(BaseImpactSummary):
     LANG = "en"
     country = "antigua_barbuda"
     args = threshold_args(LANG)
-    name = "UFFIS_impact_summary_antigua_barbuda"
+    name = "uffis_impact_summary_antigua_barbuda"
     label = f"{STRINGS[LANG]['hazard_summary_label']} (Antigua and Barbuda)"
     group = STRINGS[LANG]["group"]
     tags = ["flood", "impact", "IBF", "exposure", "table", "english"]
