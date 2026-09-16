@@ -78,6 +78,7 @@ exercises, each in both languages:
 | `Antigua_Barbuda_Hands_On_1_English.json` | Antigua and Barbuda Hands On 1 (English) |
 | `Antigua_Barbuda_Hands_On_2_English.json` | Antigua and Barbuda Hands On 2 (English) |
 | `Antigua_Barbuda_Hands_On_3_English.json` | Antigua and Barbuda Hands On 3 (English) |
+| `Antigua_Barbuda_Hands_On_3_Depth_English.json` | Antigua and Barbuda Hands On 3 with Depth (English) |
 
 Import them from the landing page once the plugins are installed and the server
 has restarted. Exercise 1 uses no plugins at all; exercise 2 uses the storm
@@ -93,6 +94,14 @@ Exercise 3 binds the three `uffis_*_antigua_barbuda` plugins to four threshold
 inputs, preset to the plugin defaults. The step-by-step guides in `docs/` are
 written for Guatemala, but every step transfers with the layer names and URLs
 swapped.
+
+`Hands On 3 with Depth` is exercise 3 with exercise 2's depth layer added: a
+`Storm` slider drives a Zarr layer on the Saint John's flood-map library under
+the parish outlines and the buildings and roads at risk, so one dashboard shows
+how deep the water gets in one storm next to which features the probability
+gates classify. The hazard classification polygons are opaque and would cover
+the depth, so they start hidden; turn them on from the layer control. The map
+opens on Saint John's because the depth library covers only that parish.
 
 A dashboard is bound to the plugins of its own language, and not only through
 the `source` names. A variable input that draws its options from a plugin
