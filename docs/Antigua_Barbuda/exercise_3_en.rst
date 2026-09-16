@@ -19,7 +19,7 @@ What you are building
 =====================
 
 A full-window map carrying the four probability rasters and the parish outline
-from exercise 1 plus two computed layers: a hazard classification and the
+from exercise 1 (without its depth layer) plus two computed layers: a hazard classification and the
 buildings and roads that fall inside it. Four number inputs across the top set
 the probability threshold for each hazard level, and an impact table sits under
 them. Change a threshold and the classification, the affected features and the
@@ -251,8 +251,8 @@ Step 4 — Add the map, the four rasters and the parishes
 =======================================================
 
 If you have exercise 1, do the following. If you do not, build the map, the
-four rasters and the parish outline from scratch as in
-`Exercise 1 <exercise_1_en.rst>`_.
+four probability rasters and the parish outline from scratch as in
+`Exercise 1 <exercise_1_en.rst>`_, skipping its depth layer.
 
 #. Open the dashboard from exercise 1.
 
@@ -269,7 +269,11 @@ four rasters and the parish outline from scratch as in
    **Order**, and select **Send to Back**. The inputs should now be visible on
    top of the map.
 
-#. Edit the map item. For each of the four rasters, edit the layer and turn off
+#. Edit the map item. Delete the **Flood Depth** layer: it is one storm of one
+   parish's library, and this dashboard is about the forecast. Step 10 brings
+   it back on a slider if you want it.
+
+#. For each of the four probability rasters, edit the layer and turn off
    **Default Visibility** on the **Layer** tab, so that all four are hidden
    when the dashboard first loads. Leave **Parishes** visible. Make sure to
    save each layer after editing it.
