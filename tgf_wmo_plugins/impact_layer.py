@@ -212,7 +212,7 @@ class ImpactLayerGuatemala(BaseImpactLayer):
     LANG = "es"
     country = "guatemala"
     args = threshold_args(LANG)
-    name = "UFFIS_impact_layer_guatemala"
+    name = "uffis_impact_layer_guatemala"
     label = f"{STRINGS[LANG]['impact_layer_label']} (Guatemala)"
     group = STRINGS[LANG]["group"]
     tags = ["inundación", "impacto", "IBF", "map_layer", "dinámico", "español"]
@@ -223,7 +223,7 @@ class ImpactLayerHaiti(BaseImpactLayer):
     LANG = "fr"
     country = "haiti"
     args = threshold_args(LANG)
-    name = "UFFIS_impact_layer_haiti"
+    name = "uffis_impact_layer_haiti"
     label = f"{STRINGS[LANG]['impact_layer_label']} (Haiti)"
     group = STRINGS[LANG]["group"]
     tags = ["inondation", "impact", "IBF", "map_layer", "dynamique", "français"]
@@ -234,7 +234,7 @@ class ImpactLayerAntiguaBarbuda(BaseImpactLayer):
     LANG = "en"
     country = "antigua_barbuda"
     args = threshold_args(LANG)
-    name = "UFFIS_impact_layer_antigua_barbuda"
+    name = "uffis_impact_layer_antigua_barbuda"
     label = f"{STRINGS[LANG]['impact_layer_label']} (Antigua and Barbuda)"
     group = STRINGS[LANG]["group"]
     tags = ["flood", "impact", "IBF", "map_layer", "dynamic", "english"]

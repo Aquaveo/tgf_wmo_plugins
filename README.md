@@ -24,18 +24,18 @@ interactive.
 
 ### Country variants
 
-The hazard family also ships per-country variants under the `UFFIS_` prefix.
+The hazard family also ships per-country variants under the `uffis_` prefix.
 Each one is a subclass that sets `LANG`, `country` and `name` and nothing
 else; the country selects the data (`PROB_URLS`, `FEATURES_URLS`, `PROB_FIELDS`,
 `GPKG_LAYERS`) and the language selects the strings.
 
 | entry point | language | data |
 |---|---|---|
-| `UFFIS_impact_summary_guatemala` | es | `Guatemala_IBF/impact_features.csv` |
-| `UFFIS_impact_layer_guatemala` | es | `Guatemala_IBF/impact_features.geojson` |
-| `UFFIS_impact_summary_haiti` / `UFFIS_impact_layer_haiti` | fr | `Haiti training/outputs/impact_features.gpkg` |
-| `UFFIS_impact_summary_antigua_barbuda` / `UFFIS_impact_layer_antigua_barbuda` | en | `antigua_barbuda_IBF/AntiguaBarbuda_Jerry_cycle_10151010_IBF_outputs.gpkg` |
-| `UFFIS_hazard_layer_antigua_barbuda` | en | `antigua_barbuda_IBF/depth_prob/antiguabarbuda_prob_depth_ge_*_overbank.tif` |
+| `uffis_impact_summary_guatemala` | es | `Guatemala_IBF/impact_features.csv` |
+| `uffis_impact_layer_guatemala` | es | `Guatemala_IBF/impact_features.geojson` |
+| `uffis_impact_summary_haiti` / `uffis_impact_layer_haiti` | fr | `Haiti training/outputs/impact_features.gpkg` |
+| `uffis_impact_summary_antigua_barbuda` / `uffis_impact_layer_antigua_barbuda` | en | `antigua_barbuda_IBF/AntiguaBarbuda_Jerry_cycle_10151010_IBF_outputs.gpkg` |
+| `uffis_hazard_layer_antigua_barbuda` | en | `antigua_barbuda_IBF/depth_prob/antiguabarbuda_prob_depth_ge_*_overbank.tif` |
 
 Haiti and Antigua and Barbuda ship geopackages with buildings and roads as
 separate layers, which are stacked into one frame with a `type` column; in
@@ -89,7 +89,7 @@ parish boundaries. Exercise 2 reads flood depth for one storm straight out of
 the Saint John's flood-map library (`AnB_IBF/AG04_SaintJohnS_v1.zarr`, 200
 storms) through a Zarr layer whose `index` is bound to a `Storm` number input;
 no storm plugin exists for these libraries yet, so there is no table or card.
-Exercise 3 binds the three `UFFIS_*_antigua_barbuda` plugins to four threshold
+Exercise 3 binds the three `uffis_*_antigua_barbuda` plugins to four threshold
 inputs, preset to the plugin defaults. The step-by-step guides in `docs/` are
 written for Guatemala, but every step transfers with the layer names and URLs
 swapped.

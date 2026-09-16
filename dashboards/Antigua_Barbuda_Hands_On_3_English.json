@@ -552,7 +552,7 @@
             "url": "https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/antigua_barbuda_IBF/gadm/ATG_gadm_adm1_pop.shp"
            }
           },
-          "layerId": "2d6e7bff-0985-4472-88ba-fc3b49aa1651"
+          "layerId": "22fc7eba-8764-4af7-9144-e5b23cd4a0f1"
          },
          "style": {
           "default": {
@@ -585,7 +585,7 @@
            }
           },
           "pluginSource": {
-           "source": "UFFIS_hazard_layer_antigua_barbuda",
+           "source": "uffis_hazard_layer_antigua_barbuda",
            "args": {
             "low_threshold": "${Low Threshold (P(≥10 cm))}",
             "medium_threshold": "${Medium Threshold (P(≥30 cm))}",
@@ -593,7 +593,7 @@
             "severe_threshold": "${Severe Threshold (P(≥100 cm))}"
            }
           },
-          "layerId": "2d2dab99-377c-45f7-9e5b-dd6eacbb6cae"
+          "layerId": "fefea344-7556-4452-9b03-6eb9a38425ed"
          },
          "style": {
           "default": {
@@ -693,7 +693,7 @@
            }
           },
           "pluginSource": {
-           "source": "UFFIS_impact_layer_antigua_barbuda",
+           "source": "uffis_impact_layer_antigua_barbuda",
            "args": {
             "low_threshold": "${Low Threshold (P(≥10 cm))}",
             "medium_threshold": "${Medium Threshold (P(≥30 cm))}",
@@ -701,7 +701,7 @@
             "severe_threshold": "${Severe Threshold (P(≥100 cm))}"
            }
           },
-          "layerId": "b7db758d-5c9b-4fea-86b7-23a7eae3753f"
+          "layerId": "b309060f-f14b-4fc3-9fe4-947ce6004013"
          },
          "style": {
           "default": {
@@ -857,7 +857,7 @@
      "y": 7,
      "w": 44,
      "h": 21,
-     "source": "UFFIS_impact_summary_antigua_barbuda",
+     "source": "uffis_impact_summary_antigua_barbuda",
      "args_string": {
       "low_threshold": "${Low Threshold (P(≥10 cm))}",
       "medium_threshold": "${Medium Threshold (P(≥30 cm))}",
