@@ -75,10 +75,24 @@ exercises, each in both languages:
 | `Guatemala_Hands_On_2_Espanol.json` | Guatemala Práctica 2 (Español) |
 | `Guatemala_Hands_On_3_English.json` | Guatemala Hands On 3 (English) |
 | `Guatemala_Hands_On_3_Espanol.json` | Guatemala Práctica 3 (Español) |
+| `Antigua_Barbuda_Hands_On_1_English.json` | Antigua and Barbuda Hands On 1 (English) |
+| `Antigua_Barbuda_Hands_On_2_English.json` | Antigua and Barbuda Hands On 2 (English) |
+| `Antigua_Barbuda_Hands_On_3_English.json` | Antigua and Barbuda Hands On 3 (English) |
 
 Import them from the landing page once the plugins are installed and the server
 has restarted. Exercise 1 uses no plugins at all; exercise 2 uses the storm
 family; exercise 3 uses the hazard family.
+
+The Antigua and Barbuda set follows the same three exercises on the Tropical
+Storm Jerry data. Exercise 1 shows the four `depth_prob` rasters with the GADM
+parish boundaries. Exercise 2 reads flood depth for one storm straight out of
+the Saint John's flood-map library (`AnB_IBF/AG04_SaintJohnS_v1.zarr`, 200
+storms) through a Zarr layer whose `index` is bound to a `Storm` number input;
+no storm plugin exists for these libraries yet, so there is no table or card.
+Exercise 3 binds the three `UFFIS_*_antigua_barbuda` plugins to four threshold
+inputs, preset to the plugin defaults. The step-by-step guides in `docs/` are
+written for Guatemala, but every step transfers with the layer names and URLs
+swapped.
 
 A dashboard is bound to the plugins of its own language, and not only through
 the `source` names. A variable input that draws its options from a plugin
