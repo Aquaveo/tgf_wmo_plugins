@@ -1,7 +1,7 @@
 .. Antigua and Barbuda hands-on exercise 1 solution, English.
 
 ==============================================================
-Exercise 1 — A flood probability map
+Exercise 1 — A flood depth and probability map
 ==============================================================
 
 Building **Antigua and Barbuda Hands On 1 (English)** step by step.
@@ -15,8 +15,9 @@ Building **Antigua and Barbuda Hands On 1 (English)** step by step.
 What you are building
 =====================
 
-One map filling the window, carrying the four exceedance-probability rasters of
-the Tropical Storm Jerry forecast, the parish boundaries drawn over them, and a
+One map filling the window, carrying the flood depth of one storm from the
+Saint John's flood-map library, the four exceedance-probability rasters of the
+Tropical Storm Jerry forecast, the parish boundaries drawn over them, and a
 small dropdown in the top-left corner that switches the base map underneath.
 
 .. figure:: images/ex1-finished.png
@@ -24,12 +25,12 @@ small dropdown in the top-left corner that switches the base map underneath.
    :width: 100%
 
    **Screenshot:** the finished dashboard over satellite imagery, layer control
-   open so all five layers are visible, the 30 cm layer drawn.
+   open so all six layers are visible, the depth and 30 cm layers drawn.
 
 This exercise is about layers: where a raster URL goes, how a colour ramp is
-pinned so four layers can be compared, how a vector outline is styled so it
-frames the data without covering it, and which layers to show when the
-dashboard first opens.
+chosen, the difference between letting the app scale a layer and pinning the
+scale yourself, how a vector outline is styled so it frames the data without
+covering it, and which layers to show when the dashboard first opens.
 
 
 Step 1 — Create the dashboard
@@ -74,7 +75,82 @@ Step 2 — Add the map
    base map selected.
 
 
-Step 3 — Add the four probability layers
+Step 3 — Add the depth layer
+============================
+
+There is no single "flood depth" GeoTIFF for Antigua and Barbuda: the forecast
+chain publishes probabilities, and depth exists only inside the parish flood-map
+libraries, one storm at a time. So the depth layer reads one storm straight out
+of the Saint John's library, a Zarr store of 200 storms.
+
+#. Next to **Layers**, click **Add Layer**. The layer editor opens with tabs
+   **Layer**, **Source**, **Style**, **Legend**, **Attributes/Table Popup** and
+   **Custom Modal Popup**.
+
+#. On the **Layer** tab, set the following properties:
+
+   .. list-table::
+      :header-rows: 1
+      :widths: 24 76
+
+      * - Field
+        - Value
+      * - ``name``
+        - ``Flood Depth (m), Saint John's library, storm 150``
+
+#. On the **Source** tab, set **Source Type** to **Zarr** and fill in:
+
+   .. list-table::
+      :header-rows: 1
+      :widths: 24 76
+
+      * - Field
+        - Value
+      * - ``url``
+        - ``https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/AnB_IBF/AG04_SaintJohnS_v1.zarr``
+      * - ``variable``
+        - ``depth``
+      * - ``index``
+        - ``150``
+      * - ``mask_below``
+        - ``0.05``
+
+   The store holds all 200 storms in one array, and ``index`` picks which slice
+   to draw — a fixed one here; exercise 2 puts this same field on a slider.
+   Storm 150 is the one the companion notebook works through. ``mask_below``
+   hides cells at or below the value given; ``0.05`` is the store's own wet
+   threshold, so dry ground shows the base map instead of the ramp's low
+   colour.
+
+#. On the **Style** tab, leave the mode on **Continuous** and pick the
+   **YlGnBu** ramp. Leave **Min** and **Max** empty.
+
+   Leaving both bounds empty is a deliberate choice, not laziness. An empty
+   bound means "resolve it from the data at render time", so the ramp stretches
+   across whatever range this particular storm holds. Set both and the raw
+   values are styled directly instead.
+
+#. On the **Legend** tab, select **Default Legend**. For a ramp-styled raster
+   the app generates a colour bar automatically.
+
+#. Save the layer by clicking **Create** at the bottom of the layer editor.
+
+.. figure:: images/ex1-layer-source-zarr.png
+   :alt: The Source tab configured for the Saint John's Zarr store
+   :width: 100%
+
+   **Screenshot:** the **Source** tab with **Source Type** Zarr, the store URL,
+   ``variable`` depth, ``index`` 150 and ``mask_below`` 0.05.
+
+.. figure:: images/ex1-layer-style-ramp.png
+   :alt: The Style tab with the YlGnBu ramp selected
+   :width: 100%
+
+   **Screenshot:** the **Style** tab, **Continuous** mode, **YlGnBu** selected,
+   **Min** and **Max** empty.
+
+
+Step 4 — Add the four probability layers
 ========================================
 
 These four are identical except for the URL, the name and their initial
@@ -102,9 +178,7 @@ largest area — ends up on top:
 
 For **each** of the four:
 
-#. Next to **Layers**, click **Add Layer**. The layer editor opens with tabs
-   **Layer**, **Source**, **Style**, **Legend**, **Attributes/Table Popup** and
-   **Custom Modal Popup**.
+#. Next to **Layers**, click **Add Layer** again.
 
 #. On the **Layer** tab, set the following properties:
 
@@ -147,12 +221,12 @@ For **each** of the four:
 #. On the **Style** tab, leave the mode on **Continuous** and pick the
    **turbo** ramp. Set **Min** = ``0`` and **Max** = ``1``.
 
-   Pinning Min and Max to 0–1 is the whole point of these four layers.
-   Probability has a fixed, meaningful range, and all four layers must use the
-   same one or they cannot be compared. Left to auto-scale, each layer would
-   stretch its ramp over its own range and 0.2 would look like a different
-   severity on each — the shallow layer's mid-tone and the deep layer's
-   mid-tone would mean different numbers.
+   Pinning Min and Max to 0–1 is the whole point of these four layers, and the
+   opposite of what you did for depth. Probability has a fixed, meaningful
+   range, and all four layers must use the same one or they cannot be
+   compared. Left to auto-scale, each layer would stretch its ramp over its own
+   range and 0.2 would look like a different severity on each — the shallow
+   layer's mid-tone and the deep layer's mid-tone would mean different numbers.
 
 #. On the **Legend** tab, select **Default Legend**. For a ramp-styled raster
    the app generates a colour bar automatically.
@@ -170,7 +244,7 @@ For **each** of the four:
    **Screenshot:** the **Source** tab with **Source Type** GeoTIFF, the 30 cm
    URL, and ``mask_below`` 0.
 
-.. figure:: images/ex1-layer-style-ramp.png
+.. figure:: images/ex1-layer-style-turbo.png
    :alt: The Style tab with the turbo ramp pinned to 0–1
    :width: 100%
 
@@ -178,7 +252,7 @@ For **each** of the four:
    **Min** 0 and **Max** 1.
 
 
-Step 4 — Add the parish boundaries
+Step 5 — Add the parish boundaries
 ==================================
 
 Antigua and Barbuda issues its flood warnings by parish, so the parish outlines
@@ -248,11 +322,11 @@ are the frame everything else is read against. They come from a shapefile.
    :alt: The Layers list showing the four rasters and the parish outline
    :width: 100%
 
-   **Screenshot:** the **Layers** list with all five layers in order, deepest
-   probability first and **Parishes** last.
+   **Screenshot:** the **Layers** list with all six layers in order, depth
+   first, then the probabilities deepest first, and **Parishes** last.
 
 
-Step 5 — Add the base map selector
+Step 6 — Add the base map selector
 ==================================
 
 The base map is a variable input so the viewer can switch it without editing
@@ -312,7 +386,7 @@ anything. Build the input first, then point the map at it.
    **Screenshot:** the **Variable Input** arguments for the base map selector.
 
 
-Step 6 — Update the map's base map, extent and viewport
+Step 7 — Update the map's base map, extent and viewport
 =======================================================
 
 #. Set the dashboard in edit mode by clicking on the **Edit Dashboard** button
@@ -387,10 +461,10 @@ You should now have:
 
 * A map filling the window, showing both Antigua and Barbuda with the parish
   outlines drawn in black.
-* A layer control listing six layers (including the base map); only the 30 cm
-  probability and the parishes are checked when the dashboard opens, and
-  toggling the others draws them.
-* A legend control with one probability colour bar, 0 to 1.
+* A layer control listing seven layers (including the base map); only the
+  depth, the 30 cm probability and the parishes are checked when the dashboard
+  opens, and toggling the others draws them.
+* A legend control with a colour bar for depth, and one for probability, 0 to 1.
 * A base-map dropdown top-left that changes the imagery underneath.
 * The probability surfaces confined to the stream channels and the low ground
   around Saint John's, with sea and dry land showing the base map.
@@ -399,10 +473,17 @@ You should now have:
 Talking points
 ==============
 
-* **Why the ramps are pinned.** Probability is a fixed range by definition, and
-  the four layers must be comparable — the same colour has to mean the same
-  odds at every depth. This is the single most transferable idea in the
-  exercise, and it is why the legend can be shared.
+* **Auto-scaled versus pinned ramps.** Depth auto-scales because its range is a
+  property of this particular storm. Probability is pinned to 0–1 because the
+  range is fixed by definition and the four layers must be comparable — the
+  same colour has to mean the same odds at every depth. This is the single most
+  transferable idea in the exercise, and it is why the probability legend can
+  be shared.
+* **What the depth layer is, and is not.** It is one storm out of a library of
+  200 synthetic ones, for one parish. It is not the forecast: the forecast
+  matches each of its 50 members to a library storm and reports the odds, which
+  is what the four probability layers hold. Depth stops dead at the parish
+  edge because the library does.
 * **What the four layers are.** Each holds P(maximum depth ≥ threshold) across
   the 50 members. They nest: any cell with a chance of 100 cm has at least that
   chance of 30 cm. Switch from 10 cm to 100 cm and watch the footprint shrink
@@ -412,8 +493,9 @@ Talking points
   the rest is a design decision worth making explicit: a dashboard chooses
   what a viewer sees first.
 * **Layer order is draw order.** The first layer in the list draws lowest, just
-  above the base map, and each later one paints over it. The parish outline
-  goes in last so it sits on top of everything.
+  above the base map, and each later one paints over it. Depth goes in first
+  and so sits at the bottom, the probabilities stack above it, and the parish
+  outline goes in last so it sits on top of everything.
 * **Nothing needed reprojecting.** The rasters are EPSG:4326, which OpenLayers
   resolves natively, so the map stays in EPSG:3857 and the layers are warped
   into it on the fly. See `The data <getting_started_en.rst#the-data>`_ for
@@ -423,6 +505,5 @@ Talking points
 Next
 ====
 
-`Exercise 2 — Flood depth for a single storm <exercise_2_en.rst>`_ replaces the
-probabilities with the depth of one storm from the library they were computed
-from, and puts the choice of storm on a slider.
+`Exercise 2 — Flood depth for a single storm <exercise_2_en.rst>`_ takes the
+depth layer you just built and puts the choice of storm on a slider.

@@ -27,10 +27,10 @@ the depth re-reads.
    **Screenshot:** the finished dashboard — Saint John's over imagery, the
    depth of storm 150 in the turbo ramp, the **Storm** slider top-right.
 
-New ideas here: reading a slice out of a Zarr store, a number input with a
-slider and a play button, and a layer whose source is bound to a variable so
-that changing the input re-reads the data instead of switching between
-duplicated layers.
+New ideas here: a number input with a slider and a play button, and a layer
+whose source is bound to a variable so that changing the input re-reads the
+data instead of switching between duplicated layers. The Zarr layer itself is
+the one from exercise 1, with its fixed ``index`` replaced by the variable.
 
 **Tip** — ``notebooks/Antigua_Barbuda/02_storm_impact.ipynb`` opens the same
 library as plain Python: what the store's metadata says about itself, how one
@@ -243,11 +243,12 @@ Step 4 — Add the map with the Zarr depth layer
       * - ``mask_below``
         - ``0.05``
 
-   The ``index`` field is where this exercise becomes interactive. The store
-   holds all 200 storms in one array of 200 × 465 × 428 cells, about 160 MB in
-   total, and ``index`` selects the slice. Binding it to ``${Storm}`` means
-   moving the slider re-reads a different slice — no duplicated layers, no
-   separate files, and only one storm's worth of data crosses the wire.
+   The ``index`` field is where this exercise becomes interactive. In
+   exercise 1 it was the constant ``150``. The store holds all 200 storms in
+   one array of 200 × 465 × 428 cells, about 160 MB in total, and ``index``
+   selects the slice. Binding it to ``${Storm}`` means moving the slider
+   re-reads a different slice — no duplicated layers, no separate files, and
+   only one storm's worth of data crosses the wire.
 
    ``mask_below`` is ``0.05`` because that is the store's own wet threshold:
    its metadata says the model does not consider a cell flooded below 5 cm.
@@ -257,10 +258,12 @@ Step 4 — Add the map with the Zarr depth layer
    ramp. Leave **Min** and **Max** empty.
 
    Leaving both bounds empty means "resolve them from the data at render time",
-   so the ramp stretches across whatever range this storm holds. Depth is a
-   property of the particular storm, so auto-scaling is right here — the
-   opposite of the probability layers in exercise 1, which had to be pinned
-   to 0–1 so they could be compared with each other.
+   so the ramp re-stretches across each storm's range as the slider moves.
+   Depth is a property of the particular storm, so auto-scaling is right here —
+   the opposite of the probability layers in exercise 1, which had to be pinned
+   to 0–1 so they could be compared with each other. Exercise 1 drew depth in
+   YlGnBu; turbo is used here because with no probability layers on the map
+   there is nothing to confuse it with, and it separates the depth bands more.
 
 #. On the **Legend** tab, select **Default Legend**. For a ramp-styled raster
    the app generates a colour bar automatically.
@@ -279,7 +282,7 @@ Step 5 — Add the parish boundaries and finish the map
 =====================================================
 
 #. Next to **Layers**, click **Add Layer** again and build the **Parishes**
-   layer exactly as in `exercise 1, step 4 <exercise_1_en.rst#step-4-add-the-parish-boundaries>`_:
+   layer exactly as in `exercise 1, step 5 <exercise_1_en.rst#step-5-add-the-parish-boundaries>`_:
    **Source Type** **Shapefile**, the ``ATG_gadm_adm1_pop.shp`` URL, transparent
    fill and a 1-pixel black stroke.
 

@@ -93,10 +93,12 @@ family (Guatemala only); exercise 3 uses the hazard family.
 
 The Antigua and Barbuda set follows the same three exercises on the Tropical
 Storm Jerry data. Exercise 1 shows the four `depth_prob` rasters with the GADM
-parish boundaries. Exercise 2 reads flood depth for one storm straight out of
-the Saint John's flood-map library (`AnB_IBF/AG04_SaintJohnS_v1.zarr`, 200
-storms) through a Zarr layer whose `index` is bound to a `Storm` number input;
-no storm plugin exists for these libraries yet, so there is no table or card.
+parish boundaries, plus flood depth for one storm read straight out of the
+Saint John's flood-map library (`AnB_IBF/AG04_SaintJohnS_v1.zarr`, 200 storms)
+through a Zarr layer with a fixed `index`; there is no standalone depth GeoTIFF
+for Antigua and Barbuda. Exercise 2 binds that `index` to a `Storm` number
+input; no storm plugin exists for these libraries yet, so there is no table or
+card.
 Exercise 3 binds the three `uffis_*_antigua_barbuda` plugins to four threshold
 inputs, preset to the plugin defaults.
 

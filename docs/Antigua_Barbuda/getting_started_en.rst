@@ -26,11 +26,11 @@ Each exercise builds one dashboard and lives in its own file:
    * - Guide
      - Dashboard
      - What it shows
-   * - `Exercise 1 — A flood probability map <exercise_1_en.rst>`_
+   * - `Exercise 1 — A flood depth and probability map <exercise_1_en.rst>`_
      - Antigua and Barbuda Hands On 1 (English)
-     - The four exceedance-probability rasters of the Tropical Storm Jerry
-       forecast over both islands, with the parish boundaries and a switchable
-       base map.
+     - Flood depth for one storm of the Saint John's flood-map library and the
+       four exceedance-probability rasters of the Tropical Storm Jerry forecast
+       on one map, with the parish boundaries and a switchable base map.
    * - `Exercise 2 — Flood depth for a single storm <exercise_2_en.rst>`_
      - Antigua and Barbuda Hands On 2 (English)
      - Maximum flood depth for one storm out of the 200-storm Saint John's
@@ -42,7 +42,7 @@ Each exercise builds one dashboard and lives in its own file:
 
 The exercises are cumulative in difficulty, not in content — each is a separate
 dashboard, and each can be built on its own. Exercise 1 teaches raster and vector
-layers, 2 adds a Zarr store sliced by a variable input, 3 adds plugin-backed
+layers, 2 puts the depth layer's storm on a variable input, 3 adds plugin-backed
 layers and interactivity through four inputs at once.
 
 A fourth dashboard, **Antigua and Barbuda Hands On 3 with Depth (English)**,
@@ -152,8 +152,8 @@ Two prefixes matter:
    * - ``AnB_IBF/``
      - The flood-map libraries, one Zarr store per parish
        (``AG01_Barbuda_v1.zarr`` through ``AG08_SaintPhilip_v1.zarr``, seven in
-       all). Each holds 200 storms of maximum depth in metres. Exercise 2 reads
-       the Saint John's store, ``AG04_SaintJohnS_v1.zarr``.
+       all). Each holds 200 storms of maximum depth in metres. Exercises 1
+       and 2 read the Saint John's store, ``AG04_SaintJohnS_v1.zarr``.
 
 All of the rasters, and the libraries, sit on one lattice: **EPSG:4326** at one
 arc-second (about 30 m), the probability rasters covering both islands at
