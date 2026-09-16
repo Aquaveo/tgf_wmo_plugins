@@ -1,13 +1,13 @@
-.. Antigua and Barbuda hands-on exercise 3 solution, English.
+.. Antigua and Barbuda hands-on exercise 3 solution.
 
 ==============================================================
 Exercise 3 — Hazard classification with adjustable thresholds
 ==============================================================
 
-Building **Antigua and Barbuda Hands On 3 (English)** step by step.
+Building **Antigua and Barbuda Hands On 3** step by step.
 
 **Start here** — This exercise reuses the map from
-`Exercise 1 <exercise_1_en.rst>`_, so building that one first will save you time.
+`Exercise 1 <exercise_1.rst>`_, so building that one first will save you time.
 
 .. contents:: On this page
    :depth: 2
@@ -94,9 +94,9 @@ Step 1 — Create the dashboard
 =============================
 
 #. Create a new dashboard (see
-   `Creating a dashboard <getting_started_en.rst#creating-a-dashboard>`_) with:
+   `Creating a dashboard <getting_started.rst#creating-a-dashboard>`_) with:
 
-   * **Name**: ``Antigua and Barbuda Hands On 3 (English)``
+   * **Name**: ``Antigua and Barbuda Hands On 3``
    * **Description**: ``Solution for WMO Antigua and Barbuda Hands On Exercise #3``
 
 #. Find your dashboard on the landing page and double-click it to open. The
@@ -214,11 +214,6 @@ For **each** of the four:
       * - ``variable_options_source``
         - ``number``
 
-#. In the number input's own settings, set **Data Type** to ``Number`` (the
-   **Output Format** fills itself with ``{{n}}``), then **Min** ``0``,
-   **Max** ``1`` and **Step** ``0.05``. Probability cannot leave 0–1, and 0.05
-   is coarse enough that a slider is usable and fine enough to land on 0.15.
-
 #. On the **Settings** tab, set **Background Color** to ``#ffffff``.
 
 #. On the **Settings** tab, add a top border by clicking the top border icon. A
@@ -252,7 +247,7 @@ Step 4 — Add the map, the four rasters and the parishes
 
 If you have exercise 1, do the following. If you do not, build the map, the
 four probability rasters and the parish outline from scratch as in
-`Exercise 1 <exercise_1_en.rst>`_, skipping its depth layer.
+`Exercise 1 <exercise_1.rst>`_, skipping its depth layer.
 
 #. Open the dashboard from exercise 1.
 
@@ -320,7 +315,7 @@ Step 5 — Add the hazard classification layer
         - ``${Severe Threshold (P(≥100 cm))}``
 
    See `Referencing a variable input
-   <getting_started_en.rst#referencing-a-variable-input>`_ for the two forms
+   <getting_started.rst#referencing-a-variable-input>`_ for the two forms
    this reference can take.
 
 #. Click **Fetch plugin defaults**.
@@ -463,17 +458,17 @@ depth alone.
 Step 10 — Optional: add the depth layer from exercise 2
 =======================================================
 
-**Antigua and Barbuda Hands On 3 with Depth (English)** is this dashboard with
+**Antigua and Barbuda Hands On 3 with Depth** is this dashboard with
 exercise 2's storm slider and depth layer added, so one screen shows how deep
 the water gets in one library storm next to which features the probability
 gates classify. To build it:
 
 #. Add a **Storm** variable input exactly as in
-   `exercise 2, step 2 <exercise_2_en.rst#step-2-add-the-storm-slider>`_, and
+   `exercise 2, step 2 <exercise_2.rst#step-2-add-the-storm-slider>`_, and
    place it just right of the base map selector.
 
 #. Edit the map, add the **Flood Depth (m), Saint John's library** Zarr layer
-   exactly as in `exercise 2, step 4 <exercise_2_en.rst#step-4-add-the-map-with-the-zarr-depth-layer>`_,
+   exactly as in `exercise 2, step 4 <exercise_2.rst#step-4-add-the-map-with-the-zarr-depth-layer>`_,
    and drag it in the layer list so it sits **above** the four probability
    rasters and **below** the parishes and the two plugin layers.
 
@@ -538,7 +533,7 @@ The shipped solution places its items as follows, on the 100-column grid:
      - 44
      - 21
 
-In the **with Depth** variant the base map input is 14 columns wide and the
+In the **with Depth** variant the base map input is 17 columns wide and the
 **Storm** slider sits at ``x`` 17, ``y`` 0, 14 wide and 6 high.
 
 
@@ -550,7 +545,7 @@ You should now have:
 * A map filling the window, with eight layers in the layer control (including
   the base map); the four probability rasters unchecked, the parishes, the
   hazard classification and the features at risk checked.
-* Four labelled threshold inputs across the top right, each stepping by 0.05.
+* Four labelled threshold inputs across the top right.
 * Moving any threshold updates the hazard layer, the impact layer and the table.
 * Raising the Severe threshold shrinks the purple but never removes it — every
   level is reachable in this data.

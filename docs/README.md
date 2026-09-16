@@ -10,7 +10,7 @@ that derive the numbers behind them are in `notebooks/<country>/`.
 |---|---|---|---|
 | Guatemala | English | [getting_started_en.rst](Guatemala/getting_started_en.rst) | [1](Guatemala/exercise_1_en.rst) · [2](Guatemala/exercise_2_en.rst) · [3](Guatemala/exercise_3_en.rst) |
 | Guatemala | Español | [getting_started_es.rst](Guatemala/getting_started_es.rst) | [1](Guatemala/exercise_1_es.rst) · [2](Guatemala/exercise_2_es.rst) · [3](Guatemala/exercise_3_es.rst) |
-| Antigua and Barbuda | English | [getting_started_en.rst](Antigua_Barbuda/getting_started_en.rst) | [1](Antigua_Barbuda/exercise_1_en.rst) · [2](Antigua_Barbuda/exercise_2_en.rst) · [3](Antigua_Barbuda/exercise_3_en.rst) |
+| Antigua and Barbuda | English | [getting_started.rst](Antigua_Barbuda/getting_started.rst) | [1](Antigua_Barbuda/exercise_1.rst) · [2](Antigua_Barbuda/exercise_2.rst) · [3](Antigua_Barbuda/exercise_3.rst) |
 
 The three exercises follow the same arc in every country: a map of raster
 layers, one storm sliced out of a Zarr store by a variable input, and a hazard

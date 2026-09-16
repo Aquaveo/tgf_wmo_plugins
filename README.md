@@ -82,10 +82,10 @@ exercises, whose step-by-step guides live in `docs/<country>/`.
 | `Guatemala/Guatemala_Hands_On_2_Espanol.json` | Guatemala Práctica 2 (Español) | `docs/Guatemala/exercise_2_es.rst` |
 | `Guatemala/Guatemala_Hands_On_3_English.json` | Guatemala Hands On 3 (English) | `docs/Guatemala/exercise_3_en.rst` |
 | `Guatemala/Guatemala_Hands_On_3_Espanol.json` | Guatemala Práctica 3 (Español) | `docs/Guatemala/exercise_3_es.rst` |
-| `Antigua_Barbuda/Antigua_Barbuda_Hands_On_1_English.json` | Antigua and Barbuda Hands On 1 (English) | `docs/Antigua_Barbuda/exercise_1_en.rst` |
-| `Antigua_Barbuda/Antigua_Barbuda_Hands_On_2_English.json` | Antigua and Barbuda Hands On 2 (English) | `docs/Antigua_Barbuda/exercise_2_en.rst` |
-| `Antigua_Barbuda/Antigua_Barbuda_Hands_On_3_English.json` | Antigua and Barbuda Hands On 3 (English) | `docs/Antigua_Barbuda/exercise_3_en.rst` |
-| `Antigua_Barbuda/Antigua_Barbuda_Hands_On_3_Depth_English.json` | Antigua and Barbuda Hands On 3 with Depth (English) | `docs/Antigua_Barbuda/exercise_3_en.rst`, step 10 |
+| `Antigua_Barbuda/Antigua_Barbuda_Hands_On_1.json` | Antigua and Barbuda Hands On 1 | `docs/Antigua_Barbuda/exercise_1.rst` |
+| `Antigua_Barbuda/Antigua_Barbuda_Hands_On_2.json` | Antigua and Barbuda Hands On 2 | `docs/Antigua_Barbuda/exercise_2.rst` |
+| `Antigua_Barbuda/Antigua_Barbuda_Hands_On_3.json` | Antigua and Barbuda Hands On 3 | `docs/Antigua_Barbuda/exercise_3.rst` |
+| `Antigua_Barbuda/Antigua_Barbuda_Hands_On_3_Depth.json` | Antigua and Barbuda Hands On 3 with Depth | `docs/Antigua_Barbuda/exercise_3.rst`, step 10 |
 
 Import them from the landing page once the plugins are installed and the server
 has restarted. Exercise 1 uses no plugins at all; exercise 2 uses the storm

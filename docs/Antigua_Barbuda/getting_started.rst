@@ -1,5 +1,5 @@
-.. Shared front matter for the Antigua and Barbuda hands-on exercise guides,
-.. English. The Guatemala guides this set was adapted from live in ../Guatemala/.
+.. Shared front matter for the Antigua and Barbuda hands-on exercise guides.
+.. The Guatemala guides this set was adapted from live in ../Guatemala/.
 
 ==================================================================
 Antigua and Barbuda Hands-On Exercises: Getting Started
@@ -26,17 +26,17 @@ Each exercise builds one dashboard and lives in its own file:
    * - Guide
      - Dashboard
      - What it shows
-   * - `Exercise 1 — A flood depth and probability map <exercise_1_en.rst>`_
-     - Antigua and Barbuda Hands On 1 (English)
+   * - `Exercise 1 — A flood depth and probability map <exercise_1.rst>`_
+     - Antigua and Barbuda Hands On 1
      - Flood depth for one storm of the Saint John's flood-map library and the
        four exceedance-probability rasters of the Tropical Storm Jerry forecast
        on one map, with the parish boundaries and a switchable base map.
-   * - `Exercise 2 — Flood depth for a single storm <exercise_2_en.rst>`_
-     - Antigua and Barbuda Hands On 2 (English)
+   * - `Exercise 2 — Flood depth for a single storm <exercise_2.rst>`_
+     - Antigua and Barbuda Hands On 2
      - Maximum flood depth for one storm out of the 200-storm Saint John's
        flood-map library, chosen with a slider.
-   * - `Exercise 3 — Hazard classification with adjustable thresholds <exercise_3_en.rst>`_
-     - Antigua and Barbuda Hands On 3 (English)
+   * - `Exercise 3 — Hazard classification with adjustable thresholds <exercise_3.rst>`_
+     - Antigua and Barbuda Hands On 3
      - A hazard classification driven by four probability thresholds the viewer
        can move, with the affected buildings and roads and an impact table.
 
@@ -45,7 +45,7 @@ dashboard, and each can be built on its own. Exercise 1 teaches raster and vecto
 layers, 2 puts the depth layer's storm on a variable input, 3 adds plugin-backed
 layers and interactivity through four inputs at once.
 
-A fourth dashboard, **Antigua and Barbuda Hands On 3 with Depth (English)**,
+A fourth dashboard, **Antigua and Barbuda Hands On 3 with Depth**,
 is exercise 3 with exercise 2's depth layer dropped in. It is not a separate
 exercise; the last step of the exercise 3 guide explains how to assemble it.
 
@@ -305,10 +305,10 @@ this repository under ``dashboards/Antigua_Barbuda/``:
 
 .. code-block:: text
 
-   dashboards/Antigua_Barbuda/Antigua_Barbuda_Hands_On_1_English.json
-   dashboards/Antigua_Barbuda/Antigua_Barbuda_Hands_On_2_English.json
-   dashboards/Antigua_Barbuda/Antigua_Barbuda_Hands_On_3_English.json
-   dashboards/Antigua_Barbuda/Antigua_Barbuda_Hands_On_3_Depth_English.json
+   dashboards/Antigua_Barbuda/Antigua_Barbuda_Hands_On_1.json
+   dashboards/Antigua_Barbuda/Antigua_Barbuda_Hands_On_2.json
+   dashboards/Antigua_Barbuda/Antigua_Barbuda_Hands_On_3.json
+   dashboards/Antigua_Barbuda/Antigua_Barbuda_Hands_On_3_Depth.json
 
 These files are whole-dashboard exports. Individual items can also be moved
 between dashboards through **Export** on an item's 3-dot menu and
