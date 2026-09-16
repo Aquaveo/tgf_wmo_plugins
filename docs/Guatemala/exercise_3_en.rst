@@ -32,7 +32,7 @@ classification, the affected features and the table all recompute.
    **Screenshot:** the finished dashboard — full-window map, four threshold
    inputs along the top, impact table on the right.
 
-**Tip** — ``notebooks/03_hazard_classification.ipynb`` derives this
+**Tip** — ``notebooks/Guatemala/03_hazard_classification.ipynb`` derives this
 classification as plain Python, including the gate sweep that shows what each
 threshold controls. Worth running first if you want to understand the analysis
 before assembling the interface.
@@ -72,7 +72,7 @@ probability gate:
 A cell takes the level of the **deepest** threshold whose gate it clears.
 
 **Warning** — Two things to know before you present this, both covered at length
-in ``notebooks/03_hazard_classification.ipynb``:
+in ``notebooks/Guatemala/03_hazard_classification.ipynb``:
 
 **The 76 cm raster contains only the values 0 and 0.2.** At most 20% of the
 ensemble members ever reached that depth anywhere in the domain. So any Severe

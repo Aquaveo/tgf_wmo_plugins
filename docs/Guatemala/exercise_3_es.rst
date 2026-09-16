@@ -33,7 +33,7 @@ vuelven a calcular.
    **Captura:** el tablero terminado: mapa a pantalla completa, cuatro campos de
    umbral en la parte superior y la tabla de impacto a la derecha.
 
-**Consejo** — ``notebooks/03_hazard_classification_es.ipynb`` deriva esta
+**Consejo** — ``notebooks/Guatemala/03_hazard_classification_es.ipynb`` deriva esta
 clasificación en Python, incluido el barrido de umbrales que muestra qué controla
 cada uno. Vale la pena ejecutarlo primero si quiere entender el análisis antes de
 armar la interfaz.
@@ -73,7 +73,7 @@ umbral de probabilidad:
 Una celda toma el nivel del umbral **más profundo** que logra superar.
 
 **Advertencia** — Dos cosas que conviene saber antes de presentar esto, ambas
-tratadas en detalle en ``notebooks/03_hazard_classification_es.ipynb``:
+tratadas en detalle en ``notebooks/Guatemala/03_hazard_classification_es.ipynb``:
 
 **El ráster de 76 cm solo contiene los valores 0 y 0.2.** A lo sumo el 20% de los
 miembros del conjunto alcanzó esa profundidad en algún punto del dominio. Por eso,
