@@ -1,10 +1,10 @@
-.. Antigua and Barbuda hands-on exercise 1 solution, English.
+.. Antigua and Barbuda hands-on exercise 1 solution.
 
 ==============================================================
 Exercise 1 — A flood depth and probability map
 ==============================================================
 
-Building **Antigua and Barbuda Hands On 1 (English)** step by step.
+Building **Antigua and Barbuda Hands On 1** step by step.
 
 .. contents:: On this page
    :depth: 2
@@ -37,9 +37,9 @@ Step 1 — Create the dashboard
 =============================
 
 #. Create a new dashboard (see
-   `Creating a dashboard <getting_started_en.rst#creating-a-dashboard>`_) with:
+   `Creating a dashboard <getting_started.rst#creating-a-dashboard>`_) with:
 
-   * **Name**: ``Antigua and Barbuda Hands On 1 (English)``
+   * **Name**: ``Antigua and Barbuda Hands On 1``
    * **Description**: ``Solution for WMO Antigua and Barbuda Hands On Exercise #1``
 
 #. Find your dashboard on the landing page and double-click it to open. The
@@ -174,7 +174,7 @@ largest area — ends up on top:
      - ``https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/antigua_barbuda_IBF/depth_prob/antiguabarbuda_prob_depth_ge_10cm_overbank.tif``
 
 (More information about the data is in
-`The data <getting_started_en.rst#the-data>`_.)
+`The data <getting_started.rst#the-data>`_.)
 
 For **each** of the four:
 
@@ -399,7 +399,7 @@ Step 7 — Update the map's base map, extent and viewport
    Map}``.
 
    See `Referencing a variable input
-   <getting_started_en.rst#referencing-a-variable-input>`_ for the two forms
+   <getting_started.rst#referencing-a-variable-input>`_ for the two forms
    this reference can take.
 
 #. In the **Map Extent** argument, choose **Use a Custom Extent** and enter:
@@ -498,12 +498,12 @@ Talking points
   outline goes in last so it sits on top of everything.
 * **Nothing needed reprojecting.** The rasters are EPSG:4326, which OpenLayers
   resolves natively, so the map stays in EPSG:3857 and the layers are warped
-  into it on the fly. See `The data <getting_started_en.rst#the-data>`_ for
+  into it on the fly. See `The data <getting_started.rst#the-data>`_ for
   why that is not something to take for granted.
 
 
 Next
 ====
 
-`Exercise 2 — Flood depth for a single storm <exercise_2_en.rst>`_ takes the
+`Exercise 2 — Flood depth for a single storm <exercise_2.rst>`_ takes the
 depth layer you just built and puts the choice of storm on a slider.

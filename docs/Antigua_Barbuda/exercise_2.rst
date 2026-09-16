@@ -1,10 +1,10 @@
-.. Antigua and Barbuda hands-on exercise 2 solution, English.
+.. Antigua and Barbuda hands-on exercise 2 solution.
 
 ==============================================================
 Exercise 2 — Flood depth for a single storm
 ==============================================================
 
-Building **Antigua and Barbuda Hands On 2 (English)** step by step.
+Building **Antigua and Barbuda Hands On 2** step by step.
 
 .. contents:: On this page
    :depth: 2
@@ -50,9 +50,9 @@ Step 1 — Create the dashboard
 =============================
 
 #. Create a new dashboard (see
-   `Creating a dashboard <getting_started_en.rst#creating-a-dashboard>`_) with:
+   `Creating a dashboard <getting_started.rst#creating-a-dashboard>`_) with:
 
-   * **Name**: ``Antigua and Barbuda Hands On 2 (English)``
+   * **Name**: ``Antigua and Barbuda Hands On 2``
    * **Description**: ``Solution for WMO Antigua and Barbuda Hands On Exercise #2``
 
 #. Find your dashboard on the landing page and double-click it to open. The
@@ -89,31 +89,12 @@ Step 2 — Add the storm slider
       * - ``variable_options_source``
         - ``number``
 
-#. A number input has its own settings, which appear once the source is
-   ``number``. Set:
-
-   .. list-table::
-      :header-rows: 1
-      :widths: 32 68
-
-      * - Setting
-        - Value
-      * - **Data Type**
-        - ``Number``
-      * - **Output Format**
-        - ``{{n}}`` (filled in for you when you pick Number)
-      * - **Min**
-        - ``1``
-      * - **Max**
-        - ``199``
-      * - **Step**
-        - ``1``
-
-   The library holds 200 storms at positions 0 to 199, sorted by their rainfall
-   total over the parish, so sliding right walks up in severity. Position 0
-   never wets a cell — its rainfall total is 0.01 mm and its data chunk was
-   never even written — so the slider starts at 1. Storm 1 floods nothing
-   above 5 cm either; the map only starts to show water a little further up.
+   ``number`` gives a numeric input with a slider and a play button; the
+   defaults are fine. The library holds 200 storms at positions 0 to 199,
+   sorted by their rainfall total over the parish, so sliding right walks up in
+   severity. Position 0 never wets a cell — its rainfall total is 0.01 mm and
+   its data chunk was never even written — and storm 1 floods nothing above
+   5 cm either; the map only starts to show water a little further up.
 
 #. On the **Settings** tab, set **Background Color** to ``#ffffff`` and add a
    border on the left side only.
@@ -136,7 +117,7 @@ Step 2 — Add the storm slider
    :width: 100%
 
    **Screenshot:** the **Variable Input** arguments for the storm slider, source
-   ``number``, range 1 to 199.
+   ``number``.
 
 
 Step 3 — Add the base map selector
@@ -282,7 +263,7 @@ Step 5 — Add the parish boundaries and finish the map
 =====================================================
 
 #. Next to **Layers**, click **Add Layer** again and build the **Parishes**
-   layer exactly as in `exercise 1, step 5 <exercise_1_en.rst#step-5-add-the-parish-boundaries>`_:
+   layer exactly as in `exercise 1, step 5 <exercise_1.rst#step-5-add-the-parish-boundaries>`_:
    **Source Type** **Shapefile**, the ``ATG_gadm_adm1_pop.shp`` URL, transparent
    fill and a 1-pixel black stroke.
 
@@ -364,7 +345,7 @@ Checkpoint
 You should now have:
 
 * A map filling the window, opened on Saint John's, with the parish outlines.
-* A **Storm** slider top-right running from 1 to 199, starting at 150.
+* A **Storm** slider top-right, starting at 150.
 * Moving it changes the depth raster; the legend's range follows.
 * A layer control listing three layers (including the base map).
 * Depth confined to the channels and low ground of Saint John's, ending at the
@@ -404,6 +385,6 @@ Talking points
 Next
 ====
 
-`Exercise 3 — Hazard classification with adjustable thresholds <exercise_3_en.rst>`_
+`Exercise 3 — Hazard classification with adjustable thresholds <exercise_3.rst>`_
 turns the probability thresholds over to the viewer, and its last step shows
 how to drop this depth layer into that dashboard.
