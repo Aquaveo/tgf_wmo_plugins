@@ -31,7 +31,7 @@ New ideas here: reading a slice out of a Zarr store, a vector layer whose
 features are produced by a plugin rather than fetched from a URL, and one
 variable input driving four separate things at once.
 
-**Tip** — ``notebooks/02_storm_impact.ipynb`` derives the numbers this dashboard
+**Tip** — ``notebooks/Guatemala/02_storm_impact.ipynb`` derives the numbers this dashboard
 shows as plain Python — how depth is sampled onto each building and road, and
 how the summary table is assembled. Worth running first if you want to
 understand the analysis before assembling the interface.

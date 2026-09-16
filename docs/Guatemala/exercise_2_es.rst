@@ -35,7 +35,7 @@ Ideas nuevas en este ejercicio: leer un corte de un almacén Zarr, una capa
 vectorial cuyos elementos los produce un módulo en lugar de descargarse de una URL,
 y una sola variable de entrada que controla cuatro cosas a la vez.
 
-**Consejo** — ``notebooks/02_storm_impact_es.ipynb`` deriva en Python los números
+**Consejo** — ``notebooks/Guatemala/02_storm_impact_es.ipynb`` deriva en Python los números
 que muestra este tablero: cómo se muestrea la profundidad sobre cada edificio y
 carretera, y cómo se arma la tabla resumen. Vale la pena ejecutarlo primero si
 quiere entender el análisis antes de armar la interfaz.

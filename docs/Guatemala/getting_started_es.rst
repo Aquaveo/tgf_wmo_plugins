@@ -55,8 +55,8 @@ entrada.
 Cuadernos complementarios
 -------------------------
 
-``notebooks/02_storm_impact_es.ipynb`` y
-``notebooks/03_hazard_classification_es.ipynb`` derivan en Python los números que
+``notebooks/Guatemala/02_storm_impact_es.ipynb`` y
+``notebooks/Guatemala/03_hazard_classification_es.ipynb`` derivan en Python los números que
 están detrás de los ejercicios 2 y 3. Estas guías tratan de *cómo construir el
 tablero*; los cuadernos tratan de *por qué los números son los que son*. Se
 complementan bien: ejecute el cuaderno primero si quiere entender el análisis, y
@@ -75,7 +75,7 @@ Convenciones
 
 **Nota** — Las capturas de pantalla de estas guías son marcadores de posición.
 Cada bloque ``figure`` describe lo que debe mostrar la imagen; coloque un PNG en
-la ruta indicada dentro de ``docs/images/`` y se mostrará.
+la ruta indicada dentro de ``docs/Guatemala/images/`` y se mostrará.
 
 
 Antes de empezar
@@ -284,9 +284,9 @@ terminados están en este repositorio dentro de ``dashboards/``:
 
 .. code-block:: text
 
-   dashboards/Guatemala_Hands_On_1_Espanol.json
-   dashboards/Guatemala_Hands_On_2_Espanol.json
-   dashboards/Guatemala_Hands_On_3_Espanol.json
+   dashboards/Guatemala/Guatemala_Hands_On_1_Espanol.json
+   dashboards/Guatemala/Guatemala_Hands_On_2_Espanol.json
+   dashboards/Guatemala/Guatemala_Hands_On_3_Espanol.json
 
 Las versiones en inglés están junto a ellos, con ``_English`` en lugar de
 ``_Espanol``. Los tableros en español usan los módulos ``_es`` en todo momento, de

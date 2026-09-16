@@ -1,11 +1,17 @@
 # tgf_wmo_plugins
 
-TethysDash visualizations for the WMO Guatemala impact-based forecasting
-training, in English and Spanish.
+TethysDash visualizations for the WMO impact-based forecasting trainings in
+Guatemala, Haiti and Antigua and Barbuda, in English, Spanish and French.
 
-Every plugin ships as a matched pair — `_en` and `_es`. The pair shares one
-implementation and differs only in the strings it renders, so the two languages
-cannot disagree about a number.
+Every plugin family shares one implementation, and its language variants differ
+only in the strings they render — all of which live in `strings.py`, in the
+three languages — so the languages cannot disagree about a number.
+
+The repository has three parts besides the plugins: `docs/` holds the
+step-by-step guides for building the hands-on dashboards, `dashboards/` the
+finished dashboards those guides build, and `notebooks/` the analysis behind
+them as plain Python. All three are organised by country; start at
+[`docs/README.md`](docs/README.md).
 
 ## Plugins
 
@@ -64,25 +70,26 @@ identical origin — so no reprojection or resampling happens anywhere.
 
 ## Dashboards
 
-`dashboards/` holds the six ready-to-import dashboards for the training — three
-exercises, each in both languages:
+`dashboards/` holds the ready-to-import dashboards for the training, one folder
+per country. Each is the finished solution to one of the three hands-on
+exercises, whose step-by-step guides live in `docs/<country>/`.
 
-| file | dashboard |
-|---|---|
-| `Guatemala_Hands_On_1_English.json` | Guatemala Hands On 1 (English) |
-| `Guatemala_Hands_On_1_Espanol.json` | Guatemala Práctica 1 (Español) |
-| `Guatemala_Hands_On_2_English.json` | Guatemala Hands On 2 (English) |
-| `Guatemala_Hands_On_2_Espanol.json` | Guatemala Práctica 2 (Español) |
-| `Guatemala_Hands_On_3_English.json` | Guatemala Hands On 3 (English) |
-| `Guatemala_Hands_On_3_Espanol.json` | Guatemala Práctica 3 (Español) |
-| `Antigua_Barbuda_Hands_On_1_English.json` | Antigua and Barbuda Hands On 1 (English) |
-| `Antigua_Barbuda_Hands_On_2_English.json` | Antigua and Barbuda Hands On 2 (English) |
-| `Antigua_Barbuda_Hands_On_3_English.json` | Antigua and Barbuda Hands On 3 (English) |
-| `Antigua_Barbuda_Hands_On_3_Depth_English.json` | Antigua and Barbuda Hands On 3 with Depth (English) |
+| file | dashboard | guide |
+|---|---|---|
+| `Guatemala/Guatemala_Hands_On_1_English.json` | Guatemala Hands On 1 (English) | `docs/Guatemala/exercise_1_en.rst` |
+| `Guatemala/Guatemala_Hands_On_1_Espanol.json` | Guatemala Práctica 1 (Español) | `docs/Guatemala/exercise_1_es.rst` |
+| `Guatemala/Guatemala_Hands_On_2_English.json` | Guatemala Hands On 2 (English) | `docs/Guatemala/exercise_2_en.rst` |
+| `Guatemala/Guatemala_Hands_On_2_Espanol.json` | Guatemala Práctica 2 (Español) | `docs/Guatemala/exercise_2_es.rst` |
+| `Guatemala/Guatemala_Hands_On_3_English.json` | Guatemala Hands On 3 (English) | `docs/Guatemala/exercise_3_en.rst` |
+| `Guatemala/Guatemala_Hands_On_3_Espanol.json` | Guatemala Práctica 3 (Español) | `docs/Guatemala/exercise_3_es.rst` |
+| `Antigua_Barbuda/Antigua_Barbuda_Hands_On_1_English.json` | Antigua and Barbuda Hands On 1 (English) | `docs/Antigua_Barbuda/exercise_1_en.rst` |
+| `Antigua_Barbuda/Antigua_Barbuda_Hands_On_2_English.json` | Antigua and Barbuda Hands On 2 (English) | `docs/Antigua_Barbuda/exercise_2_en.rst` |
+| `Antigua_Barbuda/Antigua_Barbuda_Hands_On_3_English.json` | Antigua and Barbuda Hands On 3 (English) | `docs/Antigua_Barbuda/exercise_3_en.rst` |
+| `Antigua_Barbuda/Antigua_Barbuda_Hands_On_3_Depth_English.json` | Antigua and Barbuda Hands On 3 with Depth (English) | `docs/Antigua_Barbuda/exercise_3_en.rst`, step 10 |
 
 Import them from the landing page once the plugins are installed and the server
 has restarted. Exercise 1 uses no plugins at all; exercise 2 uses the storm
-family; exercise 3 uses the hazard family.
+family (Guatemala only); exercise 3 uses the hazard family.
 
 The Antigua and Barbuda set follows the same three exercises on the Tropical
 Storm Jerry data. Exercise 1 shows the four `depth_prob` rasters with the GADM
@@ -91,9 +98,7 @@ the Saint John's flood-map library (`AnB_IBF/AG04_SaintJohnS_v1.zarr`, 200
 storms) through a Zarr layer whose `index` is bound to a `Storm` number input;
 no storm plugin exists for these libraries yet, so there is no table or card.
 Exercise 3 binds the three `uffis_*_antigua_barbuda` plugins to four threshold
-inputs, preset to the plugin defaults. The step-by-step guides in `docs/` are
-written for Guatemala, but every step transfers with the layer names and URLs
-swapped.
+inputs, preset to the plugin defaults.
 
 `Hands On 3 with Depth` is exercise 3 with exercise 2's depth layer added: a
 `Storm` slider drives a Zarr layer on the Saint John's flood-map library under

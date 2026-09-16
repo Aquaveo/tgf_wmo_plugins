@@ -1,9 +1,9 @@
-.. Shared front matter for the Guatemala hands-on exercise guides, English.
-.. A Spanish translation lives alongside this file as getting_started_es.rst.
+.. Shared front matter for the Antigua and Barbuda hands-on exercise guides,
+.. English. The Guatemala guides this set was adapted from live in ../Guatemala/.
 
-==========================================================
-Guatemala Hands-On Exercises: Getting Started
-==========================================================
+==================================================================
+Antigua and Barbuda Hands-On Exercises: Getting Started
+==================================================================
 
 Setup, background and the motions that repeat in every exercise. Read this once,
 then work through whichever exercise you need.
@@ -21,37 +21,44 @@ Each exercise builds one dashboard and lives in its own file:
 
 .. list-table::
    :header-rows: 1
-   :widths: 30 22 48
+   :widths: 30 24 46
 
    * - Guide
      - Dashboard
      - What it shows
-   * - `Exercise 1 — A flood depth and probability map <exercise_1_en.rst>`_
-     - Guatemala Hands On 1 (English)
-     - A flood depth raster and four exceedance-probability rasters on one map,
-       with a switchable base map.
-   * - `Exercise 2 — Impact for a single storm <exercise_2_en.rst>`_
-     - Guatemala Hands On 2 (English)
-     - Depth for a single storm out of a 198-member ensemble, plus the buildings
-       and roads that storm floods, a summary table and a headline card.
+   * - `Exercise 1 — A flood probability map <exercise_1_en.rst>`_
+     - Antigua and Barbuda Hands On 1 (English)
+     - The four exceedance-probability rasters of the Tropical Storm Jerry
+       forecast over both islands, with the parish boundaries and a switchable
+       base map.
+   * - `Exercise 2 — Flood depth for a single storm <exercise_2_en.rst>`_
+     - Antigua and Barbuda Hands On 2 (English)
+     - Maximum flood depth for one storm out of the 200-storm Saint John's
+       flood-map library, chosen with a slider.
    * - `Exercise 3 — Hazard classification with adjustable thresholds <exercise_3_en.rst>`_
-     - Guatemala Hands On 3 (English)
+     - Antigua and Barbuda Hands On 3 (English)
      - A hazard classification driven by four probability thresholds the viewer
        can move, with the affected buildings and roads and an impact table.
 
 The exercises are cumulative in difficulty, not in content — each is a separate
-dashboard, and each can be built on its own. Exercise 1 teaches raster layers,
-2 adds a plugin-backed vector layer and a data-driven selector, 3 adds
-interactivity through variable inputs.
+dashboard, and each can be built on its own. Exercise 1 teaches raster and vector
+layers, 2 adds a Zarr store sliced by a variable input, 3 adds plugin-backed
+layers and interactivity through four inputs at once.
+
+A fourth dashboard, **Antigua and Barbuda Hands On 3 with Depth (English)**,
+is exercise 3 with exercise 2's depth layer dropped in. It is not a separate
+exercise; the last step of the exercise 3 guide explains how to assemble it.
 
 Companion notebooks
 -------------------
 
-``notebooks/02_storm_impact.ipynb`` and ``notebooks/03_hazard_classification.ipynb``
-derive the numbers behind exercises 2 and 3 as plain Python. These guides cover
-*building the dashboard*; the notebooks cover *why the numbers are what they
-are*. They pair well: run the notebook first if you want to understand the
-analysis, follow the guide if you want to assemble the interface.
+``notebooks/Antigua_Barbuda/02_storm_impact.ipynb`` and
+``notebooks/Antigua_Barbuda/03_hazard_classification.ipynb`` derive the numbers
+behind exercises 2 and 3 as plain Python. These guides cover *building the
+dashboard*; the notebooks cover *why the numbers are what they are*. They pair
+well: run the notebook first if you want to understand the analysis, follow the
+guide if you want to assemble the interface. Both notebooks also run on Google
+Colab.
 
 Conventions
 -----------
@@ -65,7 +72,9 @@ Conventions
 
 **Note** — Screenshots in these guides are placeholders. Each ``figure`` block
 names what the image should show; drop a PNG at the given path under
-``docs/images/`` and it will render.
+``docs/Antigua_Barbuda/images/`` and it will render. The Guatemala guides under
+``docs/Guatemala/`` carry screenshots of the same dialogs, if you want to see
+what a step looks like before the Antigua and Barbuda captures exist.
 
 
 Before you begin
@@ -86,18 +95,34 @@ What you need
       pip install git+https://github.com/Aquaveo/tgf_wmo_plugins.git
 
    Restart the Tethys app after installing. To confirm it worked, open any
-   dashboard item's **Visualization Type** dropdown and look for the
+   dashboard item's **Visualization Type** dropdown and look for
+   **Flood Impact Summary (Antigua and Barbuda)** in the
    **Flood Maps (English)** group.
 #. **Outbound HTTPS from the server.** Every plugin reads its data from a public
    S3 bucket at request time. Nothing is bundled with the package.
 #. **Visualization permissions**, if your instance restricts plugin types. The
-   exercises use the ``table``, ``card`` and ``map_layer`` types.
+   exercises use the ``table`` and ``map_layer`` types.
 
 **Warning** — If the **Flood Maps (English)** group is missing from the
 dropdown, the package is not installed in the environment the app is actually
 running in. That is by far the most common setup problem. Installing into your
 shell's Python is not enough when the app runs under a different interpreter or
 container.
+
+The event
+---------
+
+Every dataset in these exercises comes from one forecast cycle of the UFFIS
+chain for **Tropical Storm Jerry**, which in October 2025 dropped about 167 mm
+in four hours on V.C. Bird airport. The forecast
+had 50 rainfall members: five StormLab realizations run from each of ten
+satellite-rainfall analysis states. The chain does not run a hydraulic model
+when a storm approaches. Instead, each parish has a library of 200 synthetic
+storms with precomputed maximum-depth maps, each member's rainfall total selects
+the closest library storm, and the probability of exceeding a depth at a cell is
+simply the share of the 50 members whose matched storm floods that cell to that
+depth. Exercise 2 opens the library; exercises 1 and 3 use the probabilities it
+produced.
 
 The data
 --------
@@ -109,7 +134,7 @@ the exercises refer to it as ``.../``:
 
    https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com
 
-Three prefixes matter:
+Two prefixes matter:
 
 .. list-table::
    :header-rows: 1
@@ -117,22 +142,37 @@ Three prefixes matter:
 
    * - Prefix
      - Contents
-   * - ``PBI_Actividad_2/``
-     - The rasters used by the map layers: one depth GeoTIFF, four
-       exceedance-probability GeoTIFFs, and the ensemble Zarr store's companion
-       files. All are EPSG:3857 copies on a single shared grid.
-   * - ``Guatemala_IBF/``
-     - The impact features (buildings and roads) and the original UTM rasters
-       they were sampled from. The plugins read the slim CSV from here.
-   * - ``floodmaps_test/``
-     - The 198-member ensemble Zarr store used by exercise 2.
+   * - ``antigua_barbuda_IBF/``
+     - The forecast outputs. ``depth_prob/`` holds the four
+       exceedance-probability GeoTIFFs (10, 30, 70 and 100 cm), ``gadm/`` the
+       parish boundaries as a shapefile, and the geopackage
+       ``AntiguaBarbuda_Jerry_cycle_10151010_IBF_outputs.gpkg`` carries the
+       71,136 buildings and 9,315 road segments with the four probabilities
+       already sampled onto them. The exercise 3 plugins read from here.
+   * - ``AnB_IBF/``
+     - The flood-map libraries, one Zarr store per parish
+       (``AG01_Barbuda_v1.zarr`` through ``AG08_SaintPhilip_v1.zarr``, seven in
+       all). Each holds 200 storms of maximum depth in metres. Exercise 2 reads
+       the Saint John's store, ``AG04_SaintJohnS_v1.zarr``.
 
-**Important** — The rasters the dashboards point at are the **EPSG:3857** copies
-under ``PBI_Actividad_2/``, not the UTM originals under ``Guatemala_IBF/``. This
-is not cosmetic. TethysDash ships no proj4, so OpenLayers can only resolve
-EPSG:4326 and EPSG:3857 for layer data. Point a layer at a UTM raster and it
-will appear to load and then vanish, or drag the whole map into UTM. If a layer
-flashes on and disappears, check its projection first.
+All of the rasters, and the libraries, sit on one lattice: **EPSG:4326** at one
+arc-second (about 30 m), the probability rasters covering both islands at
+2658 × 921 cells and each library windowed on its parish. TethysDash ships no
+proj4, so OpenLayers can resolve only EPSG:4326 and EPSG:3857 for layer data —
+and these rasters are already in the first, so nothing needs reprojecting. That
+is a real difference from the Guatemala exercises, whose rasters had to be
+copied out of UTM first.
+
+Two things about the data are worth knowing before you present it, both worked
+through in the notebooks:
+
+* **Depth saturates at 2.55 m.** The libraries stored depth as whole
+  centimetres in a byte, so a cell at 2.55 means *at least* 2.55, and no band
+  above about 2 m is distinct from the one below it.
+* **Probabilities move in steps of 0.02** and take few distinct values, because
+  five rainfall realizations drive most of the spread between 50 members. Every
+  probability layer does reach 1.0 somewhere, so — unlike Guatemala — the top
+  hazard level is reachable at any threshold.
 
 
 Groundwork common to all three exercises
@@ -261,22 +301,19 @@ Importing a finished solution
 =============================
 
 To reset between sessions, or to check your work, the finished dashboards are in
-this repository under ``dashboards/``:
+this repository under ``dashboards/Antigua_Barbuda/``:
 
 .. code-block:: text
 
-   dashboards/Guatemala_Hands_On_1_English.json
-   dashboards/Guatemala_Hands_On_2_English.json
-   dashboards/Guatemala_Hands_On_3_English.json
-
-Spanish versions sit alongside them with ``_Espanol`` in place of ``_English``.
-The Spanish dashboards use the ``_es`` plugins throughout, so a dashboard is
-internally consistent in one language — do not mix them.
+   dashboards/Antigua_Barbuda/Antigua_Barbuda_Hands_On_1_English.json
+   dashboards/Antigua_Barbuda/Antigua_Barbuda_Hands_On_2_English.json
+   dashboards/Antigua_Barbuda/Antigua_Barbuda_Hands_On_3_English.json
+   dashboards/Antigua_Barbuda/Antigua_Barbuda_Hands_On_3_Depth_English.json
 
 These files are whole-dashboard exports. Individual items can also be moved
 between dashboards through **Export** on an item's 3-dot menu and
 **Import Dashboard Item** in the header, which is the quickest way to reuse
-exercise 1's five raster layers in exercise 3.
+exercise 1's map in exercise 3.
 
 
 Troubleshooting
@@ -289,29 +326,35 @@ Troubleshooting
    * - Symptom
      - Cause and fix
    * - The **Flood Maps (English)** group is missing from
-       **Visualization Type**.
+       **Visualization Type**, or it has no **(Antigua and Barbuda)** entries.
      - ``tgf_wmo_plugins`` is not installed in the environment the app runs in,
-       or the app was not restarted. Install it server-side and restart.
+       it is an older version without the Antigua and Barbuda variants, or the
+       app was not restarted. Install it server-side and restart.
    * - A visualization says a variable is empty.
      - The ``${...}`` name does not match a ``variable_name`` exactly, or the
        variable input was added after the item that references it. Check
        spelling, spaces and punctuation, then re-select the variable.
-   * - A layer flashes on and then disappears.
-     - Almost always a projection problem. Confirm the layer points at the
-       ``PBI_Actividad_2`` EPSG:3857 copy, not a ``Guatemala_IBF`` UTM original.
-   * - The whole map jumps to somewhere in Africa.
-     - Same cause. A GeoTIFF in an unresolvable projection makes the auto-fit
-       adopt coordinates that land near 0°, 0°.
+   * - The map is blank where the depth layer should be.
+     - Storm 0 of a library is dry (its chunk was never written) and storm 1
+       floods nothing above 5 cm. Move the **Storm** slider up. Also check that
+       ``mask_below`` is ``0.05``, not something larger.
+   * - A probability layer shows almost nothing.
+     - Expected at the deeper thresholds: 100 cm is exceeded by any member on
+       only a small footprint. Compare it with the 10 cm layer, and remember
+       the ramp is pinned to 0–1 so a faint cell is a genuinely low
+       probability.
    * - Every vector feature is grey.
      - The style rules are not matching. Use **Fetch plugin defaults** rather
        than hand-authoring rules; a malformed rule never matches and fails
        silently.
-   * - A raster is a single flat colour.
-     - The ramp bounds do not suit the data, or ``mask_below`` is unset so dry
-       ground is being coloured. Check both.
-   * - Purple never appears in exercise 3.
-     - Expected if the Severe threshold is above 0.2. The 76 cm raster only ever
-       holds 0 or 0.2. Lower the threshold to 0.2 or below.
+   * - The parish outlines do not appear.
+     - The shapefile source needs the ``.shp`` URL; the ``.dbf``, ``.shx`` and
+       ``.prj`` beside it are fetched automatically. Check the URL ends in
+       ``ATG_gadm_adm1_pop.shp``.
+   * - The hazard layer takes a long time to appear.
+     - It classifies a 2658 × 921 grid and vectorises about 3,400 polygons on
+       every threshold change, and the first load also downloads the four
+       rasters. Later loads reuse the cached rasters and are quicker.
    * - The dashboard cannot be edited.
      - Only the owner can edit, and only in edit mode. Check the header for the
        **Edit Dashboard** button.
