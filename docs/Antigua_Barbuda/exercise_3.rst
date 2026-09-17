@@ -245,37 +245,100 @@ For **each** of the four:
 Step 4 — Add the map, the four rasters and the parishes
 =======================================================
 
-If you have exercise 1, do the following. If you do not, build the map, the
-four probability rasters and the parish outline from scratch as in
-`Exercise 1 <exercise_1.rst>`_, skipping its depth layer.
+For **each** of the four layers listed here follow the instructions below:
 
-#. Open the dashboard from exercise 1.
+.. list-table::
+   :header-rows: 1
+   :widths: 30 70
 
-#. Click on the map item's 3-dot menu and choose **Export**.
+   * - Layer **Name**
+     - ``url``
+   * - ``Flood Probability at 100 cm``
+     - ``https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/antigua_barbuda_IBF/depth_prob/antiguabarbuda_prob_depth_ge_100cm_overbank.tif``
+   * - ``Flood Probability at 70 cm``
+     - ``https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/antigua_barbuda_IBF/depth_prob/antiguabarbuda_prob_depth_ge_70cm_overbank.tif``
+   * - ``Flood Probability at 30 cm``
+     - ``https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/antigua_barbuda_IBF/depth_prob/antiguabarbuda_prob_depth_ge_30cm_overbank.tif``
+   * - ``Flood Probability at 10 cm``
+     - ``https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/antigua_barbuda_IBF/depth_prob/antiguabarbuda_prob_depth_ge_10cm_overbank.tif``
 
-#. Open the new dashboard for this exercise.
+(More information about the data is in
+`The data <getting_started.rst#the-data>`_.)
 
-#. Click **Edit Dashboard** in the top-right corner to enter edit mode.
+#. Next to **Layers**, click **Add Layer** again.
 
-#. Click **Import Dashboard Item** in the top-right corner and import the
-   dashboard item from exercise 1.
+#. On the **Layer** tab, set the following properties:
 
-#. If the map is covering the inputs, click on its 3-dot menu, hover over
-   **Order**, and select **Send to Back**. The inputs should now be visible on
-   top of the map.
+   .. list-table::
+      :header-rows: 1
+      :widths: 30 70
 
-#. Edit the map item. Delete the **Flood Depth** layer: it is one storm of one
-   parish's library, and this dashboard is about the forecast. Step 10 brings
-   it back if you want it.
+      * - Field
+        - Value
+      * - ``name``
+        - *see the table above*
+      * - **Default Visibility**
+        - **on** for ``Flood Probability at 30 cm``, **off** for the other three
 
-#. For each of the four probability rasters, edit the layer and turn off
-   **Default Visibility** on the **Layer** tab, so that all four are hidden
-   when the dashboard first loads. Leave **Parishes** visible. Make sure to
-   save each layer after editing it.
+   Only the 30 cm layer is drawn when the dashboard opens. All four remain in
+   the layer control, so a viewer can switch between them, but stacking four
+   nested probability surfaces paints the shallow one over the deep ones and
+   the result reads as a single blur. 30 cm is the depth the hazard
+   classification of exercise 3 treats as *Medium*, which makes it the natural
+   one to open on.
 
-   The probabilities stay available in the layer control for anyone who wants
-   to see the raw surface behind the classification, but the classification is
-   the product here and the rasters would cover it.
+#. On the **Source** tab, set **Source Type** to **GeoTIFF** and fill in:
+
+   .. list-table::
+      :header-rows: 1
+      :widths: 24 76
+
+      * - Field
+        - Value
+      * - ``url``
+        - *see the table above*
+      * - ``mask_below``
+        - ``0``
+
+   ``mask_below`` hides cells at or below the value given. Zero means "no
+   member floods this cell to this depth", and without the mask the whole
+   domain — sea included — would be painted the ramp's low colour instead of
+   showing the base map.
+
+#. On the **Style** tab, leave the mode on **Continuous** and pick the
+   **turbo** ramp. Set **Min** = ``0`` and **Max** = ``1``.
+
+   Pinning Min and Max to 0–1 is the whole point of these four layers, and the
+   opposite of what you did for depth, which uses the same ramp but lets it
+   stretch to the storm. Probability has a fixed, meaningful
+   range, and all four layers must use the same one or they cannot be
+   compared. Left to auto-scale, each layer would stretch its ramp over its own
+   range and 0.2 would look like a different severity on each — the shallow
+   layer's mid-tone and the deep layer's mid-tone would mean different numbers.
+
+#. On the **Legend** tab, select **Default Legend**. For a ramp-styled raster
+   the app generates a colour bar automatically.
+
+   The shipped solution enables the legend on all four layers. The four ramps
+   are identical, so the colour bars are too; if they take up too much room,
+   leave the legend on one layer only.
+
+#. Save the layer by clicking **Create** at the bottom of the layer editor.
+
+.. figure:: images/ex1-layer-source-geotiff.png
+   :alt: The Source tab configured for a GeoTIFF
+   :width: 100%
+
+   **Screenshot:** the **Source** tab with **Source Type** GeoTIFF. This
+   capture is from the Guatemala exercise; the 30 cm URL and ``mask_below``
+   ``0`` go in the same two fields.
+
+.. figure:: images/ex1-layer-style-turbo.png
+   :alt: The Style tab with the turbo ramp pinned to 0–1
+   :width: 100%
+
+   **Screenshot:** the **Style** tab, **Continuous** mode, **turbo** selected,
+   **Min** 0 and **Max** 1.
 
 #. Save the dashboard by clicking **Save Changes** in the top-right corner of
    the dashboard editor.
