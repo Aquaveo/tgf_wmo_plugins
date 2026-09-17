@@ -225,7 +225,7 @@ Adding and configuring a dashboard item
    :alt: A dashboard item's 3-dot menu open
    :width: 100%
 
-   **Screenshot:** an item's 3-dot menu, showing Edit, Create Copy, Export
+   **Screenshot:** an item's 3-dot menu, showing Edit, Copy, Order, Export
    and Delete.
 
 Sizing and placing items

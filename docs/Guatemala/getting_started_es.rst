@@ -241,7 +241,7 @@ Agregar y configurar un elemento del tablero
    :alt: El menú de 3 puntos de un elemento del tablero, abierto
    :width: 100%
 
-   **Captura:** el menú de 3 puntos de un elemento, mostrando Edit, Create Copy,
+   **Captura:** el menú de 3 puntos de un elemento, mostrando Edit, Copy, Order,
    Export y Delete.
 
 Dimensionar y ubicar los elementos

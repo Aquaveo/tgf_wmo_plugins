@@ -27,6 +27,5 @@ classification driven by four adjustable probability thresholds through the
 | exercise 2 | depth, impact layer, table and card for one storm | depth for one storm of the Saint John's flood-map library, chosen by number; no storm plugin yet |
 | exercise 3 | Severe level unreachable above a gate of 0.2 | every level reachable; probabilities step by 0.02 |
 
-Screenshots live in each country's `images/` folder. The Guatemala guides have
-theirs; the Antigua and Barbuda `figure` blocks name what each capture should
-show and render once a PNG is dropped at the given path.
+Screenshots live in each country's `images/` folder. The five `00-*` captures
+of the generic dialogs are the same in both.

@@ -70,11 +70,9 @@ Conventions
 * Every exercise ends with a **Checkpoint** listing what you should be able to
   see, and **Talking points** worth raising if you are teaching from it.
 
-**Note** — Screenshots in these guides are placeholders. Each ``figure`` block
-names what the image should show; drop a PNG at the given path under
-``docs/Antigua_Barbuda/images/`` and it will render. The Guatemala guides under
-``docs/Guatemala/`` carry screenshots of the same dialogs, if you want to see
-what a step looks like before the Antigua and Barbuda captures exist.
+**Note** — Screenshots were taken on TethysDash 0.19; a newer release may
+place a button or tab differently. The text names every control, so follow
+the words when a picture disagrees.
 
 
 Before you begin
@@ -265,7 +263,7 @@ Adding and configuring a dashboard item
    :alt: A dashboard item's 3-dot menu open
    :width: 100%
 
-   **Screenshot:** an item's 3-dot menu, showing Edit, Create Copy, Export
+   **Screenshot:** an item's 3-dot menu, showing Edit, Copy, Order, Export
    and Delete.
 
 Sizing and placing items
