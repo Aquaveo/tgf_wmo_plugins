@@ -1,0 +1,216 @@
+{
+ "name": "Antigua and Barbuda Current Conditions",
+ "description": "Live observations from V.C. Bird International Airport via WMO WIS2",
+ "publicDashboard": false,
+ "userPermission": "admin",
+ "permissions": [
+  {
+   "username": "admin",
+   "permission": "admin"
+  }
+ ],
+ "unrestrictedPlacement": true,
+ "image": "",
+ "owner": "admin",
+ "notes": "",
+ "tabs": [
+  {
+   "id": 401,
+   "name": "Main",
+   "gridItems": [
+    {
+     "i": "1",
+     "x": 0,
+     "y": 0,
+     "w": 100,
+     "h": 5,
+     "source": "Text",
+     "args_string": {
+      "text": "<h4>Antigua and Barbuda — current conditions</h4><p>Hourly SYNOP from V.C. Bird International Airport (WMO 78862), the only public rain gauge in the country, read live from Antigua and Barbuda Meteorological Services' WMO WIS2 feed. Rainfall is reported as 6-hour totals at 00, 06, 12 and 18 UTC and a 24-hour total at 12 UTC. Items refresh every 10 minutes.</p>"
+     },
+     "metadata_string": {
+      "refreshRate": 10,
+      "backgroundColor": "#e8eef4",
+      "border": {
+       "border": "1px solid black"
+      }
+     }
+    },
+    {
+     "i": "2",
+     "x": 0,
+     "y": 5,
+     "w": 28,
+     "h": 22,
+     "source": "obs_card_antigua_barbuda",
+     "args_string": {},
+     "metadata_string": {
+      "refreshRate": 10,
+      "backgroundColor": "#ffffff",
+      "border": {
+       "border": "1px solid black"
+      }
+     }
+    },
+    {
+     "i": "3",
+     "x": 28,
+     "y": 5,
+     "w": 72,
+     "h": 22,
+     "source": "obs_plot_antigua_barbuda",
+     "args_string": {
+      "hours": 72
+     },
+     "metadata_string": {
+      "refreshRate": 10,
+      "backgroundColor": "#ffffff",
+      "border": {
+       "border": "1px solid black"
+      }
+     }
+    },
+    {
+     "i": "4",
+     "x": 0,
+     "y": 27,
+     "w": 40,
+     "h": 20,
+     "source": "Map",
+     "args_string": {
+      "baseMap": "https://server.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer",
+      "layerControl": true,
+      "layers": [
+       {
+        "configuration": {
+         "type": "VectorLayer",
+         "props": {
+          "name": "Parishes",
+          "source": {
+           "type": "Shapefile",
+           "props": {
+            "url": "https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/antigua_barbuda_IBF/gadm/ATG_gadm_adm1_pop.shp"
+           }
+          }
+         },
+         "style": {
+          "default": {
+           "polygon": {
+            "fill": "rgba(0, 0, 0, 0)",
+            "stroke": "#000000",
+            "strokeWidth": "1"
+           }
+          }
+         }
+        }
+       },
+       {
+        "configuration": {
+         "type": "VectorLayer",
+         "props": {
+          "name": "V.C. Bird Airport observations",
+          "source": {
+           "type": "GeoJSON",
+           "props": {},
+           "geojson": {
+            "type": "FeatureCollection",
+            "crs": {
+             "type": "name",
+             "properties": {
+              "name": "EPSG:4326"
+             }
+            },
+            "features": [
+             {
+              "type": "Feature",
+              "geometry": {
+               "type": "Point",
+               "coordinates": [
+                -61.79279,
+                17.13996
+               ]
+              },
+              "properties": {
+               "station": "V.C. Bird International Airport",
+               "wmo_id": "78862"
+              }
+             }
+            ]
+           }
+          },
+          "pluginSource": {
+           "source": "obs_station_layer_antigua_barbuda",
+           "args": {}
+          }
+         },
+         "style": {
+          "default": {
+           "point": {
+            "fill": "#1f77b4",
+            "stroke": "#ffffff",
+            "strokeWidth": "2",
+            "size": 9,
+            "shape": "circle"
+           }
+          }
+         }
+        },
+        "attributeAliases": {
+         "V.C. Bird Airport observations": {
+          "observed": "Observed (UTC)",
+          "temperature": "Temperature (°C)",
+          "dewpoint": "Dew point (°C)",
+          "humidity": "Humidity (%)",
+          "pressure": "Pressure (hPa)",
+          "wind": "Wind",
+          "rain_6h": "Rain, last 6-hour total",
+          "rain_24h": "Rain, last 24-hour total"
+         }
+        },
+        "legend": {
+         "title": "Observations",
+         "items": [
+          {
+           "label": "SYNOP station",
+           "color": "#1f77b4",
+           "symbol": "circle"
+          }
+         ]
+        }
+       }
+      ],
+      "map_extent": {
+       "extent": "-6878431.34,1928974.98,11.6"
+      },
+      "mapDrawing": false
+     },
+     "metadata_string": {
+      "refreshRate": 10,
+      "backgroundColor": "#ffffff",
+      "border": {
+       "border": "1px solid black"
+      }
+     }
+    },
+    {
+     "i": "5",
+     "x": 40,
+     "y": 27,
+     "w": 60,
+     "h": 20,
+     "source": "obs_table_antigua_barbuda",
+     "args_string": {
+      "hours": 24
+     },
+     "metadata_string": {
+      "refreshRate": 10,
+      "backgroundColor": "#ffffff",
+      "border": {
+       "border": "1px solid black"
+      }
+     }
+    }
+   ]
+  }
+ ]
+}

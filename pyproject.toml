@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tgf-wmo-plugins"
-version = "0.2.1"
+version = "0.3.0"
 description = "TethysDash visualizations for the WMO Guatemala flood training, in English and Spanish"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -32,6 +32,10 @@ uffis_impact_layer_haiti = "tgf_wmo_plugins.impact_layer:ImpactLayerHaiti"
 uffis_impact_layer_antigua_barbuda = "tgf_wmo_plugins.impact_layer:ImpactLayerAntiguaBarbuda"
 uffis_hazard_layer_guatemala = "tgf_wmo_plugins.hazard_layer:HazardLayerGuatemala"
 uffis_hazard_layer_antigua_barbuda = "tgf_wmo_plugins.hazard_layer:HazardLayerAntiguaBarbuda"
+obs_card_antigua_barbuda = "tgf_wmo_plugins.observations:CurrentConditionsCardAntiguaBarbuda"
+obs_plot_antigua_barbuda = "tgf_wmo_plugins.observations:ObservationsPlotAntiguaBarbuda"
+obs_table_antigua_barbuda = "tgf_wmo_plugins.observations:ObservationsTableAntiguaBarbuda"
+obs_station_layer_antigua_barbuda = "tgf_wmo_plugins.observations:ObservationsStationLayerAntiguaBarbuda"
 
 [tool.setuptools.packages.find]
 include = ["tgf_wmo_plugins*"]
