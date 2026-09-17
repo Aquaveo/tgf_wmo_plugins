@@ -260,18 +260,8 @@ Step 4 — Add the map with the Zarr depth layer
    ``variable`` depth, ``index`` ``${Storm}`` and ``mask_below`` 0.05.
 
 
-Step 5 — Add the parish boundaries and finish the map
+Step 5 — Finish the map
 =====================================================
-
-#. Next to **Layers**, click **Add Layer** again and build the **Parishes**
-   layer exactly as in `exercise 1, step 5 <exercise_1.rst#step-5-add-the-parish-boundaries>`_:
-   **Source Type** **Shapefile**, the ``ATG_gadm_adm1_pop.shp`` URL, transparent
-   fill and a 1-pixel black stroke.
-
-   The library is windowed on Saint John's, so the depth stops dead at the
-   parish edge. The outline shows that edge is the data's, not the flood's.
-
-#. Save the layer by clicking **Create** at the bottom of the layer editor.
 
 #. In the **Map Extent** argument, choose **Use a Custom Extent** and enter:
 
@@ -348,7 +338,7 @@ You should now have:
 * A map filling the window, opened on Saint John's, with the parish outlines.
 * A **Storm** number input top-left, starting at 150.
 * Changing it changes the depth raster; the legend's range follows.
-* A layer control listing three layers (including the base map).
+* A layer control listing two layers (including the base map).
 * Depth confined to the channels and low ground of Saint John's, ending at the
   parish boundary.
 
