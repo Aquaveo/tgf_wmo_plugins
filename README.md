@@ -51,6 +51,29 @@ Barbuda probability rasters are EPSG:4326 at 1 arc-second (2658×921), unlike
 Guatemala's EPSG:3857 copies, and are served in that CRS since OpenLayers
 resolves it natively.
 
+### Observations
+
+Four plugins under the **Observations (English)** group read live weather from
+V.C. Bird International Airport (WMO 78862), the only public rain gauge in
+Antigua and Barbuda. Antigua and Barbuda Meteorological Services publishes its
+hourly SYNOP through WMO WIS2 as open data, and the Caribbean WIS2 node serves
+the decoded reports as GeoJSON over HTTP with no credentials
+(`observations.py`, `ITEMS_URL`). The fetch is cached for five minutes and
+shared by all four.
+
+| entry point | type | what it shows |
+|---|---|---|
+| `obs_card_antigua_barbuda` | card | Latest hour: temperature, dew point, humidity, pressure and 24 h change, wind, last 6 h and 24 h rainfall |
+| `obs_plot_antigua_barbuda` | plotly | Temperature, dew point, 6-hour rainfall bars and pressure over the last 24 to 168 hours (`hours` argument) |
+| `obs_table_antigua_barbuda` | table | The hourly reports, newest first, with rainfall totals on the hours they are reported |
+| `obs_station_layer_antigua_barbuda` | map_layer | The station as a map marker whose popup carries the latest observation |
+
+Rainfall arrives as 6-hour totals at 00, 06, 12 and 18 UTC and a 24-hour total
+at 12 UTC; the card also sums the 6-hour totals over the last day. The feed's
+`present_weather` is always null, so it is not shown. The ready-made dashboard is
+`dashboards/Antigua_Barbuda/Antigua_Barbuda_Current_Conditions.json`, with every
+item set to refresh every ten minutes.
+
 ## Two products, two questions
 
 The plugins split into two families that answer different questions, and the
@@ -86,6 +109,7 @@ exercises, whose step-by-step guides live in `docs/<country>/`.
 | `Antigua_Barbuda/Antigua_Barbuda_Hands_On_2.json` | Antigua and Barbuda Hands On 2 | `docs/Antigua_Barbuda/exercise_2.rst` |
 | `Antigua_Barbuda/Antigua_Barbuda_Hands_On_3.json` | Antigua and Barbuda Hands On 3 | `docs/Antigua_Barbuda/exercise_3.rst` |
 | `Antigua_Barbuda/Antigua_Barbuda_Hands_On_3_Depth.json` | Antigua and Barbuda Hands On 3 with Depth | `docs/Antigua_Barbuda/exercise_3.rst`, step 10 |
+| `Antigua_Barbuda/Antigua_Barbuda_Current_Conditions.json` | Antigua and Barbuda Current Conditions | live V.C. Bird observations; see Observations above |
 
 Import them from the landing page once the plugins are installed and the server
 has restarted. Exercise 1 uses no plugins at all; exercise 2 uses the storm
