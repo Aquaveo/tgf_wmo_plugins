@@ -24,7 +24,7 @@ classification driven by four adjustable probability thresholds through the
 | rasters | EPSG:3857 copies of UTM originals, 5 m cells | EPSG:4326 at 1 arc-second, no reprojection needed |
 | depth thresholds | 7.6 / 10 / 30 / 76 cm (three mislabelled upstream) | 10 / 30 / 70 / 100 cm |
 | exercise 1 | one depth GeoTIFF plus the probabilities | one storm of the Saint John's flood-map library plus the probabilities |
-| exercise 2 | depth, impact layer, table and card for one storm | depth for one storm of the Saint John's flood-map library on a slider; no storm plugin yet |
+| exercise 2 | depth, impact layer, table and card for one storm | depth for one storm of the Saint John's flood-map library, chosen by number; no storm plugin yet |
 | exercise 3 | Severe level unreachable above a gate of 0.2 | every level reachable; probabilities step by 0.02 |
 
 Screenshots live in each country's `images/` folder. The Guatemala guides have

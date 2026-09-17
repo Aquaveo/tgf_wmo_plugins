@@ -103,7 +103,7 @@ Exercise 3 binds the three `uffis_*_antigua_barbuda` plugins to four threshold
 inputs, preset to the plugin defaults.
 
 `Hands On 3 with Depth` is exercise 3 with exercise 2's depth layer added: a
-`Storm` slider drives a Zarr layer on the Saint John's flood-map library under
+`Storm` number input drives a Zarr layer on the Saint John's flood-map library under
 the parish outlines and the buildings and roads at risk, so one dashboard shows
 how deep the water gets in one storm next to which features the probability
 gates classify. The hazard classification polygons are opaque and would cover

@@ -17,20 +17,21 @@ What you are building
 
 A map filling the window, zoomed to Saint John's, showing the maximum flood
 depth of one storm out of the parish's 200-storm flood-map library, with the
-parish outlines over it. A slider in the top-right corner picks the storm, and
-the depth re-reads.
+parish outlines over it. A number input in the top-left corner picks the storm,
+and the depth re-reads.
 
 .. figure:: images/ex2-finished.png
    :alt: The finished exercise 2 dashboard
    :width: 100%
 
    **Screenshot:** the finished dashboard — Saint John's over imagery, the
-   depth of storm 150 in the turbo ramp, the **Storm** slider top-right.
+   depth of storm 150 in blues, the **Storm** input top-left and the base map
+   selector top-right.
 
-New ideas here: a number input with a slider and a play button, and a layer
-whose source is bound to a variable so that changing the input re-reads the
-data instead of switching between duplicated layers. The Zarr layer itself is
-the one from exercise 1, with its fixed ``index`` replaced by the variable.
+New ideas here: a number input, and a layer whose source is bound to a variable
+so that changing the input re-reads the data instead of switching between
+duplicated layers. The Zarr layer itself is the one from exercise 1, with its
+fixed ``index`` replaced by the variable.
 
 **Tip** — ``notebooks/Antigua_Barbuda/02_storm_impact.ipynb`` opens the same
 library as plain Python: what the store's metadata says about itself, how one
@@ -65,8 +66,8 @@ Step 1 — Create the dashboard
    corner to enter edit mode.
 
 
-Step 2 — Add the storm slider
-=============================
+Step 2 — Add the storm input
+============================
 
 #. You will see an existing item on the dashboard. Click on the item's 3-dot
    menu and select **Edit**.
@@ -89,15 +90,15 @@ Step 2 — Add the storm slider
       * - ``variable_options_source``
         - ``number``
 
-   ``number`` gives a numeric input with a slider and a play button; the
-   defaults are fine. The library holds 200 storms at positions 0 to 199,
-   sorted by their rainfall total over the parish, so sliding right walks up in
-   severity. Position 0 never wets a cell — its rainfall total is 0.01 mm and
-   its data chunk was never even written — and storm 1 floods nothing above
-   5 cm either; the map only starts to show water a little further up.
+   ``number`` gives a numeric box with a refresh button; the defaults are fine.
+   The library holds 200 storms at positions 0 to 199, sorted by their rainfall
+   total over the parish, so a larger number is a wetter storm. Position 0
+   never wets a cell — its rainfall total is 0.01 mm and its data chunk was
+   never even written — and storm 1 floods nothing above 5 cm either; the map
+   only starts to show water a little further up.
 
 #. On the **Settings** tab, set **Background Color** to ``#ffffff`` and add a
-   border on the left side only.
+   border on the right side only.
 
 #. Set the initial value to ``150`` in the preview on the right side of the
    editor. Any storm is fine, but 150 is the one the notebook works through, and
@@ -106,7 +107,7 @@ Step 2 — Add the storm slider
 #. Save the item by clicking **Save** in the bottom-right corner of the item
    editor.
 
-#. Drag the item to the top-right corner of the dashboard and resize it as
+#. Drag the item to the top-left corner of the dashboard and resize it as
    needed.
 
 #. Save the dashboard by clicking **Save Changes** in the top-right corner of
@@ -116,8 +117,8 @@ Step 2 — Add the storm slider
    :alt: The storm slider variable input configuration
    :width: 100%
 
-   **Screenshot:** the **Variable Input** arguments for the storm slider, source
-   ``number``.
+   **Screenshot:** the **Variable Input** arguments for the storm input, source
+   ``number``, initial value 150.
 
 
 Step 3 — Add the base map selector
@@ -163,7 +164,7 @@ anything. Build the input first, then point the map at it.
 #. Save the item by clicking **Save** in the bottom-right corner of the item
    editor.
 
-#. Drag the item to the top-left corner and resize it as needed.
+#. Drag the item to the top-right corner and resize it as needed.
 
 #. Save the dashboard by clicking **Save Changes** in the top-right corner of
    the dashboard editor.
@@ -227,7 +228,7 @@ Step 4 — Add the map with the Zarr depth layer
    The ``index`` field is where this exercise becomes interactive. In
    exercise 1 it was the constant ``150``. The store holds all 200 storms in
    one array of 200 × 465 × 428 cells, about 160 MB in total, and ``index``
-   selects the slice. Binding it to ``${Storm}`` means moving the slider
+   selects the slice. Binding it to ``${Storm}`` means changing the input
    re-reads a different slice — no duplicated layers, no separate files, and
    only one storm's worth of data crosses the wire.
 
@@ -235,16 +236,16 @@ Step 4 — Add the map with the Zarr depth layer
    its metadata says the model does not consider a cell flooded below 5 cm.
    Reusing the number the data was built with beats inventing one.
 
-#. On the **Style** tab, leave the mode on **Continuous** and pick the **turbo**
-   ramp. Leave **Min** and **Max** empty.
+#. On the **Style** tab, leave the mode on **Continuous** and pick the
+   **Blues** ramp (under **Single hue**). Leave **Min** and **Max** empty.
 
    Leaving both bounds empty means "resolve them from the data at render time",
-   so the ramp re-stretches across each storm's range as the slider moves.
+   so the ramp re-stretches across each storm's range as the storm changes.
    Depth is a property of the particular storm, so auto-scaling is right here —
    the opposite of the probability layers in exercise 1, which had to be pinned
    to 0–1 so they could be compared with each other. Exercise 1 drew depth in
-   YlGnBu; turbo is used here because with no probability layers on the map
-   there is nothing to confuse it with, and it separates the depth bands more.
+   turbo so it matched the probabilities beside it; with nothing else on this
+   map, a single-hue blue ramp reads as water without a legend.
 
 #. On the **Legend** tab, select **Default Legend**. For a ramp-styled raster
    the app generates a colour bar automatically.
@@ -291,7 +292,7 @@ Step 5 — Add the parish boundaries and finish the map
 #. Resize the map item to fill the window by dragging the handle in its
    bottom-right corner.
 
-#. If the map is covering the storm slider and base map selector, click on the
+#. If the map is covering the storm input and base map selector, click on the
    map's 3-dot menu, hover over **Order**, and select **Send to Back**. The
    inputs should now be visible on top of the map.
 
@@ -302,10 +303,10 @@ Step 5 — Add the parish boundaries and finish the map
 Step 6 — Test the wiring
 ========================
 
-Move the **Storm** slider. The depth layer re-reads its slice and the colour
-bar re-scales to the new storm's range. Press the slider's play button and the
-storms step through on their own — a quick way to see the flooded footprint
-grow, and to notice that it does not grow monotonically.
+Change the **Storm** number and press its refresh button. The depth layer
+re-reads its slice and the colour bar re-scales to the new storm's range. Try
+1, 50, 100, 150 and 199 in turn to see the flooded footprint grow — and to
+notice that it does not grow monotonically.
 
 
 Item positions
@@ -327,16 +328,16 @@ The shipped solution places its items as follows, on the 100-column grid:
      - 0
      - 99
      - 41
-   * - Base Map input
+   * - Storm input
      - 0
-     - 0
-     - 15
-     - 6
-   * - Storm slider
-     - 85
      - 0
      - 15
      - 7
+   * - Base Map input
+     - 85
+     - 0
+     - 15
+     - 6
 
 
 Checkpoint
@@ -345,8 +346,8 @@ Checkpoint
 You should now have:
 
 * A map filling the window, opened on Saint John's, with the parish outlines.
-* A **Storm** slider top-right, starting at 150.
-* Moving it changes the depth raster; the legend's range follows.
+* A **Storm** number input top-left, starting at 150.
+* Changing it changes the depth raster; the legend's range follows.
 * A layer control listing three layers (including the base map).
 * Depth confined to the channels and low ground of Saint John's, ending at the
   parish boundary.
@@ -356,9 +357,9 @@ Talking points
 ==============
 
 * **A slice, not a file.** The Zarr store is one array split into small chunks,
-  so a storm can be read without downloading the other 199. That is what lets a
-  slider drive a 160 MB dataset from a browser.
-* **Position versus storm.** The slider value is a position in a library sorted
+  so a storm can be read without downloading the other 199. That is what lets
+  one input drive a 160 MB dataset from a browser.
+* **Position versus storm.** The input value is a position in a library sorted
   by rainfall total. The store's ``index.csv`` maps each position to the
   scenario it came from and its magnitude in millimetres — real RainyDay storm
   totals, area-weighted over the parish. The Guatemala ensemble's magnitudes

@@ -266,7 +266,7 @@ four probability rasters and the parish outline from scratch as in
 
 #. Edit the map item. Delete the **Flood Depth** layer: it is one storm of one
    parish's library, and this dashboard is about the forecast. Step 10 brings
-   it back on a slider if you want it.
+   it back if you want it.
 
 #. For each of the four probability rasters, edit the layer and turn off
    **Default Visibility** on the **Layer** tab, so that all four are hidden
@@ -446,7 +446,7 @@ depth alone.
    :alt: The dashboard before raising the Severe threshold
    :width: 100%
 
-   **Screenshot:** Saint John's at the default gates.
+   **Screenshot:** the dashboard at the default gates.
 
 .. figure:: images/ex3-thresholds-after.png
    :alt: The dashboard after raising the Severe threshold
@@ -459,12 +459,12 @@ Step 10 — Optional: add the depth layer from exercise 2
 =======================================================
 
 **Antigua and Barbuda Hands On 3 with Depth** is this dashboard with
-exercise 2's storm slider and depth layer added, so one screen shows how deep
+exercise 2's storm input and depth layer added, so one screen shows how deep
 the water gets in one library storm next to which features the probability
 gates classify. To build it:
 
 #. Add a **Storm** variable input exactly as in
-   `exercise 2, step 2 <exercise_2.rst#step-2-add-the-storm-slider>`_, and
+   `exercise 2, step 2 <exercise_2.rst#step-2-add-the-storm-input>`_, and
    place it just right of the base map selector.
 
 #. Edit the map, add the **Flood Depth (m), Saint John's library** Zarr layer
@@ -534,7 +534,7 @@ The shipped solution places its items as follows, on the 100-column grid:
      - 21
 
 In the **with Depth** variant the base map input is 17 columns wide and the
-**Storm** slider sits at ``x`` 17, ``y`` 0, 14 wide and 6 high.
+**Storm** input sits at ``x`` 17, ``y`` 0, 14 wide and 6 high.
 
 
 Checkpoint

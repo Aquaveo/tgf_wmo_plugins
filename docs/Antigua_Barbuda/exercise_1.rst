@@ -25,7 +25,7 @@ small dropdown in the top-left corner that switches the base map underneath.
    :width: 100%
 
    **Screenshot:** the finished dashboard over satellite imagery, layer control
-   open so all six layers are visible, the depth and 30 cm layers drawn.
+   open so all six layers are listed, the depth and 30 cm layers drawn.
 
 This exercise is about layers: where a raster URL goes, how a colour ramp is
 chosen, the difference between letting the app scale a layer and pinning the
@@ -96,7 +96,7 @@ of the Saint John's library, a Zarr store of 200 storms.
       * - Field
         - Value
       * - ``name``
-        - ``Flood Depth (m), Saint John's library, storm 150``
+        - ``Depth (m)``
 
 #. On the **Source** tab, set **Source Type** to **Zarr** and fill in:
 
@@ -123,7 +123,7 @@ of the Saint John's library, a Zarr store of 200 storms.
    colour.
 
 #. On the **Style** tab, leave the mode on **Continuous** and pick the
-   **YlGnBu** ramp. Leave **Min** and **Max** empty.
+   **turbo** ramp. Leave **Min** and **Max** empty.
 
    Leaving both bounds empty is a deliberate choice, not laziness. An empty
    bound means "resolve it from the data at render time", so the ramp stretches
@@ -135,19 +135,13 @@ of the Saint John's library, a Zarr store of 200 storms.
 
 #. Save the layer by clicking **Create** at the bottom of the layer editor.
 
-.. figure:: images/ex1-layer-source-zarr.png
+.. figure:: images/ex2-zarr-source.png
    :alt: The Source tab configured for the Saint John's Zarr store
    :width: 100%
 
    **Screenshot:** the **Source** tab with **Source Type** Zarr, the store URL,
-   ``variable`` depth, ``index`` 150 and ``mask_below`` 0.05.
-
-.. figure:: images/ex1-layer-style-ramp.png
-   :alt: The Style tab with the YlGnBu ramp selected
-   :width: 100%
-
-   **Screenshot:** the **Style** tab, **Continuous** mode, **YlGnBu** selected,
-   **Min** and **Max** empty.
+   ``variable`` depth and ``mask_below`` 0.05. This capture is from exercise 2,
+   where ``index`` is ``${Storm}``; here type ``150``.
 
 
 Step 4 — Add the four probability layers
@@ -222,7 +216,8 @@ For **each** of the four:
    **turbo** ramp. Set **Min** = ``0`` and **Max** = ``1``.
 
    Pinning Min and Max to 0–1 is the whole point of these four layers, and the
-   opposite of what you did for depth. Probability has a fixed, meaningful
+   opposite of what you did for depth, which uses the same ramp but lets it
+   stretch to the storm. Probability has a fixed, meaningful
    range, and all four layers must use the same one or they cannot be
    compared. Left to auto-scale, each layer would stretch its ramp over its own
    range and 0.2 would look like a different severity on each — the shallow
@@ -238,11 +233,12 @@ For **each** of the four:
 #. Save the layer by clicking **Create** at the bottom of the layer editor.
 
 .. figure:: images/ex1-layer-source-geotiff.png
-   :alt: The Source tab configured for a probability GeoTIFF
+   :alt: The Source tab configured for a GeoTIFF
    :width: 100%
 
-   **Screenshot:** the **Source** tab with **Source Type** GeoTIFF, the 30 cm
-   URL, and ``mask_below`` 0.
+   **Screenshot:** the **Source** tab with **Source Type** GeoTIFF. This
+   capture is from the Guatemala exercise; the 30 cm URL and ``mask_below``
+   ``0`` go in the same two fields.
 
 .. figure:: images/ex1-layer-style-turbo.png
    :alt: The Style tab with the turbo ramp pinned to 0–1
@@ -250,6 +246,13 @@ For **each** of the four:
 
    **Screenshot:** the **Style** tab, **Continuous** mode, **turbo** selected,
    **Min** 0 and **Max** 1.
+
+.. figure:: images/ex1-layer-list.png
+   :alt: The Layers list showing the depth layer and the four probabilities
+   :width: 100%
+
+   **Screenshot:** the **Layers** list so far: depth first, then the four
+   probabilities deepest first. The parish outline comes next.
 
 
 Step 5 — Add the parish boundaries
@@ -317,13 +320,6 @@ are the frame everything else is read against. They come from a shapefile.
 
 #. Save the dashboard by clicking **Save Changes** in the top-right corner of
    the dashboard editor.
-
-.. figure:: images/ex1-layer-list.png
-   :alt: The Layers list showing the four rasters and the parish outline
-   :width: 100%
-
-   **Screenshot:** the **Layers** list with all six layers in order, depth
-   first, then the probabilities deepest first, and **Parishes** last.
 
 
 Step 6 — Add the base map selector

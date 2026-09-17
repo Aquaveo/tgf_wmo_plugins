@@ -34,7 +34,7 @@ Each exercise builds one dashboard and lives in its own file:
    * - `Exercise 2 — Flood depth for a single storm <exercise_2.rst>`_
      - Antigua and Barbuda Hands On 2
      - Maximum flood depth for one storm out of the 200-storm Saint John's
-       flood-map library, chosen with a slider.
+       flood-map library, chosen with a number input.
    * - `Exercise 3 — Hazard classification with adjustable thresholds <exercise_3.rst>`_
      - Antigua and Barbuda Hands On 3
      - A hazard classification driven by four probability thresholds the viewer
@@ -336,8 +336,8 @@ Troubleshooting
        spelling, spaces and punctuation, then re-select the variable.
    * - The map is blank where the depth layer should be.
      - Storm 0 of a library is dry (its chunk was never written) and storm 1
-       floods nothing above 5 cm. Move the **Storm** slider up. Also check that
-       ``mask_below`` is ``0.05``, not something larger.
+       floods nothing above 5 cm. Enter a larger **Storm** number. Also check
+       that ``mask_below`` is ``0.05``, not something larger.
    * - A probability layer shows almost nothing.
      - Expected at the deeper thresholds: 100 cm is exceeded by any member on
        only a small footprint. Compare it with the 10 cm layer, and remember
