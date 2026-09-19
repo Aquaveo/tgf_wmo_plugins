@@ -35,6 +35,9 @@ uffis_hazard_layer_antigua_barbuda = "tgf_wmo_plugins.hazard_layer:HazardLayerAn
 uffis_impact_summary_comoros = "tgf_wmo_plugins.impact_summary:ImpactSummaryComoros"
 uffis_impact_layer_comoros = "tgf_wmo_plugins.impact_layer:ImpactLayerComoros"
 uffis_hazard_layer_comoros = "tgf_wmo_plugins.hazard_layer:HazardLayerComoros"
+uffis_storm_card_comoros = "tgf_wmo_plugins.storm_card:StormCardComoros"
+uffis_storm_impact_layer_comoros = "tgf_wmo_plugins.storm_impact_layer:StormImpactLayerComoros"
+uffis_storm_impact_summary_comoros = "tgf_wmo_plugins.storm_impact_summary:StormImpactSummaryComoros"
 
 [tool.setuptools.packages.find]
 include = ["tgf_wmo_plugins*"]

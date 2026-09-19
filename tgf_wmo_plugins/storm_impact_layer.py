@@ -7,8 +7,22 @@ from tethysapp.tethysdash.plugin_helpers import (
     TethysDashPlugin,
 )
 
-from tgf_wmo_plugins.common import FIRST_WET_STORM, STORM_OPTIONS, coerce_index
-from tgf_wmo_plugins.storm_impact import DEPTH_BANDS, banded_features, store_grid
+from tgf_wmo_plugins.common import (
+    COMOROS_STORM_OPTIONS,
+    COMOROS_UNIT_OPTIONS,
+    COMOROS_UNITS,
+    FIRST_WET_STORM,
+    STORM_OPTIONS,
+    coerce_index,
+)
+from tgf_wmo_plugins.storm_impact import (
+    COMOROS_DEFAULT_STORM,
+    COMOROS_MEASURES,
+    DEPTH_BANDS,
+    banded_features,
+    comoros_banded_features,
+    store_grid,
+)
 from tgf_wmo_plugins.strings import STRINGS
 
 
@@ -115,3 +129,51 @@ class StormImpactLayerES(BaseStormImpactLayer):
     group = STRINGS["es"]["group"]
     tags = ["inundación", "impacto", "zarr", "tormenta", "map_layer", "español"]
     description = STRINGS["es"]["storm_layer_desc"]
+
+
+# Vector output is EPSG:4326 for every country. The raster loaders resolve a
+# published CRS on demand from the generated EPSG table, but `loadGeoJSON` hands
+# `crs.properties.name` straight to OpenLayers without that lookup, so a
+# plugin-returned collection has to name a projection the map already holds.
+# This is the same OUTPUT_CRS impact_layer settles on, for the same reason.
+OUTPUT_CRS = "EPSG:4326"
+
+
+class BaseStormImpactLayerComoros(BaseStormImpactLayer):
+    """One commune's flooded buildings and roads, for one storm of its library.
+
+    Only the two ends differ from the Guatemala layer: which features are
+    sampled, and that the result is reprojected out of the island model's
+    EPSG:5629 grid. The style, the legend and the run() scaffold are inherited.
+    """
+
+    args = {"commune": COMOROS_UNIT_OPTIONS, "index": COMOROS_STORM_OPTIONS}
+
+    def fetch_features(self):
+        s = STRINGS[self.LANG]
+        unit = self.get_arg("commune", COMOROS_UNITS[0][0])
+        index = coerce_index(
+            self.get_arg("index", COMOROS_DEFAULT_STORM), COMOROS_DEFAULT_STORM
+        )
+
+        self.send_update(s["msg_sampling"], percentage_complete=40)
+        flooded = comoros_banded_features(unit, index).copy()
+        flooded["nivel"] = flooded.banda.map(s["bands"])
+        flooded = flooded.to_crs(OUTPUT_CRS)
+
+        self.send_update(
+            s["msg_flooded"].format(count=len(flooded)), percentage_complete=100
+        )
+        columns = ["type", "nivel", "banda", "profundidad_m", *COMOROS_MEASURES]
+        collection = json.loads(flooded[columns + ["geometry"]].to_json())
+        collection["crs"] = {"type": "name", "properties": {"name": OUTPUT_CRS}}
+        return collection
+
+
+class StormImpactLayerComoros(BaseStormImpactLayerComoros):
+    LANG = "fr"
+    name = "uffis_storm_impact_layer_comoros"
+    label = f"{STRINGS['fr']['storm_layer_label']} (Comores)"
+    group = STRINGS["fr"]["group"]
+    tags = ["inondation", "impact", "zarr", "tempête", "map_layer", "français"]
+    description = STRINGS["fr"]["storm_layer_desc"]

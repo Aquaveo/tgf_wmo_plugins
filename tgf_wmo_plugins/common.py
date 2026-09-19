@@ -8,7 +8,9 @@ reads a single chunk.
 
 import os
 import tempfile
+import time
 import urllib.request
+from functools import lru_cache
 from pathlib import Path
 
 import pandas as pd
@@ -265,16 +267,52 @@ def load_stats(store_url):
         ) from exc
 
 
-def open_zarr_store(store_url):
-    """Open the Zarr group read-only.
+class ZarrStoreError(Exception):
+    """A Zarr store could not be opened."""
 
-    Reuses the app's own opener, which retries transient range-read failures and
-    normalizes errors. It is deliberately Django-free, so importing it here does
-    not drag in app state.
+
+def _retry(fn, attempts=3, base_delay=0.25):
+    """Call `fn`, retrying on any exception with linear backoff.
+
+    A store is read live over HTTPS, so a single range read fails transiently now
+    and then -- a dropped connection, a 5xx from the bucket. Re-issuing it beats
+    failing the whole request.
     """
-    from tethysapp.tethysdash.zarr_utils import open_store
+    for attempt in range(attempts):
+        try:
+            return fn()
+        except Exception:
+            if attempt == attempts - 1:
+                raise
+            time.sleep(base_delay * (attempt + 1))
 
-    return open_store(store_url)
+
+@lru_cache(maxsize=64)
+def open_zarr_store(store_url):
+    """Open the Zarr group at `store_url` (a public https URL) read-only.
+
+    This used to delegate to `tethysapp.tethysdash.zarr_utils.open_store`. That
+    module was a server-side Zarr-to-COG converter and was removed once the
+    frontend began rendering Zarr directly, so the opener lives here now.
+
+    fsspec rather than s3fs on purpose: the stores are public, and s3fs would
+    drag in an AWS stack and expect credentials that are not needed to read them.
+
+    zarr is imported inside the function because most of this package's plugins
+    never touch a store -- only the storm family does -- and importing it at
+    module scope would cost every one of them the load.
+    """
+    import zarr
+    from zarr.storage import FsspecStore
+
+    try:
+        return _retry(
+            lambda: zarr.open_group(FsspecStore.from_url(store_url), mode="r")
+        )
+    except Exception as exc:  # noqa: BLE001 - surfaced to the dashboard as-is
+        raise ZarrStoreError(
+            f"could not open zarr store {store_url}: {exc}"
+        ) from exc
 
 
 def coerce_index(value, default=0):
@@ -323,9 +361,9 @@ COMOROS_CYCLE = "20240427.000000"
 COMOROS_UNIT = "KM274_Moroni"
 COMOROS_PCODE = COMOROS_UNIT.split("_")[0]
 COMOROS_ISLAND = "grande"
+BUCKET = "https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com"
 COMOROS_ROOT = (
-    "https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/"
-    "Comoros_training/Comoros_cycle_20240427_0000UTC"
+    f"{BUCKET}/Comoros_training/Comoros_cycle_20240427_0000UTC"
     "/Comoros_cycle_20240427_0000UTC"
 )
 # One geopackage per island: it carries all 29 communes of Grande Comore, and the
@@ -333,6 +371,118 @@ COMOROS_ROOT = (
 COMOROS_FEATURES_URL = (
     f"{COMOROS_ROOT}/ibf/receptors_{COMOROS_ISLAND}_{COMOROS_CYCLE}.gpkg"
 )
+
+# Every ADM3 commune the cycle publishes, as (path segment, display name, island,
+# population). The segment is what appears in a product URL; the island decides
+# which receptor geopackage carries the commune; the population is the
+# denominator for that commune's exposure share.
+#
+# Static rather than read from communes_<cycle>.csv, so building a dropdown costs
+# no network round-trip at import -- the same reason STORM_MAGNITUDES_MM above is
+# a literal. Regenerate from that CSV if the cycle changes.
+COMOROS_UNITS = [
+    ("KM111_BambaoMtsanga", "Bambao Mtsanga", "anjouan", 13970),
+    ("KM112_Domoni", "Domoni", "anjouan", 25005),
+    ("KM113_Jimlime", "Jimlimé", "anjouan", 13433),
+    ("KM114_Koni", "Koni", "anjouan", 14203),
+    ("KM115_Ngandzale", "Ngandzalé", "anjouan", 9288),
+    ("KM121_Adda", "Adda", "anjouan", 14029),
+    ("KM122_Chaweni", "Chaweni", "anjouan", 6138),
+    ("KM123_Mramani", "Mramani", "anjouan", 10212),
+    ("KM124_Mremani", "Mrémani", "anjouan", 12160),
+    ("KM125_Ongojou", "Ongojou", "anjouan", 9739),
+    ("KM131_BandraniYaChironkamba", "Bandrani Ya Chironkamba", "anjouan", 12837),
+    ("KM132_BandraniYaMtsangani", "Bandrani Ya Mtsangani", "anjouan", 8403),
+    ("KM133_Mirontsi", "Mirontsi", "anjouan", 20874),
+    ("KM134_Mutsamudu", "Mutsamudu", "anjouan", 37426),
+    ("KM141_BambaoMtrouni", "Bambao Mtrouni", "anjouan", 23179),
+    ("KM142_Bazimini", "Bazimini", "anjouan", 17846),
+    ("KM143_Ouani", "Ouani", "anjouan", 28723),
+    ("KM151_Moya", "Moya", "anjouan", 15199),
+    ("KM152_Sima", "Sima", "anjouan", 22258),
+    ("KM153_Vouani", "Vouani", "anjouan", 12460),
+    ("KM211_Mboinkou", "Mboinkou", "grande", 7281),
+    ("KM212_NyumaMro", "Nyuma Mro", "grande", 8265),
+    ("KM213_NyumaMsiru", "Nyuma Msiru", "grande", 12244),
+    ("KM221_Djoumoipangua", "Djoumoipangua", "grande", 7229),
+    ("KM222_Tsinimoipangua", "Tsinimoipangua", "grande", 14492),
+    ("KM231_Bangaani", "Bangaani", "grande", 16801),
+    ("KM232_Djoumoichongo", "Djoumoichongo", "grande", 6777),
+    ("KM233_Hamanvou", "Hamanvou", "grande", 16237),
+    ("KM234_Isahari", "Isahari", "grande", 9848),
+    ("KM235_Mbadani", "Mbadani", "grande", 11953),
+    ("KM241_Domba", "Domba", "grande", 5933),
+    ("KM242_Itsahidi", "Itsahidi", "grande", 19281),
+    ("KM243_Pimba", "Pimba", "grande", 8604),
+    ("KM251_Ngouengoe", "Ngouengoe", "grande", 9684),
+    ("KM252_Nioumagama", "Nioumagama", "grande", 7748),
+    ("KM261_CembenoiLacSale", "Cembenoi Lac Salé", "grande", 6816),
+    ("KM262_CembenoiSadaDjoulamlima", "Cembenoi Sada Djoulamlima", "grande", 5465),
+    ("KM263_Mitsamiouli", "Mitsamiouli", "grande", 12361),
+    ("KM264_NyumaKomo", "Nyuma Komo", "grande", 5971),
+    ("KM265_NyumamroKiblani", "Nyumamro Kiblani", "grande", 11984),
+    ("KM266_NyumamroSouheili", "Nyumamro Souheili", "grande", 14465),
+    ("KM271_BambaoYaHari", "Bambao Ya Hari", "grande", 23640),
+    ("KM272_BambaoYaMboini", "Bambao Ya Mboini", "grande", 22089),
+    ("KM273_BambaoYadjou", "Bambao Yadjou", "grande", 16781),
+    ("KM274_Moroni", "Moroni", "grande", 69668),
+    ("KM281_Dimani", "Dimani", "grande", 9864),
+    ("KM282_OichiliYadjou", "Oichili Yadjou", "grande", 10138),
+    ("KM283_OichiliYamboini", "Oichili Yamboini", "grande", 7745),
+    ("KM291_CratereDuKarthala", "Cratère du Karthala", "grande", 0),
+    ("KM311_Djando", "Djando", "moheli", 7276),
+    ("KM321_Fomboni", "Fomboni", "moheli", 22727),
+    ("KM322_MoiliMdjini", "Moili Mdjini", "moheli", 8716),
+    ("KM323_Moimbassa", "Moimbassa", "moheli", 4750),
+    ("KM331_Mledjele", "Mlédjélé", "moheli", 4891),
+    ("KM332_Moimbao", "Moimbao", "moheli", 3205),
+]
+
+COMOROS_UNIT_NAME = {seg: name for seg, name, _isl, _pop in COMOROS_UNITS}
+COMOROS_UNIT_ISLAND = {seg: isl for seg, _name, isl, _pop in COMOROS_UNITS}
+COMOROS_UNIT_POPULATION = {seg: pop for seg, _name, _isl, pop in COMOROS_UNITS}
+
+# Commune choices for a plugin `args` entry, in pcode order so the three islands
+# group together.
+COMOROS_UNIT_OPTIONS = [
+    {"value": seg, "label": name} for seg, name, _isl, _pop in COMOROS_UNITS
+]
+
+
+# Every position in a commune's library, as a plugin `args` dropdown.
+#
+# The label is the position itself, not a rainfall total. Guatemala labels its
+# storms in millimetres because one national store serves the whole dashboard,
+# but a Comoros magnitude is the area-weighted mean rain over one commune, so the
+# same position is 346 mm in Cembenoi Lac Salé and 462 mm in Moimbassa -- a third
+# apart, and no single number is right for all 55. What is the same everywhere is
+# the ordering: every store holds 200 scenarios sorted by magnitude, so a higher
+# position is a wetter storm in every commune. The storm card reports the actual
+# millimetres once a commune has been chosen.
+#
+# The driest few positions are a commune's permanent standing water rather than a
+# storm, so they are offered but will look almost dry -- which is the honest thing
+# for them to look like.
+COMOROS_STORM_COUNT = 200
+COMOROS_STORM_OPTIONS = [
+    {"value": str(i), "label": str(i)} for i in range(COMOROS_STORM_COUNT)
+]
+
+
+def comoros_store_url(unit):
+    """The Zarr flood-map library for one commune.
+
+    Not every commune has one yet: the stores were still uploading when these
+    plugins were written, and only KM251 onward were in place. A missing store
+    surfaces as a read error naming the URL, which is the actionable thing.
+    """
+    return f"{BUCKET}/Comoros_IBF/Comoros/fim_store_{unit}_v1.zarr"
+
+
+def comoros_receptors_url(unit):
+    """The receptor geopackage for the island `unit` sits on."""
+    island = COMOROS_UNIT_ISLAND[unit]
+    return f"{COMOROS_ROOT}/ibf/receptors_{island}_{COMOROS_CYCLE}.gpkg"
 
 # Layer feeding each hazard level, shallowest first -- the pairing the notebook
 # uses, and the order the escalation depends on.

@@ -36,6 +36,17 @@ is country-specific.
 | `ex1-layer-list.png` | the **Layers** list with all four layers, deepest first |
 | `ex1-settings-fill-viewport.png` | the **Settings** tab with **Fill Viewport** on |
 
+## Exercise 2
+
+| file | shows |
+|---|---|
+| `ex2-finished.png` | the finished dashboard: three selectors, map, summary table and card |
+| `ex2-storm-input.png` | the **Variable Input** arguments for the storm selector, with the plugin-derived options source selected |
+| `ex2-zarr-source.png` | the **Source** tab: **Zarr**, the store URL carrying `${Commune}`, `variable` depth, `index` `${Storm}`, `mask_below` 0.05 |
+| `ex2-dynamic-layer-source.png` | the **Source** tab with the storm impact layer selected, `commune` and `index` bound, and **Fetch plugin defaults** |
+| `ex2-dynamic-layer-style.png` | the **Style** tab after fetching, showing the eight rules on the `banda` attribute |
+| `ex2-table-card.png` | the summary table and card for one scenario |
+
 **Before capturing anything**, note the warning at the top of `exercise_1.rst`:
 the Comoros rasters are EPSG:5629, and until that code is registered in
 `reactapp/components/map/projections.js` the layers will not place. Screenshots
