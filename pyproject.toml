@@ -32,6 +32,9 @@ uffis_impact_layer_haiti = "tgf_wmo_plugins.impact_layer:ImpactLayerHaiti"
 uffis_impact_layer_antigua_barbuda = "tgf_wmo_plugins.impact_layer:ImpactLayerAntiguaBarbuda"
 uffis_hazard_layer_guatemala = "tgf_wmo_plugins.hazard_layer:HazardLayerGuatemala"
 uffis_hazard_layer_antigua_barbuda = "tgf_wmo_plugins.hazard_layer:HazardLayerAntiguaBarbuda"
+uffis_impact_summary_comoros = "tgf_wmo_plugins.impact_summary:ImpactSummaryComoros"
+uffis_impact_layer_comoros = "tgf_wmo_plugins.impact_layer:ImpactLayerComoros"
+uffis_hazard_layer_comoros = "tgf_wmo_plugins.hazard_layer:HazardLayerComoros"
 
 [tool.setuptools.packages.find]
 include = ["tgf_wmo_plugins*"]

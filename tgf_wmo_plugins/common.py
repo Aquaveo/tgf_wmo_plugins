@@ -314,6 +314,26 @@ ANTIGUA_BARBUDA_FEATURES_CSV_URL = (
     "antigua_barbuda_IBF/AntiguaBarbuda_Jerry_cycle_10151010_IBF_outputs.gpkg"
 )
 
+# Comoros writes one product set per ADM3 commune rather than one national grid,
+# so a unit has to be pinned before any path resolves. That is the same shape as
+# Guatemala (one municipality) and Haiti (one commune), not Antigua and Barbuda
+# (the whole country). Moroni is the capital, and its pcode prefix also decides
+# which island file carries its receptors.
+COMOROS_CYCLE = "20240427.000000"
+COMOROS_UNIT = "KM274_Moroni"
+COMOROS_PCODE = COMOROS_UNIT.split("_")[0]
+COMOROS_ISLAND = "grande"
+COMOROS_ROOT = (
+    "https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/"
+    "Comoros_training/Comoros_cycle_20240427_0000UTC"
+    "/Comoros_cycle_20240427_0000UTC"
+)
+# One geopackage per island: it carries all 29 communes of Grande Comore, and the
+# Moroni rows are a subset selected by GPKG_WHERE below.
+COMOROS_FEATURES_URL = (
+    f"{COMOROS_ROOT}/ibf/receptors_{COMOROS_ISLAND}_{COMOROS_CYCLE}.gpkg"
+)
+
 # Layer feeding each hazard level, shallowest first -- the pairing the notebook
 # uses, and the order the escalation depends on.
 PROB_FIELDS = {
@@ -335,8 +355,19 @@ PROB_FIELDS = {
         "probability_high",
         "probability_severe",
     ],
+    "comoros": [
+        "probability_low",
+        "probability_med",
+        "probability_high",
+        "probability_severe",
+    ],
 }
-TYPE_FIELD = {"guatemala": "tipo", "haiti": "type", "antigua_barbuda": "type"}
+TYPE_FIELD = {
+    "guatemala": "tipo",
+    "haiti": "type",
+    "antigua_barbuda": "type",
+    "comoros": "type",
+}
 
 HAITI_LAYERS = {
     "batiment": (
@@ -370,17 +401,62 @@ AB_LAYERS = {
     "road": ("AntiguaBarbuda_Jerry_cycle_10151010_roads", {}),
 }
 
+# Comoros names its four exceedance columns after the depth rather than the hazard
+# level, and both layers spell them the same way, so one rename dict serves both.
+# The measures already carry the names the plugins read, as for Antigua and
+# Barbuda, so nothing else is renamed.
+KM_PROB_RENAMES = {
+    "p_ge_10cm_pct": "probability_low",
+    "p_ge_30cm_pct": "probability_med",
+    "p_ge_70cm_pct": "probability_high",
+    "p_ge_100cm_pct": "probability_severe",
+}
+KM_LAYERS = {
+    "building": ("buildings", KM_PROB_RENAMES),
+    "road": ("roads", KM_PROB_RENAMES),
+}
+
 # Geopackage layout per country, for the readers that stack buildings and
 # roads into one frame. Guatemala is absent: it ships a flat GeoJSON/CSV.
-GPKG_LAYERS = {"haiti": HAITI_LAYERS, "antigua_barbuda": AB_LAYERS}
+GPKG_LAYERS = {
+    "haiti": HAITI_LAYERS,
+    "antigua_barbuda": AB_LAYERS,
+    "comoros": KM_LAYERS,
+}
+
+# Row filter applied at read time, per country. Only Comoros needs one: its
+# geopackage is per island, so the commune has to be selected out of it. Pushing
+# this into the driver rather than filtering afterwards keeps 110,000 unwanted
+# geometries from ever being built.
+GPKG_WHERE = {"comoros": f"ADM3_PCODE = '{COMOROS_PCODE}'"}
+
+# Factor that puts a country's probability columns on the 0-1 scale the gates
+# assume. Only Comoros stores them as percent; left unscaled, a gate of 0.8 is
+# cleared by anything above 0.8 PERCENT and roughly eight times too many features
+# land in a hazard level. Normalising in the reader rather than in the classifier
+# keeps the unit from reaching gates() and DEFAULT_GATES, which every country
+# shares.
+PROB_SCALE = {"comoros": 0.01}
+
+
+def scale_probabilities(df, country):
+    """Put `country`'s probability columns on the fraction scale, in place."""
+    scale = PROB_SCALE.get(country)
+    if scale is not None:
+        df[PROB_FIELDS[country]] = df[PROB_FIELDS[country]] * scale
+    return df
 
 # Population across every building in the country's geopackage, so exposure can
 # be given as a share. Guatemala from notebooks/precompute_impact_table.py;
 # Haiti summed the same way over the `population_per_building` field.
+# Comoros is Moroni's own population, matching the commune GPKG_WHERE selects.
+# Grande Comore is 379,364 and the country 758,311; widening the filter without
+# widening this measures the share against the wrong denominator.
 TOTAL_POPULATION = {
     "guatemala": 290868,
     "haiti": 336473,
     "antigua_barbuda": 93839,
+    "comoros": 69668,
 }
 
 

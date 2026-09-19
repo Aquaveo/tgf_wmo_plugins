@@ -17,10 +17,12 @@ from tgf_wmo_plugins.common import (
     GUATEMALA_FEATURES_CSV_URL,
     HAITI_FEATURES_CSV_URL,
     ANTIGUA_BARBUDA_FEATURES_CSV_URL,
+    COMOROS_FEATURES_URL,
+    GPKG_LAYERS,
+    GPKG_WHERE,
     PROB_FIELDS,
     TOTAL_POPULATION,
-    HAITI_LAYERS,
-    AB_LAYERS,
+    scale_probabilities,
 )
 from tgf_wmo_plugins.strings import STRINGS, threshold_args
 
@@ -29,26 +31,24 @@ from tgf_wmo_plugins.strings import STRINGS, threshold_args
 def _load(url, country):
     if country == "guatemala":
         return pd.read_csv(url)
-    else:
-        if country == "haiti":
-            layers = HAITI_LAYERS
-        elif country == "antigua_barbuda":
-            layers = AB_LAYERS
 
-        path = cached_download(url)
-
-        parts = []
-        for type_, (layer, renames) in layers.items():
-            part = pyogrio.read_dataframe(
-                path,
-                layer=layer,
-                read_geometry=False,
-                use_arrow=True,
-            )
-            part = part.rename(columns=renames)
-            part["type"] = type_
-            parts.append(part)
-        return pd.concat(parts, ignore_index=True)
+    path = cached_download(url)
+    parts = []
+    for type_, (layer, renames) in GPKG_LAYERS[country].items():
+        part = pyogrio.read_dataframe(
+            path,
+            layer=layer,
+            # Only Comoros sets one: its geopackage covers a whole island, so the
+            # commune is selected in the driver rather than afterwards.
+            where=GPKG_WHERE.get(country),
+            read_geometry=False,
+            use_arrow=True,
+        )
+        part = part.rename(columns=renames)
+        part["type"] = type_
+        parts.append(part)
+    # Comoros stores its probabilities as percent; the gates are fractions.
+    return scale_probabilities(pd.concat(parts, ignore_index=True), country)
 
 
 class BaseImpactSummary(ThresholdGates, TethysDashPlugin):
@@ -68,6 +68,8 @@ class BaseImpactSummary(ThresholdGates, TethysDashPlugin):
             csv_url = HAITI_FEATURES_CSV_URL
         elif country == "antigua_barbuda":
             csv_url = ANTIGUA_BARBUDA_FEATURES_CSV_URL
+        elif country == "comoros":
+            csv_url = COMOROS_FEATURES_URL
 
         df = _load(csv_url, self.country).copy()
 
@@ -116,7 +118,9 @@ class BaseImpactSummary(ThresholdGates, TethysDashPlugin):
                     f"{100 * group.population.sum() / TOTAL_POPULATION['haiti']:.2f}%"
                 ),
             }
-        elif self.country == "antigua_barbuda":
+        elif self.country in ("antigua_barbuda", "comoros"):
+            # Both geopackages spell the measures the same way, so one branch
+            # serves them; only the denominator differs.
             buildings = group[group.type == "building"]
             return {
                 s["col_level"]: name,
@@ -125,7 +129,7 @@ class BaseImpactSummary(ThresholdGates, TethysDashPlugin):
                 s["col_area"]: f"{group.building_area_m2.sum():,.0f}",
                 s["col_roads_km"]: f"{group.road_length_m.sum() / 1000:,.1f}",
                 s["col_pop_share"]: (
-                    f"{100 * group.population_per_building.sum() / TOTAL_POPULATION['antigua_barbuda']:.2f}%"
+                    f"{100 * group.population_per_building.sum() / TOTAL_POPULATION[self.country]:.2f}%"
                 ),
             }
 
@@ -171,4 +175,15 @@ class ImpactSummaryAntiguaBarbuda(BaseImpactSummary):
     label = f"{STRINGS[LANG]['hazard_summary_label']} (Antigua and Barbuda)"
     group = STRINGS[LANG]["group"]
     tags = ["flood", "impact", "IBF", "exposure", "table", "english"]
+    description = STRINGS[LANG]["hazard_summary_desc"]
+
+
+class ImpactSummaryComoros(BaseImpactSummary):
+    LANG = "fr"
+    country = "comoros"
+    args = threshold_args(LANG)
+    name = "uffis_impact_summary_comoros"
+    label = f"{STRINGS[LANG]['hazard_summary_label']} (Comores)"
+    group = STRINGS[LANG]["group"]
+    tags = ["inondation", "impact", "IBF", "exposition", "tableau", "français"]
     description = STRINGS[LANG]["hazard_summary_desc"]

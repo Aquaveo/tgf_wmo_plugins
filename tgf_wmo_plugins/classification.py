@@ -22,6 +22,7 @@ from functools import lru_cache
 import numpy as np
 import rasterio
 
+from tgf_wmo_plugins.common import COMOROS_CYCLE, COMOROS_ROOT, COMOROS_UNIT
 from tgf_wmo_plugins.strings import THRESHOLD_ARGS
 
 BUCKET = "https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com"
@@ -45,6 +46,16 @@ PROB_URLS = {
     "antigua_barbuda": [
         f"{BUCKET}/antigua_barbuda_IBF/depth_prob/"
         f"antiguabarbuda_prob_depth_ge_{depth}_overbank.tif"
+        for depth in ("10cm", "30cm", "70cm", "100cm")
+    ],
+    # Comoros is EPSG:5629 (Moznet / UTM zone 38S) at 30.57 m, the island model's
+    # own grid rather than a reprojected copy, and windowed on one commune rather
+    # than a whole country -- 169 x 198 cells for Moroni. The hazard layer
+    # reprojects the polygons it makes from these, because 5629 is not one of the
+    # two projections the frontend can resolve.
+    "comoros": [
+        f"{COMOROS_ROOT}/fim/{COMOROS_UNIT}/stream_sat_stormlab/pluvial_overbank/"
+        f"prob_depth_ge_{depth}_overbank.{COMOROS_CYCLE}.tif"
         for depth in ("10cm", "30cm", "70cm", "100cm")
     ],
 }

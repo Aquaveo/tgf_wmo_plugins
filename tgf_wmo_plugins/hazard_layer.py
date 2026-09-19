@@ -3,7 +3,8 @@
 A map layer config can only point at a URL, and there is no endpoint that serves
 a computed raster, so the classified grid is vectorized: each connected run of
 equal class becomes one polygon carrying a `peligro` attribute. Guatemala comes
-to roughly 600 polygons at the default gates, Antigua and Barbuda to about 3,400.
+to roughly 600 polygons at the default gates, Antigua and Barbuda to about 3,400,
+and Moroni -- one commune rather than a country -- to about 150.
 
 Being a dynamic map_layer, `fetch_features` re-runs whenever a bound variable
 input changes, so wiring the four gates to variable inputs makes the
@@ -14,6 +15,7 @@ from functools import lru_cache
 
 import rasterio
 from rasterio.features import shapes
+from rasterio.warp import transform_geom
 from tethysapp.tethysdash.plugin_helpers import (
     LayerConfigurationBuilder,
     TethysDashPlugin,
@@ -36,7 +38,16 @@ POLYGON_WARN_LIMIT = 20000
 COUNTRY_NAMES = {
     "guatemala": "Guatemala",
     "antigua_barbuda": "Antigua and Barbuda",
+    "comoros": "Comores",
 }
+
+# The frontend does not bundle proj4, so OpenLayers resolves only these two.
+# Guatemala's rasters are already EPSG:3857 and Antigua and Barbuda's EPSG:4326,
+# so their polygons go out in the grid's own CRS. The Comoros grid is EPSG:5629
+# (Moznet / UTM zone 38S), which would be read as raw map units and land nowhere
+# near the Indian Ocean, so those polygons are reprojected before they are sent.
+RESOLVABLE_CRS = {"EPSG:4326", "EPSG:3857"}
+OUTPUT_CRS = "EPSG:4326"
 
 
 @lru_cache(maxsize=16)
@@ -115,13 +126,30 @@ class BaseHazardLayer(ThresholdGates, TethysDashPlugin):
 
         self.send_update(s["msg_polygons"], percentage_complete=75)
         features = self._vectorize(s, peligro, transform)
+        features, crs = self._to_resolvable_crs(features, crs)
 
         self.send_update(s["msg_done"], percentage_complete=100)
         return {
             "type": "FeatureCollection",
             "features": features,
-            "crs": {"type": "name", "properties": {"name": str(crs)}},
+            "crs": {"type": "name", "properties": {"name": crs}},
         }
+
+    @staticmethod
+    def _to_resolvable_crs(features, crs):
+        """Reproject the polygons when the grid's CRS is one the frontend cannot read.
+
+        A no-op for Guatemala and Antigua and Barbuda. Done on the GeoJSON
+        geometries rather than on the raster so the classification still happens
+        cell for cell on the model's own grid -- warping the probabilities first
+        would resample them and move the class boundaries.
+        """
+        name = str(crs)
+        if name in RESOLVABLE_CRS:
+            return features, name
+        for feature in features:
+            feature["geometry"] = transform_geom(crs, OUTPUT_CRS, feature["geometry"])
+        return features, OUTPUT_CRS
 
     @staticmethod
     def _read(urls):
@@ -207,3 +235,10 @@ class HazardLayerAntiguaBarbuda(BaseHazardLayer):
     country = "antigua_barbuda"
     name = "uffis_hazard_layer_antigua_barbuda"
     label = f"{STRINGS['en']['hazard_layer_label']} (Antigua and Barbuda)"
+
+
+class HazardLayerComoros(BaseHazardLayer):
+    LANG = "fr"
+    country = "comoros"
+    name = "uffis_hazard_layer_comoros"
+    label = f"{STRINGS['fr']['hazard_layer_label']} (Comores)"

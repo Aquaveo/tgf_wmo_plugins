@@ -25,11 +25,14 @@ from tethysapp.tethysdash.plugin_helpers import (
 from tgf_wmo_plugins.classification import LEVELS, ThresholdGates
 from tgf_wmo_plugins.common import (
     ANTIGUA_BARBUDA_FEATURES_CSV_URL,
+    COMOROS_FEATURES_URL,
     FEATURES_URL,
     GPKG_LAYERS,
+    GPKG_WHERE,
     HAITI_FEATURES_CSV_URL,
     PROB_FIELDS,
     cached_download,
+    scale_probabilities,
 )
 from tgf_wmo_plugins.strings import STRINGS, threshold_args
 
@@ -47,6 +50,7 @@ FEATURES_URLS = {
     "guatemala": FEATURES_URL,
     "haiti": HAITI_FEATURES_CSV_URL,
     "antigua_barbuda": ANTIGUA_BARBUDA_FEATURES_CSV_URL,
+    "comoros": COMOROS_FEATURES_URL,
 }
 
 # Measures the popup shows, per country. A geopackage layer only carries the
@@ -60,6 +64,13 @@ MEASURES = {
         "building_area_m2",
         "road_length_m",
     ],
+    # The Comoros geopackage happens to spell these exactly as Antigua and
+    # Barbuda's does, so the popup needs no renames on top of the probabilities.
+    "comoros": [
+        "population_per_building",
+        "building_area_m2",
+        "road_length_m",
+    ],
 }
 
 # Attributes carried through to the GeoJSON, per country. `peligro` drives the
@@ -68,6 +79,7 @@ FEATURE_COLUMNS = {
     "guatemala": ["tipo", "nivel", "peligro", *MEASURES["guatemala"]],
     "haiti": ["type", "nivel", "peligro", *MEASURES["haiti"]],
     "antigua_barbuda": ["type", "nivel", "peligro", *MEASURES["antigua_barbuda"]],
+    "comoros": ["type", "nivel", "peligro", *MEASURES["comoros"]],
 }
 
 
@@ -91,6 +103,11 @@ def _read_geopackage(url, country):
             path,
             layer=layer,
             columns=[f for f in wanted if f in available],
+            # Only Comoros sets one: its file is per island, so the commune is
+            # selected in the driver rather than after 130,000 geometries have
+            # been built. `where` is evaluated on the layer, so the column it
+            # names does not have to be among `columns`.
+            where=GPKG_WHERE.get(country),
             read_geometry=True,
             use_arrow=True,
         )
@@ -101,7 +118,7 @@ def _read_geopackage(url, country):
     stacked = gpd.GeoDataFrame(pd.concat(parts, ignore_index=True), crs=parts[0].crs)
     for col in MEASURES[country]:
         stacked[col] = stacked[col].fillna(0.0) if col in stacked else 0.0
-    return stacked
+    return scale_probabilities(stacked, country)
 
 
 @lru_cache(maxsize=4)
@@ -238,4 +255,15 @@ class ImpactLayerAntiguaBarbuda(BaseImpactLayer):
     label = f"{STRINGS[LANG]['impact_layer_label']} (Antigua and Barbuda)"
     group = STRINGS[LANG]["group"]
     tags = ["flood", "impact", "IBF", "map_layer", "dynamic", "english"]
+    description = STRINGS[LANG]["impact_layer_desc"]
+
+
+class ImpactLayerComoros(BaseImpactLayer):
+    LANG = "fr"
+    country = "comoros"
+    args = threshold_args(LANG)
+    name = "uffis_impact_layer_comoros"
+    label = f"{STRINGS[LANG]['impact_layer_label']} (Comores)"
+    group = STRINGS[LANG]["group"]
+    tags = ["inondation", "impact", "IBF", "map_layer", "dynamique", "français"]
     description = STRINGS[LANG]["impact_layer_desc"]
