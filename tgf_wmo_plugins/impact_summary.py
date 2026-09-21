@@ -11,15 +11,23 @@ import pandas as pd
 import pyogrio
 from tethysapp.tethysdash.plugin_helpers import TethysDashPlugin
 
-from tgf_wmo_plugins.classification import LEVELS, ComorosUnit, ThresholdGates
+from tgf_wmo_plugins.classification import (
+    LEVELS,
+    BarbadosParish,
+    ComorosUnit,
+    ThresholdGates,
+    UnitScoped,
+)
 from tgf_wmo_plugins.common import (
     cached_download,
     GUATEMALA_FEATURES_CSV_URL,
     HAITI_FEATURES_CSV_URL,
     ANTIGUA_BARBUDA_FEATURES_CSV_URL,
+    BARBADOS_FEATURES_URL,
+    BARBADOS_PARISH_OPTIONS,
     COMOROS_FEATURES_URL,
     COMOROS_UNIT_OPTIONS,
-    COMOROS_UNIT_POPULATION,
+    UNIT_POPULATION,
     GPKG_LAYERS,
     PROB_FIELDS,
     TOTAL_POPULATION,
@@ -73,11 +81,14 @@ class BaseImpactSummary(ThresholdGates, TethysDashPlugin):
             csv_url = ANTIGUA_BARBUDA_FEATURES_CSV_URL
         elif country == "comoros":
             csv_url = COMOROS_FEATURES_URL
+        elif country == "barbados":
+            csv_url = BARBADOS_FEATURES_URL
 
-        unit = self.unit() if isinstance(self, ComorosUnit) else None
-        if unit:
-            # The commune decides both which island file to read and which rows
-            # to keep out of it.
+        unit = self.unit() if isinstance(self, UnitScoped) else None
+        if unit and country == "comoros":
+            # Comoros alone splits its receptors by island, so there the commune
+            # decides which file to read as well as which rows to keep out of it.
+            # Barbados keeps one island file and the parish only selects rows.
             csv_url = comoros_receptors_url(unit)
         df = _load(csv_url, self.country, unit).copy()
 
@@ -103,11 +114,12 @@ class BaseImpactSummary(ThresholdGates, TethysDashPlugin):
     def _population(self):
         """The denominator for the exposure share.
 
-        Comoros reports against the chosen commune; every other country has a
-        single domain and so a single constant.
+        A unit-scoped plugin reports against the unit it was asked for -- the
+        Comorian commune, the Barbadian parish -- so the share answers "of the
+        people here". Every other country has a single domain and one constant.
         """
-        if isinstance(self, ComorosUnit):
-            return COMOROS_UNIT_POPULATION[self.unit()]
+        if isinstance(self, UnitScoped):
+            return UNIT_POPULATION[self.country][self.unit()]
         return TOTAL_POPULATION[self.country]
 
     def _row(self, s, name, group):
@@ -136,7 +148,7 @@ class BaseImpactSummary(ThresholdGates, TethysDashPlugin):
                     f"{100 * group.population.sum() / TOTAL_POPULATION['haiti']:.2f}%"
                 ),
             }
-        elif self.country in ("antigua_barbuda", "comoros"):
+        elif self.country in ("antigua_barbuda", "comoros", "barbados"):
             # Both geopackages spell the measures the same way, so one branch
             # serves them; only the denominator differs.
             buildings = group[group.type == "building"]
@@ -152,12 +164,12 @@ class BaseImpactSummary(ThresholdGates, TethysDashPlugin):
             }
 
 
-class ImpactSummaryBarbados(BaseImpactSummary):
+class ImpactSummaryBarbados(BarbadosParish, BaseImpactSummary):
     LANG = "en"
     country = "barbados"
-    args = threshold_args(LANG)
+    args = {**threshold_args(LANG), "parish": BARBADOS_PARISH_OPTIONS}
     name = "uffis_impact_summary_barbados"
-    label = f"{STRINGS['en']['hazard_summary_label']} (Barbados)"
+    label = f"{STRINGS[LANG]['hazard_summary_label']} (Barbados)"
     group = STRINGS["en"]["group"]
     tags = ["flood", "impact", "IBF", "exposure", "table", "english"]
     description = STRINGS["en"]["hazard_summary_desc"]

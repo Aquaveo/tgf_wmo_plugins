@@ -22,7 +22,14 @@ from functools import lru_cache
 import numpy as np
 import rasterio
 
-from tgf_wmo_plugins.common import COMOROS_CYCLE, COMOROS_ROOT, COMOROS_UNIT
+from tgf_wmo_plugins.common import (
+    BARBADOS_CYCLE,
+    BARBADOS_PARISH,
+    BARBADOS_ROOT,
+    COMOROS_CYCLE,
+    COMOROS_ROOT,
+    COMOROS_UNIT,
+)
 from tgf_wmo_plugins.strings import THRESHOLD_ARGS
 
 BUCKET = "https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com"
@@ -48,6 +55,16 @@ PROB_URLS = {
         f"antiguabarbuda_prob_depth_ge_{depth}_overbank.tif"
         for depth in ("10cm", "30cm", "70cm", "100cm")
     ],
+    # The eleven parish products mosaicked onto one island grid, EPSG:4326 at
+    # one arc-second. The package's own README says to use the mosaic rather
+    # than the per-parish windows for island-wide maps and counts: the windows
+    # overlap and disagree in the overlap, because each is matched on its own
+    # parish rainfall.
+    "barbados": [
+        f"{BARBADOS_ROOT}/03_fim_island_mosaic/"
+        f"prob_depth_ge_{depth}.{BARBADOS_CYCLE}.tif"
+        for depth in ("10cm", "30cm", "70cm", "100cm")
+    ],
 }
 
 
@@ -69,16 +86,55 @@ def comoros_prob_urls(unit=COMOROS_UNIT):
     ]
 
 
-class ComorosUnit:
-    """Reads the commune argument the per-commune Comoros products need.
+def barbados_prob_urls(parish=BARBADOS_PARISH):
+    """The four exceedance rasters for one Barbadian parish.
 
-    Mixed into every Comoros plugin that reads a commune-scoped product, beside
-    ThresholdGates, so the argument name is declared in exactly one place. Like
-    the gates, it is read at request time rather than baked into the class.
+    The parish windows and the island mosaic in PROB_URLS are both published.
+    The mosaic is the right input for an island-wide map -- the windows are
+    parish-plus-buffer and disagree where they overlap, because each is matched
+    on its own parish rainfall -- but a plugin showing one parish should read
+    that parish's own product, which is the rainfall the window was matched on.
+    The same reasoning is why the depth exercise reads a per-parish Zarr store.
+
+    The buffer means the raster extends past the parish boundary. The receptors
+    do not: they are filtered on ADM1_PCODE, so the counts stay parish-clean
+    while the shading runs a little wide.
+    """
+    return [
+        f"{BARBADOS_ROOT}/03_fim_parishes/Barbados_{parish.split('_', 1)[1]}/"
+        f"pluvial/prob_depth_ge_{depth}.{BARBADOS_CYCLE}.tif"
+        for depth in ("10cm", "30cm", "70cm", "100cm")
+    ]
+
+
+class UnitScoped:
+    """Reads the admin-unit argument that a per-unit product needs.
+
+    Mixed into every plugin whose products are published one set per admin unit,
+    beside ThresholdGates, so the argument name is declared in exactly one place.
+    Like the gates it is read at request time rather than baked into the class,
+    because one plugin serves every unit.
     """
 
+    unit_arg = "unit"
+    default_unit = None
+
     def unit(self):
-        return self.get_arg("commune", COMOROS_UNIT)
+        return self.get_arg(self.unit_arg, self.default_unit)
+
+
+class ComorosUnit(UnitScoped):
+    """Comoros publishes one raster set and one receptor slice per ADM3 commune."""
+
+    unit_arg = "commune"
+    default_unit = COMOROS_UNIT
+
+
+class BarbadosParish(UnitScoped):
+    """Barbados publishes one raster set per ADM1 parish beside the island mosaic."""
+
+    unit_arg = "parish"
+    default_unit = BARBADOS_PARISH
 
 # Level -> (class value, display label, colour). Ordered shallow to deep, which
 # is also the order the notebook assigns them in.

@@ -1,0 +1,456 @@
+{
+  "name": "Barbados Hands On 2",
+  "description": "Solution for WMO Barbados Hands On Exercise #2",
+  "publicDashboard": false,
+  "userPermission": "admin",
+  "permissions": [
+    {
+      "username": "admin",
+      "permission": "admin"
+    }
+  ],
+  "unrestrictedPlacement": true,
+  "autoThumbnail": true,
+  "owner": "admin",
+  "notes": "",
+  "tabs": [
+    {
+      "id": 231,
+      "name": "Main",
+      "gridItems": [
+        {
+          "x": 0,
+          "y": 0,
+          "w": 60,
+          "h": 44,
+          "source": "Map",
+          "args_string": {
+            "baseMap": "${Base Map}",
+            "layerControl": true,
+            "layers": [
+              {
+                "configuration": {
+                  "type": "WebGLTile",
+                  "props": {
+                    "name": "Flood Depth (m), parish library",
+                    "source": {
+                      "type": "Zarr",
+                      "props": {
+                        "url": "https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/Barbados_IBF/Barbados/fim_store_${Parish}_v1.zarr",
+                        "variable": "depth",
+                        "index": "${Storm}",
+                        "mask_below": "0.05",
+                        "normalize": true
+                      },
+                      "rampName": "Blues"
+                    }
+                  },
+                  "style": {
+                    "color": [
+                      "case",
+                      [
+                        "==",
+                        [
+                          "band",
+                          2
+                        ],
+                        0
+                      ],
+                      [
+                        0,
+                        0,
+                        0,
+                        0
+                      ],
+                      [
+                        "interpolate",
+                        [
+                          "linear"
+                        ],
+                        [
+                          "band",
+                          1
+                        ],
+                        0,
+                        "#f7fbff",
+                        0.03225806451612903,
+                        "#f1f7fd",
+                        0.06451612903225806,
+                        "#eaf3fb",
+                        0.0967741935483871,
+                        "#e4eff9",
+                        0.12903225806451613,
+                        "#deebf7",
+                        0.16129032258064516,
+                        "#d7e7f5",
+                        0.1935483870967742,
+                        "#d1e2f3",
+                        0.22580645161290322,
+                        "#cadef0",
+                        0.25806451612903225,
+                        "#c3daee",
+                        0.2903225806451613,
+                        "#bad6eb",
+                        0.3225806451612903,
+                        "#afd1e7",
+                        0.3548387096774194,
+                        "#a4cde3",
+                        0.3870967741935484,
+                        "#98c6e0",
+                        0.41935483870967744,
+                        "#8bc0dd",
+                        0.45161290322580644,
+                        "#7fb9da",
+                        0.4838709677419355,
+                        "#73b2d7",
+                        0.5161290322580645,
+                        "#67aad3",
+                        0.5483870967741935,
+                        "#5ba3d0",
+                        0.5806451612903226,
+                        "#519ccc",
+                        0.6129032258064516,
+                        "#4795c8",
+                        0.6451612903225806,
+                        "#3d8dc3",
+                        0.6774193548387096,
+                        "#3484bf",
+                        0.7096774193548387,
+                        "#2b7bba",
+                        0.7419354838709677,
+                        "#2373b5",
+                        0.7741935483870968,
+                        "#1c6aaf",
+                        0.8064516129032258,
+                        "#1662a9",
+                        0.8387096774193549,
+                        "#115aa2",
+                        0.8709677419354839,
+                        "#0d5299",
+                        0.9032258064516129,
+                        "#094990",
+                        0.9354838709677419,
+                        "#084184",
+                        0.967741935483871,
+                        "#083878",
+                        1,
+                        "#08306b"
+                      ]
+                    ]
+                  }
+                },
+                "legend": "default"
+              },
+              {
+                "configuration": {
+                  "type": "VectorLayer",
+                  "props": {
+                    "name": "Flooded buildings and roads",
+                    "layerId": "4183e82f-ba27-4a25-ade0-2f59a0012ed9",
+                    "source": {
+                      "type": "GeoJSON",
+                      "props": {},
+                      "geojson": {
+                        "type": "FeatureCollection",
+                        "features": [],
+                        "crs": {
+                          "type": "name",
+                          "properties": {
+                            "name": "EPSG:4326"
+                          }
+                        }
+                      }
+                    },
+                    "pluginSource": {
+                      "source": "uffis_storm_impact_layer_barbados",
+                      "args": {
+                        "parish": "${Parish}",
+                        "index": "${Storm}"
+                      }
+                    }
+                  },
+                  "style": {
+                    "default": {
+                      "point": {
+                        "fill": "#9e9e9e",
+                        "stroke": "#9e9e9e",
+                        "strokeWidth": "1",
+                        "size": "3",
+                        "shape": "circle"
+                      },
+                      "linestring": {
+                        "stroke": "#9e9e9e",
+                        "strokeWidth": "1"
+                      }
+                    },
+                    "rules": [
+                      {
+                        "name": "0.05 - 0.3 m (buildings)",
+                        "geometryType": "point",
+                        "strokeWidth": "1",
+                        "size": "4",
+                        "shape": "circle",
+                        "conditionField": "band",
+                        "conditionType": "=",
+                        "conditionValue": "1",
+                        "fill": "green",
+                        "stroke": "green"
+                      },
+                      {
+                        "name": "0.05 - 0.3 m (roads)",
+                        "geometryType": "linestring",
+                        "conditionField": "band",
+                        "conditionType": "=",
+                        "conditionValue": "1",
+                        "stroke": "green",
+                        "strokeWidth": "3"
+                      },
+                      {
+                        "name": "0.3 - 1 m (buildings)",
+                        "geometryType": "point",
+                        "strokeWidth": "1",
+                        "size": "4",
+                        "shape": "circle",
+                        "conditionField": "band",
+                        "conditionType": "=",
+                        "conditionValue": "2",
+                        "fill": "yellow",
+                        "stroke": "yellow"
+                      },
+                      {
+                        "name": "0.3 - 1 m (roads)",
+                        "geometryType": "linestring",
+                        "conditionField": "band",
+                        "conditionType": "=",
+                        "conditionValue": "2",
+                        "stroke": "yellow",
+                        "strokeWidth": "3"
+                      },
+                      {
+                        "name": "1 - 2 m (buildings)",
+                        "geometryType": "point",
+                        "strokeWidth": "1",
+                        "size": "4",
+                        "shape": "circle",
+                        "conditionField": "band",
+                        "conditionType": "=",
+                        "conditionValue": "3",
+                        "fill": "red",
+                        "stroke": "red"
+                      },
+                      {
+                        "name": "1 - 2 m (roads)",
+                        "geometryType": "linestring",
+                        "conditionField": "band",
+                        "conditionType": "=",
+                        "conditionValue": "3",
+                        "stroke": "red",
+                        "strokeWidth": "3"
+                      },
+                      {
+                        "name": "2 m or more (buildings)",
+                        "geometryType": "point",
+                        "strokeWidth": "1",
+                        "size": "4",
+                        "shape": "circle",
+                        "conditionField": "band",
+                        "conditionType": "=",
+                        "conditionValue": "4",
+                        "fill": "purple",
+                        "stroke": "purple"
+                      },
+                      {
+                        "name": "2 m or more (roads)",
+                        "geometryType": "linestring",
+                        "conditionField": "band",
+                        "conditionType": "=",
+                        "conditionValue": "4",
+                        "stroke": "purple",
+                        "strokeWidth": "3"
+                      }
+                    ]
+                  }
+                },
+                "legend": {
+                  "title": "Depth",
+                  "items": [
+                    {
+                      "label": "0.05 - 0.3 m",
+                      "color": "green",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "0.3 - 1 m",
+                      "color": "yellow",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "1 - 2 m",
+                      "color": "red",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "2 m or more",
+                      "color": "purple",
+                      "symbol": "square"
+                    }
+                  ]
+                }
+              }
+            ],
+            "map_extent": {
+              "extent": "-6634889.03,1473048.86,13"
+            },
+            "mapDrawing": {}
+          },
+          "metadata_string": {},
+          "i": "1"
+        },
+        {
+          "x": 60,
+          "y": 0,
+          "w": 13,
+          "h": 6,
+          "source": "Variable Input",
+          "args_string": {
+            "variable_name": "Base Map",
+            "show_label": true,
+            "variable_options_source": "Base Map Layers",
+            "initial_value": "https://server.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer"
+          },
+          "metadata_string": {
+            "backgroundColor": "#ffffff"
+          },
+          "i": "2"
+        },
+        {
+          "x": 74,
+          "y": 0,
+          "w": 13,
+          "h": 6,
+          "source": "Variable Input",
+          "args_string": {
+            "variable_name": "Parish",
+            "show_label": true,
+            "variable_options_source": "dropdown",
+            "variable_options_source.metadata": {
+              "choices": [
+                {
+                  "value": "BB01_ChristChurch",
+                  "label": "Christ Church"
+                },
+                {
+                  "value": "BB02_SaintAndrew",
+                  "label": "Saint Andrew"
+                },
+                {
+                  "value": "BB03_SaintGeorge",
+                  "label": "Saint George"
+                },
+                {
+                  "value": "BB04_SaintJames",
+                  "label": "Saint James"
+                },
+                {
+                  "value": "BB05_SaintJohn",
+                  "label": "Saint John"
+                },
+                {
+                  "value": "BB06_SaintJoseph",
+                  "label": "Saint Joseph"
+                },
+                {
+                  "value": "BB07_SaintLucy",
+                  "label": "Saint Lucy"
+                },
+                {
+                  "value": "BB08_SaintMichael",
+                  "label": "Saint Michael"
+                },
+                {
+                  "value": "BB09_SaintPeter",
+                  "label": "Saint Peter"
+                },
+                {
+                  "value": "BB10_SaintPhilip",
+                  "label": "Saint Philip"
+                },
+                {
+                  "value": "BB11_SaintThomas",
+                  "label": "Saint Thomas"
+                }
+              ]
+            },
+            "initial_value": "BB08_SaintMichael"
+          },
+          "metadata_string": {
+            "backgroundColor": "#ffffff"
+          },
+          "i": "3"
+        },
+        {
+          "x": 89,
+          "y": 0,
+          "w": 11,
+          "h": 6,
+          "source": "Variable Input",
+          "args_string": {
+            "variable_name": "Storm",
+            "show_label": true,
+            "variable_options_source": "Flood Maps (English): Storm Impact Summary (Barbados) - Index",
+            "variable_options_source.metadata": {
+              "min": 1,
+              "max": 199,
+              "step": 1,
+              "dataType": "Number",
+              "outputFormat": "{{n}}",
+              "rangeMode": false,
+              "speedOptions": [
+                2000,
+                1000,
+                500,
+                250,
+                100
+              ],
+              "initialValue": 150
+            },
+            "initial_value": 150
+          },
+          "metadata_string": {
+            "border": {
+              "border-left": "1px solid black"
+            },
+            "backgroundColor": "#ffffff"
+          },
+          "i": "4"
+        },
+        {
+          "i": "5",
+          "x": 60,
+          "y": 9,
+          "w": 40,
+          "h": 20,
+          "source": "uffis_storm_impact_summary_barbados",
+          "args_string": {
+            "parish": "${Parish}",
+            "index": "${Storm}"
+          },
+          "metadata_string": {}
+        },
+        {
+          "i": "6",
+          "x": 62,
+          "y": 29,
+          "w": 37,
+          "h": 12,
+          "source": "uffis_storm_card_barbados",
+          "args_string": {
+            "parish": "${Parish}",
+            "index": "${Storm}"
+          },
+          "metadata_string": {}
+        }
+      ]
+    }
+  ]
+}

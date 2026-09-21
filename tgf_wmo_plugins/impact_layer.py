@@ -6,8 +6,9 @@ as the maximum over its own footprint -- so the escalating gates classify a
 feature directly, no rasterising involved.
 
 Only features that land in a hazard level are returned. Normal is the large
-majority and adds nothing a basemap does not already show, and dropping it keeps
-the payload to a few hundred KB rather than the ~2 MB source.
+majority and adds nothing a basemap does not already show, so dropping it is
+what keeps the response tractable -- for Barbados, 28,000 features out of
+227,000, and 11 MB rather than the ~90 MB the whole stock would serialise to.
 """
 
 import json
@@ -22,14 +23,23 @@ from tethysapp.tethysdash.plugin_helpers import (
     TethysDashPlugin,
 )
 
-from tgf_wmo_plugins.classification import LEVELS, ComorosUnit, ThresholdGates
+from tgf_wmo_plugins.classification import (
+    LEVELS,
+    BarbadosParish,
+    ComorosUnit,
+    ThresholdGates,
+    UnitScoped,
+)
 from tgf_wmo_plugins.common import (
     ANTIGUA_BARBUDA_FEATURES_CSV_URL,
+    BARBADOS_FEATURES_URL,
+    BARBADOS_PARISH_OPTIONS,
     COMOROS_FEATURES_URL,
     COMOROS_UNIT_OPTIONS,
     FEATURES_URL,
     GPKG_LAYERS,
     HAITI_FEATURES_CSV_URL,
+    as_representative_points,
     PROB_FIELDS,
     TYPE_FIELD,
     cached_download,
@@ -54,6 +64,7 @@ FEATURES_URLS = {
     "haiti": HAITI_FEATURES_CSV_URL,
     "antigua_barbuda": ANTIGUA_BARBUDA_FEATURES_CSV_URL,
     "comoros": COMOROS_FEATURES_URL,
+    "barbados": BARBADOS_FEATURES_URL,
 }
 
 # Measures the popup shows, per country. A geopackage layer only carries the
@@ -70,6 +81,11 @@ MEASURES = {
     # The Comoros geopackage happens to spell these exactly as Antigua and
     # Barbuda's does, so the popup needs no renames on top of the probabilities.
     "comoros": [
+        "population_per_building",
+        "building_area_m2",
+        "road_length_m",
+    ],
+    "barbados": [
         "population_per_building",
         "building_area_m2",
         "road_length_m",
@@ -134,7 +150,9 @@ def _load(country, unit=None):
     a Comoros commune is a different set of features out of the same island file
     -- without it the first commune read would be served to every other.
     """
-    url = comoros_receptors_url(unit) if unit else FEATURES_URLS[country]
+    # Comoros splits its receptors into one file per island, so the unit selects
+    # the file; every other country has one file and the unit selects rows in it.
+    url = comoros_receptors_url(unit) if country == "comoros" else FEATURES_URLS[country]
     if country in GPKG_LAYERS:
         gdf = _read_geopackage(url, country, unit)
     else:
@@ -149,6 +167,11 @@ class BaseImpactLayer(ThresholdGates, TethysDashPlugin):
     country = None
     type = "map_layer"
     dynamic_map_layer = True
+    # Ship buildings as representative points instead of footprints. One flag
+    # drives both the geometry and the `geometryType` of the building rules,
+    # because a rule that names the wrong bucket never fires and the features it
+    # was meant for stay the default grey -- the two have to move together.
+    buildings_as_points = False
 
     def run(self):
         s = STRINGS[self.LANG]
@@ -172,7 +195,8 @@ class BaseImpactLayer(ThresholdGates, TethysDashPlugin):
         gates = self.gates()
 
         self.send_update(s["msg_loading_features"], percentage_complete=20)
-        gdf = _load(country, self.unit() if isinstance(self, ComorosUnit) else None).copy()
+        unit = self.unit() if isinstance(self, UnitScoped) else None
+        gdf = _load(country, unit).copy()
 
         self.send_update(s["msg_classifying"], percentage_complete=60)
         hazard, level = s["attr_hazard"], s["attr_level"]
@@ -182,6 +206,8 @@ class BaseImpactLayer(ThresholdGates, TethysDashPlugin):
 
         exposed = gdf[gdf[hazard] > 0].copy()
         exposed[level] = exposed[hazard].map(s["levels"])
+        if self.buildings_as_points:
+            exposed = as_representative_points(exposed)
 
         self.send_update(
             s["msg_at_risk"].format(count=len(exposed)), percentage_complete=100
@@ -191,11 +217,14 @@ class BaseImpactLayer(ThresholdGates, TethysDashPlugin):
         collection["crs"] = {"type": "name", "properties": {"name": OUTPUT_CRS}}
         return collection
 
-    @staticmethod
-    def _style(s):
-        """Rule-based styling on the hazard-class attribute, polygons and lines.
+    @classmethod
+    def _style(cls, s):
+        """Rule-based styling on the hazard-class attribute, buildings and lines.
 
-        See hazard_layer._style for why the rule shape is what it is.
+        See hazard_layer._style for why the rule shape is what it is. The
+        building rules follow `buildings_as_points`, so a plugin that serialises
+        points emits point rules and one that serialises footprints emits polygon
+        rules, without either being written out twice.
         """
         rules = []
         for value, color in LEVELS:
@@ -207,11 +236,10 @@ class BaseImpactLayer(ThresholdGates, TethysDashPlugin):
             rules.append(
                 {
                     "name": f"{s['levels'][value]} ({s['buildings']})",
-                    "geometryType": "polygon",
+                    **cls._building_rule(),
                     **condition,
                     "fill": color,
                     "stroke": color,
-                    "strokeWidth": "1",
                 }
             )
             rules.append(
@@ -223,13 +251,28 @@ class BaseImpactLayer(ThresholdGates, TethysDashPlugin):
                     "strokeWidth": "3",
                 }
             )
-        return {
-            "default": {
-                "polygon": {"fill": "#9e9e9e", "stroke": "#9e9e9e", "strokeWidth": "0"},
-                "linestring": {"stroke": "#9e9e9e", "strokeWidth": "1"},
-            },
-            "rules": rules,
-        }
+        return {"default": cls._default_style(), "rules": rules}
+
+    @classmethod
+    def _building_rule(cls):
+        """The geometry-dependent half of a building rule. A point carries a size
+        and a shape that a polygon has no use for."""
+        if cls.buildings_as_points:
+            return {"geometryType": "point", "strokeWidth": "1",
+                    "size": "4", "shape": "circle"}
+        return {"geometryType": "polygon", "strokeWidth": "1"}
+
+    @classmethod
+    def _default_style(cls):
+        """What an unmatched feature falls back to, keyed by geometry bucket."""
+        buildings = (
+            {"point": {"fill": "#9e9e9e", "stroke": "#9e9e9e",
+                       "strokeWidth": "1", "size": "3", "shape": "circle"}}
+            if cls.buildings_as_points
+            else {"polygon": {"fill": "#9e9e9e", "stroke": "#9e9e9e",
+                              "strokeWidth": "0"}}
+        )
+        return {**buildings, "linestring": {"stroke": "#9e9e9e", "strokeWidth": "1"}}
 
 
 class ImpactLayerGuatemala(BaseImpactLayer):
@@ -260,6 +303,20 @@ class ImpactLayerAntiguaBarbuda(BaseImpactLayer):
     args = threshold_args(LANG)
     name = "uffis_impact_layer_antigua_barbuda"
     label = f"{STRINGS[LANG]['impact_layer_label']} (Antigua and Barbuda)"
+    group = STRINGS[LANG]["group"]
+    tags = ["flood", "impact", "IBF", "map_layer", "dynamic", "english"]
+    description = STRINGS[LANG]["impact_layer_desc"]
+
+
+class ImpactLayerBarbados(BarbadosParish, BaseImpactLayer):
+    LANG = "en"
+    country = "barbados"
+    # The four gates plus the parish: the receptor file is the whole island, so
+    # which parish to cut out of it is a request-time choice.
+    args = {**threshold_args(LANG), "parish": BARBADOS_PARISH_OPTIONS}
+    buildings_as_points = True
+    name = "uffis_impact_layer_barbados"
+    label = f"{STRINGS[LANG]['impact_layer_label']} (Barbados)"
     group = STRINGS[LANG]["group"]
     tags = ["flood", "impact", "IBF", "map_layer", "dynamic", "english"]
     description = STRINGS[LANG]["impact_layer_desc"]

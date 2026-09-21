@@ -9,17 +9,18 @@ from tgf_wmo_plugins.common import (
     coerce_index,
 )
 from tgf_wmo_plugins.common import (
-    COMOROS_STORM_OPTIONS,
+    BARBADOS_PARISH_OPTIONS,
     COMOROS_UNIT_OPTIONS,
     COMOROS_UNITS,
+    UNIT_STORM_OPTIONS,
 )
 from tgf_wmo_plugins.storm_impact import (
-    COMOROS_BUILDING,
-    COMOROS_DEFAULT_STORM,
     DEPTH_BANDS,
+    UNIT_BUILDING,
+    UNIT_DEFAULT_STORM,
     banded_features,
-    comoros_banded_features,
-    comoros_population,
+    unit_banded_features,
+    unit_population,
 )
 from tgf_wmo_plugins.strings import STRINGS
 
@@ -69,21 +70,23 @@ class StormImpactSummaryGuatemala(BaseStormImpactSummary):
     description = STRINGS["es"]["storm_summary_desc"]
 
 
-class BaseStormImpactSummaryComoros(TethysDashPlugin):
-    """Exposure by depth band for one storm of one commune's library."""
+class BaseStormImpactSummaryUnit(TethysDashPlugin):
+    """Exposure by depth band for one storm of one unit's library."""
 
     LANG = None
+    country = None
+    unit_arg = "unit"
+    default_unit = None
     type = "table"
-    args = {"commune": COMOROS_UNIT_OPTIONS, "index": COMOROS_STORM_OPTIONS}
 
     def run(self):
         s = STRINGS[self.LANG]
-        unit = self.get_arg("commune", COMOROS_UNITS[0][0])
+        unit = self.get_arg(self.unit_arg, self.default_unit)
         index = coerce_index(
-            self.get_arg("index", COMOROS_DEFAULT_STORM), COMOROS_DEFAULT_STORM
+            self.get_arg("index", UNIT_DEFAULT_STORM), UNIT_DEFAULT_STORM
         )
-        gdf = comoros_banded_features(unit, index)
-        total = comoros_population(unit)
+        gdf = unit_banded_features(self.country, unit, index)
+        total = unit_population(self.country, unit)
 
         rows = [
             self._row(s, s["bands"][value], gdf[gdf.banda == value], total)
@@ -97,7 +100,7 @@ class BaseStormImpactSummaryComoros(TethysDashPlugin):
         # group["type"], never group.type: on a GeoDataFrame the attribute is the
         # geometry type, so the comparison would match nothing and every building
         # count would read 0.
-        buildings = group[group["type"] == COMOROS_BUILDING]
+        buildings = group[group["type"] == UNIT_BUILDING]
         population = group.population_per_building.sum()
         return {
             s["col_depth"]: name,
@@ -109,10 +112,27 @@ class BaseStormImpactSummaryComoros(TethysDashPlugin):
         }
 
 
-class StormImpactSummaryComoros(BaseStormImpactSummaryComoros):
+class StormImpactSummaryComoros(BaseStormImpactSummaryUnit):
     LANG = "fr"
+    country = "comoros"
+    unit_arg = "commune"
+    default_unit = COMOROS_UNITS[0][0]
+    args = {"commune": COMOROS_UNIT_OPTIONS, "index": UNIT_STORM_OPTIONS}
     name = "uffis_storm_impact_summary_comoros"
     label = f"{STRINGS['fr']['storm_summary_label']} (Comores)"
     group = STRINGS["fr"]["group"]
     tags = ["inondation", "impact", "zarr", "tempête", "tableau", "français"]
     description = STRINGS["fr"]["storm_summary_desc"]
+
+
+class StormImpactSummaryBarbados(BaseStormImpactSummaryUnit):
+    LANG = "en"
+    country = "barbados"
+    unit_arg = "parish"
+    default_unit = "BB08_SaintMichael"
+    args = {"parish": BARBADOS_PARISH_OPTIONS, "index": UNIT_STORM_OPTIONS}
+    name = "uffis_storm_impact_summary_barbados"
+    label = f"{STRINGS['en']['storm_summary_label']} (Barbados)"
+    group = STRINGS["en"]["group"]
+    tags = ["flood", "impact", "zarr", "storm", "table", "english"]
+    description = STRINGS["en"]["storm_summary_desc"]

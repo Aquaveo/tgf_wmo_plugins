@@ -3,7 +3,8 @@
 from tethysapp.tethysdash.plugin_helpers import TethysDashPlugin
 
 from tgf_wmo_plugins.common import (
-    COMOROS_STORM_OPTIONS,
+    BARBADOS_PARISH_OPTIONS,
+    UNIT_STORM_OPTIONS,
     COMOROS_UNIT_OPTIONS,
     COMOROS_UNITS,
     DEFAULT_STORE,
@@ -13,7 +14,7 @@ from tgf_wmo_plugins.common import (
     load_stats,
     storm_row,
 )
-from tgf_wmo_plugins.storm_impact import COMOROS_DEFAULT_STORM, comoros_storm_stats
+from tgf_wmo_plugins.storm_impact import UNIT_DEFAULT_STORM, unit_storm_stats
 from tgf_wmo_plugins.strings import STRINGS
 
 
@@ -97,25 +98,30 @@ class StormCardGuatemala(BaseStormCard):
     description = STRINGS["es"]["storm_card_desc"]
 
 
-class BaseStormCardComoros(TethysDashPlugin):
-    """The same four figures as BaseStormCard, for one commune's library.
+class BaseStormCardUnit(TethysDashPlugin):
+    """The same four figures as BaseStormCard, for one unit's library.
 
     Kept separate rather than folded into that class because the two read their
     numbers from different places: Guatemala has one national store with an
-    `ensemble_stats.csv` precomputed beside it, while a Comoros commune store
-    ships no summary, so the figures are computed from the storm's own chunk.
+    `ensemble_stats.csv` precomputed beside it, while a per-unit store ships no
+    summary, so the figures are computed from the storm's own chunk.
+
+    Subclasses set `country`, and `unit_arg` -- the name the dashboard binds,
+    which reads "commune" for Comoros and "parish" for Barbados.
     """
 
     LANG = None
+    country = None
+    unit_arg = "unit"
+    default_unit = None
     type = "card"
-    args = {"commune": COMOROS_UNIT_OPTIONS, "index": COMOROS_STORM_OPTIONS}
 
     def run(self):
         s = STRINGS[self.LANG]
-        unit = self.get_arg("commune", COMOROS_UNITS[0][0])
-        index = coerce_index(self.get_arg("index", COMOROS_DEFAULT_STORM),
-                             COMOROS_DEFAULT_STORM)
-        stats = comoros_storm_stats(unit, index)
+        unit = self.get_arg(self.unit_arg, self.default_unit)
+        index = coerce_index(self.get_arg("index", UNIT_DEFAULT_STORM),
+                             UNIT_DEFAULT_STORM)
+        stats = unit_storm_stats(self.country, unit, index)
 
         if stats is None:
             return {"data": [{"color": "#888888", "label": s["out_of_range"],
@@ -146,10 +152,27 @@ class BaseStormCardComoros(TethysDashPlugin):
         }
 
 
-class StormCardComoros(BaseStormCardComoros):
+class StormCardComoros(BaseStormCardUnit):
     LANG = "fr"
+    country = "comoros"
+    unit_arg = "commune"
+    default_unit = COMOROS_UNITS[0][0]
+    args = {"commune": COMOROS_UNIT_OPTIONS, "index": UNIT_STORM_OPTIONS}
     name = "uffis_storm_card_comoros"
     label = f"{STRINGS['fr']['storm_card_label']} (Comores)"
     group = STRINGS["fr"]["group"]
     tags = ["inondation", "zarr", "tempête", "carte", "français"]
     description = STRINGS["fr"]["storm_card_desc"]
+
+
+class StormCardBarbados(BaseStormCardUnit):
+    LANG = "en"
+    country = "barbados"
+    unit_arg = "parish"
+    default_unit = "BB08_SaintMichael"
+    args = {"parish": BARBADOS_PARISH_OPTIONS, "index": UNIT_STORM_OPTIONS}
+    name = "uffis_storm_card_barbados"
+    label = f"{STRINGS['en']['storm_card_label']} (Barbados)"
+    group = STRINGS["en"]["group"]
+    tags = ["flood", "zarr", "storm", "card", "english"]
+    description = STRINGS["en"]["storm_card_desc"]

@@ -216,3 +216,11 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Local IBF working data for Barbados, kept out of the repo for size. The
+# training package and the pipeline checkout together are ~4.3 GB, and the
+# receptor file they produce is published to S3 rather than committed:
+# Barbados_training/.../04_ibf_island_deduplicated/
+TITO_Barbados_Training/
+Barbados_Tomas_2010_flood_maps_for_IBF/
+barbados_ibf_receptors_full.*.gpkg

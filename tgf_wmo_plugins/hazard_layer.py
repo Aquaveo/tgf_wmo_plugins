@@ -25,12 +25,14 @@ from tgf_wmo_plugins.classification import (
     LEVELS,
     NODATA,
     PROB_URLS,
+    BarbadosParish,
     ComorosUnit,
     ThresholdGates,
+    barbados_prob_urls,
     clasificar_peligro,
     comoros_prob_urls,
 )
-from tgf_wmo_plugins.common import COMOROS_UNIT_OPTIONS
+from tgf_wmo_plugins.common import BARBADOS_PARISH_OPTIONS, COMOROS_UNIT_OPTIONS
 from tgf_wmo_plugins.strings import STRINGS, threshold_args
 
 # Vectorizing a heavily fragmented classification could produce a huge payload.
@@ -42,6 +44,7 @@ COUNTRY_NAMES = {
     "guatemala": "Guatemala",
     "antigua_barbuda": "Antigua and Barbuda",
     "comoros": "Comores",
+    "barbados": "Barbados",
 }
 
 # The frontend does not bundle proj4, so OpenLayers resolves only these two.
@@ -243,6 +246,20 @@ class HazardLayerAntiguaBarbuda(BaseHazardLayer):
     country = "antigua_barbuda"
     name = "uffis_hazard_layer_antigua_barbuda"
     label = f"{STRINGS['en']['hazard_layer_label']} (Antigua and Barbuda)"
+
+
+class HazardLayerBarbados(BarbadosParish, BaseHazardLayer):
+    LANG = "en"
+    country = "barbados"
+    name = "uffis_hazard_layer_barbados"
+    label = f"{STRINGS['en']['hazard_layer_label']} (Barbados)"
+    # The four gates plus the parish. The island mosaic in PROB_URLS stays the
+    # right input for an island-wide view; this plugin works a parish at a time,
+    # so it reads that parish's own window.
+    args = {**threshold_args("en"), "parish": BARBADOS_PARISH_OPTIONS}
+
+    def prob_urls(self):
+        return barbados_prob_urls(self.unit())
 
 
 class HazardLayerComoros(ComorosUnit, BaseHazardLayer):

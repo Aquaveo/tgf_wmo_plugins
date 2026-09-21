@@ -26,6 +26,8 @@ dependencies = [
 
 [project.entry-points."intake.drivers"]
 uffis_impact_summary_barbados = "tgf_wmo_plugins.impact_summary:ImpactSummaryBarbados"
+uffis_impact_layer_barbados = "tgf_wmo_plugins.impact_layer:ImpactLayerBarbados"
+uffis_hazard_layer_barbados = "tgf_wmo_plugins.hazard_layer:HazardLayerBarbados"
 uffis_impact_summary_guatemala = "tgf_wmo_plugins.impact_summary:ImpactSummaryGuatemala"
 uffis_impact_summary_haiti = "tgf_wmo_plugins.impact_summary:ImpactSummaryHaiti"
 uffis_impact_summary_antigua_barbuda = "tgf_wmo_plugins.impact_summary:ImpactSummaryAntiguaBarbuda"
@@ -43,6 +45,9 @@ uffis_storm_impact_summary_comoros = "tgf_wmo_plugins.storm_impact_summary:Storm
 uffis_storm_card_guatemala = "tgf_wmo_plugins.storm_card:StormCardGuatemala"
 uffis_storm_impact_layer_guatemala = "tgf_wmo_plugins.storm_impact_layer:StormImpactLayerGuatemala"
 uffis_storm_impact_summary_guatemala = "tgf_wmo_plugins.storm_impact_summary:StormImpactSummaryGuatemala"
+uffis_storm_card_barbados = "tgf_wmo_plugins.storm_card:StormCardBarbados"
+uffis_storm_impact_layer_barbados = "tgf_wmo_plugins.storm_impact_layer:StormImpactLayerBarbados"
+uffis_storm_impact_summary_barbados = "tgf_wmo_plugins.storm_impact_summary:StormImpactSummaryBarbados"
 
 [tool.setuptools.packages.find]
 include = ["tgf_wmo_plugins*"]
