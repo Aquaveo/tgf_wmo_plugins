@@ -19,7 +19,9 @@ dependencies = [
     "zarr",
     "fsspec",
     "aiohttp",
-    "pyogrio"
+    "pyogrio",
+    "zarr==3.1.6",
+    "pyarrow==22.0.0"
 ]
 
 [project.entry-points."intake.drivers"]
