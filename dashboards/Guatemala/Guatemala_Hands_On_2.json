@@ -1,0 +1,379 @@
+{
+ "name": "Guatemala Práctica 2",
+ "description": "Solución para el Ejercicio Práctico #2 de la OMM en Guatemala",
+ "publicDashboard": false,
+ "userPermission": "admin",
+ "permissions": [
+  {
+   "username": "admin",
+   "permission": "admin"
+  }
+ ],
+ "unrestrictedPlacement": true,
+ "image": "/media/tethysdash/app/818087b2-909a-4104-89de-e2693e59ca41.png",
+ "owner": "admin",
+ "notes": "",
+ "tabs": [
+  {
+   "id": 202,
+   "name": "Principal",
+   "gridItems": [
+    {
+     "i": "1",
+     "x": 0,
+     "y": 0,
+     "w": 54,
+     "h": 38,
+     "source": "Map",
+     "args_string": {
+      "baseMap": "${Mapa Base}",
+      "layerControl": true,
+      "layers": [
+       {
+        "configuration": {
+         "type": "WebGLTile",
+         "props": {
+          "name": "Profundidad de Inundación",
+          "source": {
+           "type": "Zarr",
+           "props": {
+            "url": "https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/floodmaps_test",
+            "variable": "depth",
+            "index": "${Tormenta}",
+            "normalize": true
+           },
+           "rampName": "turbo"
+          }
+         },
+         "style": {
+          "color": [
+           "case",
+           [
+            "==",
+            [
+             "band",
+             2
+            ],
+            0
+           ],
+           [
+            0,
+            0,
+            0,
+            0
+           ],
+           [
+            "interpolate",
+            [
+             "linear"
+            ],
+            [
+             "band",
+             1
+            ],
+            0,
+            "#30123b",
+            0.03225806451612903,
+            "#362360",
+            0.06451612903225806,
+            "#3b3384",
+            0.0967741935483871,
+            "#4043a6",
+            0.12903225806451613,
+            "#4352bd",
+            0.16129032258064516,
+            "#4562d4",
+            0.1935483870967742,
+            "#4671e7",
+            0.22580645161290322,
+            "#447ff1",
+            0.25806451612903225,
+            "#438dfa",
+            0.2903225806451613,
+            "#3d9cfb",
+            0.3225806451612903,
+            "#34aaf4",
+            0.3548387096774194,
+            "#2bb8ed",
+            0.3870967741935484,
+            "#24c4e1",
+            0.41935483870967744,
+            "#1ed0d2",
+            0.45161290322580644,
+            "#18dcc4",
+            0.4838709677419355,
+            "#20e4b5",
+            0.5161290322580645,
+            "#2aeba5",
+            0.5483870967741935,
+            "#34f296",
+            0.5806451612903226,
+            "#49f683",
+            0.6129032258064516,
+            "#5efb70",
+            0.6451612903225806,
+            "#73fd5f",
+            0.6774193548387096,
+            "#88fc51",
+            0.7096774193548387,
+            "#9efb43",
+            0.7419354838709677,
+            "#b2f738",
+            0.7741935483870968,
+            "#c4ed32",
+            0.8064516129032258,
+            "#d6e42b",
+            0.8387096774193549,
+            "#e4d426",
+            0.8709677419354839,
+            "#eec222",
+            0.9032258064516129,
+            "#f8af1e",
+            0.9354838709677419,
+            "#d57b15",
+            0.967741935483871,
+            "#a83f0c",
+            1,
+            "#7a0403"
+           ]
+          ]
+         }
+        },
+        "legend": "default"
+       },
+       {
+        "configuration": {
+         "type": "VectorLayer",
+         "props": {
+          "name": "Edificios y carreteras inundados",
+          "source": {
+           "type": "GeoJSON",
+           "props": {},
+           "geojson": {
+            "type": "FeatureCollection",
+            "features": [],
+            "crs": {
+             "type": "name",
+             "properties": {
+              "name": "EPSG:4326"
+             }
+            }
+           }
+          },
+          "pluginSource": {
+           "source": "uffis_storm_impact_layer_guatemala",
+           "args": {
+            "index": "${Tormenta}"
+           }
+          },
+          "layerId": "c141e70d-2f74-4d08-b213-16d1a6c0eed1"
+         },
+         "style": {
+          "default": {
+           "polygon": {
+            "fill": "#9e9e9e",
+            "stroke": "#9e9e9e",
+            "strokeWidth": "0"
+           },
+           "linestring": {
+            "stroke": "#9e9e9e",
+            "strokeWidth": "1"
+           }
+          },
+          "rules": [
+           {
+            "name": "0.05 - 0.3 m (edificios)",
+            "geometryType": "polygon",
+            "conditionField": "banda",
+            "conditionType": "=",
+            "conditionValue": "1",
+            "fill": "green",
+            "stroke": "green",
+            "strokeWidth": "1"
+           },
+           {
+            "name": "0.05 - 0.3 m (carreteras)",
+            "geometryType": "linestring",
+            "conditionField": "banda",
+            "conditionType": "=",
+            "conditionValue": "1",
+            "stroke": "green",
+            "strokeWidth": "3"
+           },
+           {
+            "name": "0.3 - 1 m (edificios)",
+            "geometryType": "polygon",
+            "conditionField": "banda",
+            "conditionType": "=",
+            "conditionValue": "2",
+            "fill": "yellow",
+            "stroke": "yellow",
+            "strokeWidth": "1"
+           },
+           {
+            "name": "0.3 - 1 m (carreteras)",
+            "geometryType": "linestring",
+            "conditionField": "banda",
+            "conditionType": "=",
+            "conditionValue": "2",
+            "stroke": "yellow",
+            "strokeWidth": "3"
+           },
+           {
+            "name": "1 - 2 m (edificios)",
+            "geometryType": "polygon",
+            "conditionField": "banda",
+            "conditionType": "=",
+            "conditionValue": "3",
+            "fill": "red",
+            "stroke": "red",
+            "strokeWidth": "1"
+           },
+           {
+            "name": "1 - 2 m (carreteras)",
+            "geometryType": "linestring",
+            "conditionField": "banda",
+            "conditionType": "=",
+            "conditionValue": "3",
+            "stroke": "red",
+            "strokeWidth": "3"
+           },
+           {
+            "name": "2 m o más (edificios)",
+            "geometryType": "polygon",
+            "conditionField": "banda",
+            "conditionType": "=",
+            "conditionValue": "4",
+            "fill": "purple",
+            "stroke": "purple",
+            "strokeWidth": "1"
+           },
+           {
+            "name": "2 m o más (carreteras)",
+            "geometryType": "linestring",
+            "conditionField": "banda",
+            "conditionType": "=",
+            "conditionValue": "4",
+            "stroke": "purple",
+            "strokeWidth": "3"
+           }
+          ]
+         }
+        },
+        "legend": {
+         "title": "Profundidad",
+         "items": [
+          {
+           "label": "0.05 - 0.3 m",
+           "color": "green",
+           "symbol": "square"
+          },
+          {
+           "label": "0.3 - 1 m",
+           "color": "yellow",
+           "symbol": "square"
+          },
+          {
+           "label": "1 - 2 m",
+           "color": "red",
+           "symbol": "square"
+          },
+          {
+           "label": "2 m o más",
+           "color": "purple",
+           "symbol": "square"
+          }
+         ]
+        }
+       }
+      ],
+      "map_extent": {
+       "extent": "-10078413.13,1629754.90,14.83"
+      },
+      "mapDrawing": {}
+     },
+     "metadata_string": {
+      "border": {
+       "border": "1px solid black"
+      },
+      "backgroundColor": "#ffffff"
+     }
+    },
+    {
+     "i": "2",
+     "x": 42,
+     "y": 0,
+     "w": 12,
+     "h": 6,
+     "source": "Variable Input",
+     "args_string": {
+      "variable_name": "Tormenta",
+      "show_label": true,
+      "variable_options_source": "Mapas de Inundación (Español): Resumen de Impacto por Tormenta (Español) - Index",
+      "variable_options_source.metadata": {
+       "min": 2,
+       "max": 199,
+       "step": 1,
+       "dataType": "Number",
+       "outputFormat": "{{n}}",
+       "rangeMode": false,
+       "speedOptions": [
+        1000,
+        500
+       ],
+       "initialValue": 2
+      },
+      "initial_value": "2"
+     },
+     "metadata_string": {
+      "border": {
+       "border-right": "1px solid black"
+      },
+      "backgroundColor": "#ffffff"
+     }
+    },
+    {
+     "i": "3",
+     "x": 54,
+     "y": 23,
+     "w": 46,
+     "h": 13,
+     "source": "uffis_storm_card_guatemala",
+     "args_string": {
+      "index": "${Tormenta}"
+     },
+     "metadata_string": {}
+    },
+    {
+     "i": "4",
+     "x": 0,
+     "y": 0,
+     "w": 15,
+     "h": 6,
+     "source": "Variable Input",
+     "args_string": {
+      "variable_name": "Mapa Base",
+      "show_label": true,
+      "variable_options_source": "Base Map Layers",
+      "initial_value": "https://server.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer"
+     },
+     "metadata_string": {
+      "backgroundColor": "#ffffff"
+     }
+    },
+    {
+     "i": "5",
+     "x": 54,
+     "y": 2,
+     "w": 45,
+     "h": 26,
+     "source": "uffis_storm_impact_summary_guatemala",
+     "args_string": {
+      "index": "${Tormenta}"
+     },
+     "metadata_string": {}
+    }
+   ]
+  }
+ ]
+}

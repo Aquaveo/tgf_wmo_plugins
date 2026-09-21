@@ -284,9 +284,9 @@ terminados están en este repositorio dentro de ``dashboards/``:
 
 .. code-block:: text
 
-   dashboards/Guatemala/Guatemala_Hands_On_1_Espanol.json
-   dashboards/Guatemala/Guatemala_Hands_On_2_Espanol.json
-   dashboards/Guatemala/Guatemala_Hands_On_3_Espanol.json
+   dashboards/Guatemala/Guatemala_Hands_On_1.json
+   dashboards/Guatemala/Guatemala_Hands_On_2.json
+   dashboards/Guatemala/Guatemala_Hands_On_3.json
 
 Las versiones en inglés están junto a ellos, con ``_English`` en lugar de
 ``_Espanol``. Los tableros en español usan los módulos ``_es`` en todo momento, de

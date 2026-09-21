@@ -47,6 +47,17 @@ is country-specific.
 | `ex2-dynamic-layer-style.png` | the **Style** tab after fetching, showing the eight rules on the `banda` attribute |
 | `ex2-table-card.png` | the summary table and card for one scenario |
 
+## Exercise 3
+
+| file | shows |
+|---|---|
+| `ex3-finished.png` | the finished dashboard: full-window map, four threshold inputs along the top, commune selector top-left, impact table right |
+| `ex3-threshold-inputs.png` | the four threshold inputs side by side, each showing its label and value |
+| `ex3-hazard-layer-source.png` | the **Source** tab for the hazard layer, four gates and the commune bound to variables |
+| `ex3-impact-summary.png` | the impact summary table arguments bound to the four thresholds and the commune |
+| `ex3-thresholds-before.png` | the view before lowering the Faible threshold |
+| `ex3-thresholds-after.png` | the same view after lowering it |
+
 **Before capturing anything**, note the warning at the top of `exercise_1.rst`:
 the Comoros rasters are EPSG:5629, and until that code is registered in
 `reactapp/components/map/projections.js` the layers will not place. Screenshots

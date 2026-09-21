@@ -574,11 +574,17 @@ GPKG_LAYERS = {
     "comoros": KM_LAYERS,
 }
 
-# Row filter applied at read time, per country. Only Comoros needs one: its
-# geopackage is per island, so the commune has to be selected out of it. Pushing
-# this into the driver rather than filtering afterwards keeps 110,000 unwanted
-# geometries from ever being built.
-GPKG_WHERE = {"comoros": f"ADM3_PCODE = '{COMOROS_PCODE}'"}
+def gpkg_where(country, unit=None):
+    """Row filter for a country's geopackage read, or None for no filter.
+
+    Only Comoros needs one: its geopackage is per island, so the commune has to
+    be selected out of it. Pushing this into the driver rather than filtering
+    afterwards keeps 110,000 unwanted geometries from ever being built.
+    """
+    if country != "comoros":
+        return None
+    pcode = (unit or COMOROS_UNIT).split("_")[0]
+    return f"ADM3_PCODE = '{pcode}'"
 
 # Factor that puts a country's probability columns on the 0-1 scale the gates
 # assume. Only Comoros stores them as percent; left unscaled, a gate of 0.8 is

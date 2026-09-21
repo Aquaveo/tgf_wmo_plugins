@@ -40,6 +40,9 @@ uffis_hazard_layer_comoros = "tgf_wmo_plugins.hazard_layer:HazardLayerComoros"
 uffis_storm_card_comoros = "tgf_wmo_plugins.storm_card:StormCardComoros"
 uffis_storm_impact_layer_comoros = "tgf_wmo_plugins.storm_impact_layer:StormImpactLayerComoros"
 uffis_storm_impact_summary_comoros = "tgf_wmo_plugins.storm_impact_summary:StormImpactSummaryComoros"
+uffis_storm_card_guatemala = "tgf_wmo_plugins.storm_card:StormCardGuatemala"
+uffis_storm_impact_layer_guatemala = "tgf_wmo_plugins.storm_impact_layer:StormImpactLayerGuatemala"
+uffis_storm_impact_summary_guatemala = "tgf_wmo_plugins.storm_impact_summary:StormImpactSummaryGuatemala"
 
 [tool.setuptools.packages.find]
 include = ["tgf_wmo_plugins*"]

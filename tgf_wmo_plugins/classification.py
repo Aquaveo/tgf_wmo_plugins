@@ -48,17 +48,37 @@ PROB_URLS = {
         f"antiguabarbuda_prob_depth_ge_{depth}_overbank.tif"
         for depth in ("10cm", "30cm", "70cm", "100cm")
     ],
-    # Comoros is EPSG:5629 (Moznet / UTM zone 38S) at 30.57 m, the island model's
-    # own grid rather than a reprojected copy, and windowed on one commune rather
-    # than a whole country -- 169 x 198 cells for Moroni. The hazard layer
-    # reprojects the polygons it makes from these, because 5629 is not one of the
-    # two projections the frontend can resolve.
-    "comoros": [
-        f"{COMOROS_ROOT}/fim/{COMOROS_UNIT}/stream_sat_stormlab/pluvial_overbank/"
-        f"prob_depth_ge_{depth}_overbank.{COMOROS_CYCLE}.tif"
-        for depth in ("10cm", "30cm", "70cm", "100cm")
-    ],
 }
+
+
+def comoros_prob_urls(unit=COMOROS_UNIT):
+    """The four exceedance rasters for one Comorian commune.
+
+    Comoros cannot join PROB_URLS above: its products are written one set per
+    ADM3 commune, so there is no single list of four to name. The plugins pick a
+    commune at request time and call this instead.
+
+    EPSG:5629 (Moznet / UTM zone 38S) at 30.57 m -- the island model's own grid
+    rather than a reprojected copy -- and windowed on the commune, so 169 x 198
+    cells for Moroni rather than a national extent.
+    """
+    base = f"{COMOROS_ROOT}/fim/{unit}/stream_sat_stormlab/pluvial_overbank"
+    return [
+        f"{base}/prob_depth_ge_{depth}_overbank.{COMOROS_CYCLE}.tif"
+        for depth in ("10cm", "30cm", "70cm", "100cm")
+    ]
+
+
+class ComorosUnit:
+    """Reads the commune argument the per-commune Comoros products need.
+
+    Mixed into every Comoros plugin that reads a commune-scoped product, beside
+    ThresholdGates, so the argument name is declared in exactly one place. Like
+    the gates, it is read at request time rather than baked into the class.
+    """
+
+    def unit(self):
+        return self.get_arg("commune", COMOROS_UNIT)
 
 # Level -> (class value, display label, colour). Ordered shallow to deep, which
 # is also the order the notebook assigns them in.

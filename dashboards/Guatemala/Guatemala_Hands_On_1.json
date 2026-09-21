@@ -1,6 +1,6 @@
 {
- "name": "Comoros Hands On 1 (English)",
- "description": "Solution for WMO Comoros Hands On Exercise #1",
+ "name": "Guatemala Práctica 1",
+ "description": "Solución para el Ejercicio Práctico #1 de la OMM en Guatemala",
  "publicDashboard": false,
  "userPermission": "admin",
  "permissions": [
@@ -10,37 +10,147 @@
   }
  ],
  "unrestrictedPlacement": true,
- "autoThumbnail": true,
- "image": "/media/tethysdash/app/cf88a9a2-63c1-4f73-894a-08d51d2e09ad.png",
+ "image": "/media/tethysdash/app/c24c23fd-f046-4cf9-a75e-e091b4686cc8.png",
  "owner": "admin",
  "notes": "",
  "tabs": [
   {
-   "id": 216,
-   "name": "Main",
+   "id": 200,
+   "name": "Principal",
    "gridItems": [
     {
      "i": "1",
-     "x": 8,
-     "y": 4,
-     "w": 20,
-     "h": 20,
+     "x": 0,
+     "y": 0,
+     "w": 99,
+     "h": 41,
      "source": "Map",
      "args_string": {
-      "baseMap": "${Base Map}",
+      "baseMap": "${Mapa Base}",
       "layerControl": true,
       "layers": [
        {
         "configuration": {
          "type": "WebGLTile",
          "props": {
-          "name": "Flood Probability at 100 cm",
+          "name": "Profundidad (m)",
           "opacity": ".5",
           "source": {
            "type": "GeoTIFF",
            "props": {
-            "url": "https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/Comoros_training/Comoros_cycle_20240427_0000UTC/Comoros_cycle_20240427_0000UTC/fim/${Commune}/stream_sat_stormlab/pluvial_overbank/prob_depth_ge_100cm_overbank.20240427.000000.tif",
-            "mask_below": "${Probability Mask}",
+            "url": "https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/PBI_Actividad_2/depth_m.tif",
+            "mask_below": "0.01",
+            "normalize": true
+           },
+           "rampName": "YlGnBu"
+          }
+         },
+         "style": {
+          "color": [
+           "case",
+           [
+            "==",
+            [
+             "band",
+             2
+            ],
+            0
+           ],
+           [
+            0,
+            0,
+            0,
+            0
+           ],
+           [
+            "interpolate",
+            [
+             "linear"
+            ],
+            [
+             "band",
+             1
+            ],
+            0,
+            "#ffffd9",
+            0.03225806451612903,
+            "#fafdcf",
+            0.06451612903225806,
+            "#f6fbc5",
+            0.0967741935483871,
+            "#f1f9bc",
+            0.12903225806451613,
+            "#e9f6b8",
+            0.16129032258064516,
+            "#e1f3b5",
+            0.1935483870967742,
+            "#d8f0b3",
+            0.22580645161290322,
+            "#ccebb4",
+            0.25806451612903225,
+            "#c0e6b5",
+            0.2903225806451613,
+            "#b1e0b6",
+            0.3225806451612903,
+            "#9dd9b8",
+            0.3548387096774194,
+            "#8ad1ba",
+            0.3870967741935484,
+            "#79cbbc",
+            0.41935483870967744,
+            "#69c5be",
+            0.45161290322580644,
+            "#59bfc1",
+            0.4838709677419355,
+            "#4cb7c1",
+            0.5161290322580645,
+            "#3fb0c2",
+            0.5483870967741935,
+            "#33a8c2",
+            0.5806451612903226,
+            "#2b9ec1",
+            0.6129032258064516,
+            "#2394bf",
+            0.6451612903225806,
+            "#1e89bc",
+            0.6774193548387096,
+            "#1f7bb6",
+            0.7096774193548387,
+            "#206eaf",
+            0.7419354838709677,
+            "#2261aa",
+            0.7741935483870968,
+            "#2256a4",
+            0.8064516129032258,
+            "#234b9f",
+            0.8387096774193549,
+            "#224197",
+            0.8709677419354839,
+            "#20388e",
+            0.9032258064516129,
+            "#1d2f85",
+            0.9354838709677419,
+            "#172977",
+            0.967741935483871,
+            "#0f2367",
+            1,
+            "#081d58"
+           ]
+          ]
+         }
+        },
+        "legend": "default"
+       },
+       {
+        "configuration": {
+         "type": "WebGLTile",
+         "props": {
+          "name": "Probabilidad de Inundación a 76 cm",
+          "source": {
+           "type": "GeoTIFF",
+           "props": {
+            "url": "https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/PBI_Actividad_2/prob_76cm.tif",
+            "mask_below": "0",
             "normalize": false
            },
            "rampName": "turbo",
@@ -56,6 +166,20 @@
             [
              "band",
              2
+            ],
+            0
+           ],
+           [
+            0,
+            0,
+            0,
+            0
+           ],
+           [
+            "<=",
+            [
+             "band",
+             1
             ],
             0
            ],
@@ -148,17 +272,16 @@
         "configuration": {
          "type": "WebGLTile",
          "props": {
-          "name": "Flood Probability at 70 cm",
-          "opacity": ".5",
+          "name": "Probabilidad de Inundación a 30 cm",
           "source": {
            "type": "GeoTIFF",
            "props": {
-            "url": "https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/Comoros_training/Comoros_cycle_20240427_0000UTC/Comoros_cycle_20240427_0000UTC/fim/${Commune}/stream_sat_stormlab/pluvial_overbank/prob_depth_ge_70cm_overbank.20240427.000000.tif",
-            "mask_below": "${Probability Mask}",
+            "url": "https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/PBI_Actividad_2/prob_30cm.tif",
+            "mask_below": "0",
             "normalize": false
            },
            "rampName": "turbo",
-           "rampMin": "0",
+           "rampMin": "00",
            "rampMax": "1"
           }
          },
@@ -170,6 +293,20 @@
             [
              "band",
              2
+            ],
+            0
+           ],
+           [
+            0,
+            0,
+            0,
+            0
+           ],
+           [
+            "<=",
+            [
+             "band",
+             1
             ],
             0
            ],
@@ -261,13 +398,12 @@
         "configuration": {
          "type": "WebGLTile",
          "props": {
-          "name": "Flood Probability at 30 cm",
-          "opacity": ".5",
+          "name": "Probabilidad de Inundación a 10 cm",
           "source": {
            "type": "GeoTIFF",
            "props": {
-            "url": "https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/Comoros_training/Comoros_cycle_20240427_0000UTC/Comoros_cycle_20240427_0000UTC/fim/${Commune}/stream_sat_stormlab/pluvial_overbank/prob_depth_ge_30cm_overbank.20240427.000000.tif",
-            "mask_below": "${Probability Mask}",
+            "url": "https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/PBI_Actividad_2/prob_10cm.tif",
+            "mask_below": "0",
             "normalize": false
            },
            "rampName": "turbo",
@@ -283,6 +419,20 @@
             [
              "band",
              2
+            ],
+            0
+           ],
+           [
+            0,
+            0,
+            0,
+            0
+           ],
+           [
+            "<=",
+            [
+             "band",
+             1
             ],
             0
            ],
@@ -374,13 +524,12 @@
         "configuration": {
          "type": "WebGLTile",
          "props": {
-          "name": "Flood Probability at 10 cm",
-          "opacity": ".5",
+          "name": "Probabilidad de Inundación a 7.6 cm",
           "source": {
            "type": "GeoTIFF",
            "props": {
-            "url": "https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/Comoros_training/Comoros_cycle_20240427_0000UTC/Comoros_cycle_20240427_0000UTC/fim/${Commune}/stream_sat_stormlab/pluvial_overbank/prob_depth_ge_10cm_overbank.20240427.000000.tif",
-            "mask_below": "${Probability Mask}",
+            "url": "https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/PBI_Actividad_2/prob_7p62.tif",
+            "mask_below": "0",
             "normalize": false
            },
            "rampName": "turbo",
@@ -396,6 +545,20 @@
             [
              "band",
              2
+            ],
+            0
+           ],
+           [
+            0,
+            0,
+            0,
+            0
+           ],
+           [
+            "<=",
+            [
+             "band",
+             1
             ],
             0
            ],
@@ -485,7 +648,7 @@
        }
       ],
       "map_extent": {
-       "extent": "4814984.15,-1312113.30,13.83"
+       "extent": "-10078437.52,1629645.07,15"
       },
       "mapDrawing": {}
      },
@@ -495,274 +658,16 @@
     },
     {
      "i": "2",
-     "x": 86,
-     "y": 0,
-     "w": 14,
-     "h": 5,
-     "source": "Variable Input",
-     "args_string": {
-      "variable_name": "Probability Mask",
-      "show_label": true,
-      "variable_options_source": "number",
-      "initial_value": 0
-     },
-     "metadata_string": {
-      "backgroundColor": "#FFFFFF"
-     }
-    },
-    {
-     "i": "3",
      "x": 0,
      "y": 0,
-     "w": 14,
+     "w": 15,
      "h": 5,
      "source": "Variable Input",
      "args_string": {
-      "variable_name": "Base Map",
+      "variable_name": "Mapa Base",
       "show_label": true,
       "variable_options_source": "Base Map Layers",
       "initial_value": "https://server.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer"
-     },
-     "metadata_string": {
-      "backgroundColor": "#FFFFFF"
-     }
-    },
-    {
-     "i": "4",
-     "x": 42,
-     "y": 0,
-     "w": 18,
-     "h": 5,
-     "source": "Variable Input",
-     "args_string": {
-      "variable_name": "Commune",
-      "show_label": true,
-      "variable_options_source": "dropdown",
-      "variable_options_source.metadata": {
-       "choices": [
-        {
-         "label": "Bambao Mtsanga",
-         "value": "KM111_BambaoMtsanga"
-        },
-        {
-         "label": "Domoni",
-         "value": "KM112_Domoni"
-        },
-        {
-         "label": "Jimlimé",
-         "value": "KM113_Jimlime"
-        },
-        {
-         "label": "Koni",
-         "value": "KM114_Koni"
-        },
-        {
-         "label": "Ngandzalé",
-         "value": "KM115_Ngandzale"
-        },
-        {
-         "label": "Adda",
-         "value": "KM121_Adda"
-        },
-        {
-         "label": "Chaweni",
-         "value": "KM122_Chaweni"
-        },
-        {
-         "label": "Mramani",
-         "value": "KM123_Mramani"
-        },
-        {
-         "label": "Mrémani",
-         "value": "KM124_Mremani"
-        },
-        {
-         "label": "Ongojou",
-         "value": "KM125_Ongojou"
-        },
-        {
-         "label": "Bandrani Ya Chironkamba",
-         "value": "KM131_BandraniYaChironkamba"
-        },
-        {
-         "label": "Bandrani Ya Mtsangani",
-         "value": "KM132_BandraniYaMtsangani"
-        },
-        {
-         "label": "Mirontsi",
-         "value": "KM133_Mirontsi"
-        },
-        {
-         "label": "Mutsamudu",
-         "value": "KM134_Mutsamudu"
-        },
-        {
-         "label": "Bambao Mtrouni",
-         "value": "KM141_BambaoMtrouni"
-        },
-        {
-         "label": "Bazimini",
-         "value": "KM142_Bazimini"
-        },
-        {
-         "label": "Ouani",
-         "value": "KM143_Ouani"
-        },
-        {
-         "label": "Moya",
-         "value": "KM151_Moya"
-        },
-        {
-         "label": "Sima",
-         "value": "KM152_Sima"
-        },
-        {
-         "label": "Vouani",
-         "value": "KM153_Vouani"
-        },
-        {
-         "label": "Mboinkou",
-         "value": "KM211_Mboinkou"
-        },
-        {
-         "label": "Nyuma Mro",
-         "value": "KM212_NyumaMro"
-        },
-        {
-         "label": "Nyuma Msiru",
-         "value": "KM213_NyumaMsiru"
-        },
-        {
-         "label": "Djoumoipangua",
-         "value": "KM221_Djoumoipangua"
-        },
-        {
-         "label": "Tsinimoipangua",
-         "value": "KM222_Tsinimoipangua"
-        },
-        {
-         "label": "Bangaani",
-         "value": "KM231_Bangaani"
-        },
-        {
-         "label": "Djoumoichongo",
-         "value": "KM232_Djoumoichongo"
-        },
-        {
-         "label": "Hamanvou",
-         "value": "KM233_Hamanvou"
-        },
-        {
-         "label": "Isahari",
-         "value": "KM234_Isahari"
-        },
-        {
-         "label": "Mbadani",
-         "value": "KM235_Mbadani"
-        },
-        {
-         "label": "Domba",
-         "value": "KM241_Domba"
-        },
-        {
-         "label": "Itsahidi",
-         "value": "KM242_Itsahidi"
-        },
-        {
-         "label": "Pimba",
-         "value": "KM243_Pimba"
-        },
-        {
-         "label": "Ngouengoe",
-         "value": "KM251_Ngouengoe"
-        },
-        {
-         "label": "Nioumagama",
-         "value": "KM252_Nioumagama"
-        },
-        {
-         "label": "Cembenoi Lac Salé",
-         "value": "KM261_CembenoiLacSale"
-        },
-        {
-         "label": "Cembenoi Sada Djoulamlima",
-         "value": "KM262_CembenoiSadaDjoulamlima"
-        },
-        {
-         "label": "Mitsamiouli",
-         "value": "KM263_Mitsamiouli"
-        },
-        {
-         "label": "Nyuma Komo",
-         "value": "KM264_NyumaKomo"
-        },
-        {
-         "label": "Nyumamro Kiblani",
-         "value": "KM265_NyumamroKiblani"
-        },
-        {
-         "label": "Nyumamro Souheili",
-         "value": "KM266_NyumamroSouheili"
-        },
-        {
-         "label": "Bambao Ya Hari",
-         "value": "KM271_BambaoYaHari"
-        },
-        {
-         "label": "Bambao Ya Mboini",
-         "value": "KM272_BambaoYaMboini"
-        },
-        {
-         "label": "Bambao Yadjou",
-         "value": "KM273_BambaoYadjou"
-        },
-        {
-         "label": "Moroni",
-         "value": "KM274_Moroni"
-        },
-        {
-         "label": "Dimani",
-         "value": "KM281_Dimani"
-        },
-        {
-         "label": "Oichili Yadjou",
-         "value": "KM282_OichiliYadjou"
-        },
-        {
-         "label": "Oichili Yamboini",
-         "value": "KM283_OichiliYamboini"
-        },
-        {
-         "label": "Cratère du Karthala",
-         "value": "KM291_CratereDuKarthala"
-        },
-        {
-         "label": "Djando",
-         "value": "KM311_Djando"
-        },
-        {
-         "label": "Fomboni",
-         "value": "KM321_Fomboni"
-        },
-        {
-         "label": "Moili Mdjini",
-         "value": "KM322_MoiliMdjini"
-        },
-        {
-         "label": "Moimbassa",
-         "value": "KM323_Moimbassa"
-        },
-        {
-         "label": "Mlédjélé",
-         "value": "KM331_Mledjele"
-        },
-        {
-         "label": "Moimbao",
-         "value": "KM332_Moimbao"
-        }
-       ]
-      },
-      "initial_value": "KM274_Moroni"
      },
      "metadata_string": {
       "backgroundColor": "#ffffff"

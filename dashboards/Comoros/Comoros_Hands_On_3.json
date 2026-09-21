@@ -1,6 +1,6 @@
 {
- "name": "Antigua and Barbuda Hands On 3 with Depth",
- "description": "Hands On 3 plus flood depth for one storm of the Saint John's flood-map library",
+ "name": "Comores Exercice 3",
+ "description": "Solution pour l'exercice pratique OMM Comores n°3",
  "publicDashboard": false,
  "userPermission": "admin",
  "permissions": [
@@ -10,12 +10,12 @@
   }
  ],
  "unrestrictedPlacement": true,
- "image": "/media/tethysdash/app/756cbca8-bc08-49ae-91a4-6a1e4e7b228c.png",
+ "autoThumbnail": true,
  "owner": "admin",
  "notes": "",
  "tabs": [
   {
-   "id": 306,
+   "id": 220,
    "name": "Main",
    "gridItems": [
     {
@@ -26,655 +26,463 @@
      "h": 41,
      "source": "Map",
      "args_string": {
-      "baseMap": "${Base Map}",
+      "baseMap": "${Fond de Carte}",
       "layerControl": true,
       "layers": [
        {
         "configuration": {
          "type": "WebGLTile",
          "props": {
-          "name": "Flood Probability at 100 cm",
+          "name": "Probabilité d'inondation à 100 cm",
+          "opacity": ".5",
           "source": {
            "type": "GeoTIFF",
            "props": {
-            "url": "https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/antigua_barbuda_IBF/depth_prob/antiguabarbuda_prob_depth_ge_100cm_overbank.tif",
+            "url": "https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/Comoros_training/Comoros_cycle_20240427_0000UTC/Comoros_cycle_20240427_0000UTC/fim/${Commune}/stream_sat_stormlab/pluvial_overbank/prob_depth_ge_100cm_overbank.20240427.000000.tif",
             "mask_below": "0",
             "normalize": false
            },
            "rampName": "turbo",
            "rampMin": "0",
            "rampMax": "1"
-          }
-         },
-         "layerVisibility": false,
-         "style": {
-          "color": [
-           "case",
-           [
-            "==",
-            [
-             "band",
-             2
-            ],
-            0
-           ],
-           [
-            0,
-            0,
-            0,
-            0
-           ],
-           [
-            "<=",
-            [
-             "band",
-             1
-            ],
-            0
-           ],
-           [
-            0,
-            0,
-            0,
-            0
-           ],
-           [
-            "interpolate",
-            [
-             "linear"
-            ],
-            [
-             "band",
-             1
-            ],
-            0,
-            "#30123b",
-            0.03225806451612903,
-            "#362360",
-            0.06451612903225806,
-            "#3b3384",
-            0.0967741935483871,
-            "#4043a6",
-            0.12903225806451613,
-            "#4352bd",
-            0.16129032258064516,
-            "#4562d4",
-            0.1935483870967742,
-            "#4671e7",
-            0.22580645161290322,
-            "#447ff1",
-            0.25806451612903225,
-            "#438dfa",
-            0.2903225806451613,
-            "#3d9cfb",
-            0.3225806451612903,
-            "#34aaf4",
-            0.3548387096774194,
-            "#2bb8ed",
-            0.3870967741935484,
-            "#24c4e1",
-            0.41935483870967744,
-            "#1ed0d2",
-            0.45161290322580644,
-            "#18dcc4",
-            0.4838709677419355,
-            "#20e4b5",
-            0.5161290322580645,
-            "#2aeba5",
-            0.5483870967741935,
-            "#34f296",
-            0.5806451612903226,
-            "#49f683",
-            0.6129032258064516,
-            "#5efb70",
-            0.6451612903225806,
-            "#73fd5f",
-            0.6774193548387096,
-            "#88fc51",
-            0.7096774193548387,
-            "#9efb43",
-            0.7419354838709677,
-            "#b2f738",
-            0.7741935483870968,
-            "#c4ed32",
-            0.8064516129032258,
-            "#d6e42b",
-            0.8387096774193549,
-            "#e4d426",
-            0.8709677419354839,
-            "#eec222",
-            0.9032258064516129,
-            "#f8af1e",
-            0.9354838709677419,
-            "#d57b15",
-            0.967741935483871,
-            "#a83f0c",
-            1,
-            "#7a0403"
-           ]
-          ]
-         }
-        },
-        "legend": "default"
-       },
-       {
-        "configuration": {
-         "type": "WebGLTile",
-         "props": {
-          "name": "Flood Probability at 70 cm",
-          "source": {
-           "type": "GeoTIFF",
-           "props": {
-            "url": "https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/antigua_barbuda_IBF/depth_prob/antiguabarbuda_prob_depth_ge_70cm_overbank.tif",
-            "mask_below": "0",
-            "normalize": false
-           },
-           "rampName": "turbo",
-           "rampMin": "0",
-           "rampMax": "1"
-          }
-         },
-         "layerVisibility": false,
-         "style": {
-          "color": [
-           "case",
-           [
-            "==",
-            [
-             "band",
-             2
-            ],
-            0
-           ],
-           [
-            0,
-            0,
-            0,
-            0
-           ],
-           [
-            "<=",
-            [
-             "band",
-             1
-            ],
-            0
-           ],
-           [
-            0,
-            0,
-            0,
-            0
-           ],
-           [
-            "interpolate",
-            [
-             "linear"
-            ],
-            [
-             "band",
-             1
-            ],
-            0,
-            "#30123b",
-            0.03225806451612903,
-            "#362360",
-            0.06451612903225806,
-            "#3b3384",
-            0.0967741935483871,
-            "#4043a6",
-            0.12903225806451613,
-            "#4352bd",
-            0.16129032258064516,
-            "#4562d4",
-            0.1935483870967742,
-            "#4671e7",
-            0.22580645161290322,
-            "#447ff1",
-            0.25806451612903225,
-            "#438dfa",
-            0.2903225806451613,
-            "#3d9cfb",
-            0.3225806451612903,
-            "#34aaf4",
-            0.3548387096774194,
-            "#2bb8ed",
-            0.3870967741935484,
-            "#24c4e1",
-            0.41935483870967744,
-            "#1ed0d2",
-            0.45161290322580644,
-            "#18dcc4",
-            0.4838709677419355,
-            "#20e4b5",
-            0.5161290322580645,
-            "#2aeba5",
-            0.5483870967741935,
-            "#34f296",
-            0.5806451612903226,
-            "#49f683",
-            0.6129032258064516,
-            "#5efb70",
-            0.6451612903225806,
-            "#73fd5f",
-            0.6774193548387096,
-            "#88fc51",
-            0.7096774193548387,
-            "#9efb43",
-            0.7419354838709677,
-            "#b2f738",
-            0.7741935483870968,
-            "#c4ed32",
-            0.8064516129032258,
-            "#d6e42b",
-            0.8387096774193549,
-            "#e4d426",
-            0.8709677419354839,
-            "#eec222",
-            0.9032258064516129,
-            "#f8af1e",
-            0.9354838709677419,
-            "#d57b15",
-            0.967741935483871,
-            "#a83f0c",
-            1,
-            "#7a0403"
-           ]
-          ]
-         }
-        },
-        "legend": "default"
-       },
-       {
-        "configuration": {
-         "type": "WebGLTile",
-         "props": {
-          "name": "Flood Probability at 30 cm",
-          "source": {
-           "type": "GeoTIFF",
-           "props": {
-            "url": "https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/antigua_barbuda_IBF/depth_prob/antiguabarbuda_prob_depth_ge_30cm_overbank.tif",
-            "mask_below": "0",
-            "normalize": false
-           },
-           "rampName": "turbo",
-           "rampMin": "0",
-           "rampMax": "1"
-          }
-         },
-         "layerVisibility": false,
-         "style": {
-          "color": [
-           "case",
-           [
-            "==",
-            [
-             "band",
-             2
-            ],
-            0
-           ],
-           [
-            0,
-            0,
-            0,
-            0
-           ],
-           [
-            "<=",
-            [
-             "band",
-             1
-            ],
-            0
-           ],
-           [
-            0,
-            0,
-            0,
-            0
-           ],
-           [
-            "interpolate",
-            [
-             "linear"
-            ],
-            [
-             "band",
-             1
-            ],
-            0,
-            "#30123b",
-            0.03225806451612903,
-            "#362360",
-            0.06451612903225806,
-            "#3b3384",
-            0.0967741935483871,
-            "#4043a6",
-            0.12903225806451613,
-            "#4352bd",
-            0.16129032258064516,
-            "#4562d4",
-            0.1935483870967742,
-            "#4671e7",
-            0.22580645161290322,
-            "#447ff1",
-            0.25806451612903225,
-            "#438dfa",
-            0.2903225806451613,
-            "#3d9cfb",
-            0.3225806451612903,
-            "#34aaf4",
-            0.3548387096774194,
-            "#2bb8ed",
-            0.3870967741935484,
-            "#24c4e1",
-            0.41935483870967744,
-            "#1ed0d2",
-            0.45161290322580644,
-            "#18dcc4",
-            0.4838709677419355,
-            "#20e4b5",
-            0.5161290322580645,
-            "#2aeba5",
-            0.5483870967741935,
-            "#34f296",
-            0.5806451612903226,
-            "#49f683",
-            0.6129032258064516,
-            "#5efb70",
-            0.6451612903225806,
-            "#73fd5f",
-            0.6774193548387096,
-            "#88fc51",
-            0.7096774193548387,
-            "#9efb43",
-            0.7419354838709677,
-            "#b2f738",
-            0.7741935483870968,
-            "#c4ed32",
-            0.8064516129032258,
-            "#d6e42b",
-            0.8387096774193549,
-            "#e4d426",
-            0.8709677419354839,
-            "#eec222",
-            0.9032258064516129,
-            "#f8af1e",
-            0.9354838709677419,
-            "#d57b15",
-            0.967741935483871,
-            "#a83f0c",
-            1,
-            "#7a0403"
-           ]
-          ]
-         }
-        },
-        "legend": "default"
-       },
-       {
-        "configuration": {
-         "type": "WebGLTile",
-         "props": {
-          "name": "Flood Probability at 10 cm",
-          "source": {
-           "type": "GeoTIFF",
-           "props": {
-            "url": "https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/antigua_barbuda_IBF/depth_prob/antiguabarbuda_prob_depth_ge_10cm_overbank.tif",
-            "mask_below": "0",
-            "normalize": false
-           },
-           "rampName": "turbo",
-           "rampMin": "0",
-           "rampMax": "1"
-          }
-         },
-         "layerVisibility": false,
-         "style": {
-          "color": [
-           "case",
-           [
-            "==",
-            [
-             "band",
-             2
-            ],
-            0
-           ],
-           [
-            0,
-            0,
-            0,
-            0
-           ],
-           [
-            "<=",
-            [
-             "band",
-             1
-            ],
-            0
-           ],
-           [
-            0,
-            0,
-            0,
-            0
-           ],
-           [
-            "interpolate",
-            [
-             "linear"
-            ],
-            [
-             "band",
-             1
-            ],
-            0,
-            "#30123b",
-            0.03225806451612903,
-            "#362360",
-            0.06451612903225806,
-            "#3b3384",
-            0.0967741935483871,
-            "#4043a6",
-            0.12903225806451613,
-            "#4352bd",
-            0.16129032258064516,
-            "#4562d4",
-            0.1935483870967742,
-            "#4671e7",
-            0.22580645161290322,
-            "#447ff1",
-            0.25806451612903225,
-            "#438dfa",
-            0.2903225806451613,
-            "#3d9cfb",
-            0.3225806451612903,
-            "#34aaf4",
-            0.3548387096774194,
-            "#2bb8ed",
-            0.3870967741935484,
-            "#24c4e1",
-            0.41935483870967744,
-            "#1ed0d2",
-            0.45161290322580644,
-            "#18dcc4",
-            0.4838709677419355,
-            "#20e4b5",
-            0.5161290322580645,
-            "#2aeba5",
-            0.5483870967741935,
-            "#34f296",
-            0.5806451612903226,
-            "#49f683",
-            0.6129032258064516,
-            "#5efb70",
-            0.6451612903225806,
-            "#73fd5f",
-            0.6774193548387096,
-            "#88fc51",
-            0.7096774193548387,
-            "#9efb43",
-            0.7419354838709677,
-            "#b2f738",
-            0.7741935483870968,
-            "#c4ed32",
-            0.8064516129032258,
-            "#d6e42b",
-            0.8387096774193549,
-            "#e4d426",
-            0.8709677419354839,
-            "#eec222",
-            0.9032258064516129,
-            "#f8af1e",
-            0.9354838709677419,
-            "#d57b15",
-            0.967741935483871,
-            "#a83f0c",
-            1,
-            "#7a0403"
-           ]
-          ]
-         }
-        },
-        "legend": "default"
-       },
-       {
-        "configuration": {
-         "type": "WebGLTile",
-         "props": {
-          "name": "Flood Depth (m), Saint John's library",
-          "source": {
-           "type": "Zarr",
-           "props": {
-            "url": "https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/AnB_IBF/AG04_SaintJohnS_v1.zarr",
-            "variable": "depth",
-            "index": "${Storm}",
-            "mask_below": "0.05",
-            "normalize": true
-           },
-           "rampName": "Blues"
-          }
-         },
-         "style": {
-          "color": [
-           "case",
-           [
-            "==",
-            [
-             "band",
-             2
-            ],
-            0
-           ],
-           [
-            0,
-            0,
-            0,
-            0
-           ],
-           [
-            "interpolate",
-            [
-             "linear"
-            ],
-            [
-             "band",
-             1
-            ],
-            0,
-            "#f7fbff",
-            0.03225806451612903,
-            "#f1f7fd",
-            0.06451612903225806,
-            "#eaf3fb",
-            0.0967741935483871,
-            "#e4eff9",
-            0.12903225806451613,
-            "#deebf7",
-            0.16129032258064516,
-            "#d7e7f5",
-            0.1935483870967742,
-            "#d1e2f3",
-            0.22580645161290322,
-            "#cadef0",
-            0.25806451612903225,
-            "#c3daee",
-            0.2903225806451613,
-            "#bad6eb",
-            0.3225806451612903,
-            "#afd1e7",
-            0.3548387096774194,
-            "#a4cde3",
-            0.3870967741935484,
-            "#98c6e0",
-            0.41935483870967744,
-            "#8bc0dd",
-            0.45161290322580644,
-            "#7fb9da",
-            0.4838709677419355,
-            "#73b2d7",
-            0.5161290322580645,
-            "#67aad3",
-            0.5483870967741935,
-            "#5ba3d0",
-            0.5806451612903226,
-            "#519ccc",
-            0.6129032258064516,
-            "#4795c8",
-            0.6451612903225806,
-            "#3d8dc3",
-            0.6774193548387096,
-            "#3484bf",
-            0.7096774193548387,
-            "#2b7bba",
-            0.7419354838709677,
-            "#2373b5",
-            0.7741935483870968,
-            "#1c6aaf",
-            0.8064516129032258,
-            "#1662a9",
-            0.8387096774193549,
-            "#115aa2",
-            0.8709677419354839,
-            "#0d5299",
-            0.9032258064516129,
-            "#094990",
-            0.9354838709677419,
-            "#084184",
-            0.967741935483871,
-            "#083878",
-            1,
-            "#08306b"
-           ]
-          ]
-         }
-        },
-        "legend": "default"
-       },
-       {
-        "configuration": {
-         "type": "VectorLayer",
-         "props": {
-          "name": "Parishes",
-          "source": {
-           "type": "Shapefile",
-           "props": {
-            "url": "https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/antigua_barbuda_IBF/gadm/ATG_gadm_adm1_pop.shp"
-           }
           },
-          "layerId": "103c22ad-8571-40ee-ae67-0210166a3664"
+          "visible": false
          },
          "style": {
-          "default": {
-           "polygon": {
-            "fill": "rgba(0, 0, 0, 0)",
-            "stroke": "#000000",
-            "strokeWidth": "1"
-           }
-          }
+          "color": [
+           "case",
+           [
+            "==",
+            [
+             "band",
+             2
+            ],
+            0
+           ],
+           [
+            0,
+            0,
+            0,
+            0
+           ],
+           [
+            "interpolate",
+            [
+             "linear"
+            ],
+            [
+             "band",
+             1
+            ],
+            0,
+            "#30123b",
+            0.03225806451612903,
+            "#362360",
+            0.06451612903225806,
+            "#3b3384",
+            0.0967741935483871,
+            "#4043a6",
+            0.12903225806451613,
+            "#4352bd",
+            0.16129032258064516,
+            "#4562d4",
+            0.1935483870967742,
+            "#4671e7",
+            0.22580645161290322,
+            "#447ff1",
+            0.25806451612903225,
+            "#438dfa",
+            0.2903225806451613,
+            "#3d9cfb",
+            0.3225806451612903,
+            "#34aaf4",
+            0.3548387096774194,
+            "#2bb8ed",
+            0.3870967741935484,
+            "#24c4e1",
+            0.41935483870967744,
+            "#1ed0d2",
+            0.45161290322580644,
+            "#18dcc4",
+            0.4838709677419355,
+            "#20e4b5",
+            0.5161290322580645,
+            "#2aeba5",
+            0.5483870967741935,
+            "#34f296",
+            0.5806451612903226,
+            "#49f683",
+            0.6129032258064516,
+            "#5efb70",
+            0.6451612903225806,
+            "#73fd5f",
+            0.6774193548387096,
+            "#88fc51",
+            0.7096774193548387,
+            "#9efb43",
+            0.7419354838709677,
+            "#b2f738",
+            0.7741935483870968,
+            "#c4ed32",
+            0.8064516129032258,
+            "#d6e42b",
+            0.8387096774193549,
+            "#e4d426",
+            0.8709677419354839,
+            "#eec222",
+            0.9032258064516129,
+            "#f8af1e",
+            0.9354838709677419,
+            "#d57b15",
+            0.967741935483871,
+            "#a83f0c",
+            1,
+            "#7a0403"
+           ]
+          ]
+         }
+        },
+        "legend": "default"
+       },
+       {
+        "configuration": {
+         "type": "WebGLTile",
+         "props": {
+          "name": "Probabilité d'inondation à 70 cm",
+          "opacity": ".5",
+          "source": {
+           "type": "GeoTIFF",
+           "props": {
+            "url": "https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/Comoros_training/Comoros_cycle_20240427_0000UTC/Comoros_cycle_20240427_0000UTC/fim/${Commune}/stream_sat_stormlab/pluvial_overbank/prob_depth_ge_70cm_overbank.20240427.000000.tif",
+            "mask_below": "0",
+            "normalize": false
+           },
+           "rampName": "turbo",
+           "rampMin": "0",
+           "rampMax": "1"
+          },
+          "visible": false
+         },
+         "style": {
+          "color": [
+           "case",
+           [
+            "==",
+            [
+             "band",
+             2
+            ],
+            0
+           ],
+           [
+            0,
+            0,
+            0,
+            0
+           ],
+           [
+            "interpolate",
+            [
+             "linear"
+            ],
+            [
+             "band",
+             1
+            ],
+            0,
+            "#30123b",
+            0.03225806451612903,
+            "#362360",
+            0.06451612903225806,
+            "#3b3384",
+            0.0967741935483871,
+            "#4043a6",
+            0.12903225806451613,
+            "#4352bd",
+            0.16129032258064516,
+            "#4562d4",
+            0.1935483870967742,
+            "#4671e7",
+            0.22580645161290322,
+            "#447ff1",
+            0.25806451612903225,
+            "#438dfa",
+            0.2903225806451613,
+            "#3d9cfb",
+            0.3225806451612903,
+            "#34aaf4",
+            0.3548387096774194,
+            "#2bb8ed",
+            0.3870967741935484,
+            "#24c4e1",
+            0.41935483870967744,
+            "#1ed0d2",
+            0.45161290322580644,
+            "#18dcc4",
+            0.4838709677419355,
+            "#20e4b5",
+            0.5161290322580645,
+            "#2aeba5",
+            0.5483870967741935,
+            "#34f296",
+            0.5806451612903226,
+            "#49f683",
+            0.6129032258064516,
+            "#5efb70",
+            0.6451612903225806,
+            "#73fd5f",
+            0.6774193548387096,
+            "#88fc51",
+            0.7096774193548387,
+            "#9efb43",
+            0.7419354838709677,
+            "#b2f738",
+            0.7741935483870968,
+            "#c4ed32",
+            0.8064516129032258,
+            "#d6e42b",
+            0.8387096774193549,
+            "#e4d426",
+            0.8709677419354839,
+            "#eec222",
+            0.9032258064516129,
+            "#f8af1e",
+            0.9354838709677419,
+            "#d57b15",
+            0.967741935483871,
+            "#a83f0c",
+            1,
+            "#7a0403"
+           ]
+          ]
+         }
+        }
+       },
+       {
+        "configuration": {
+         "type": "WebGLTile",
+         "props": {
+          "name": "Probabilité d'inondation à 30 cm",
+          "opacity": ".5",
+          "source": {
+           "type": "GeoTIFF",
+           "props": {
+            "url": "https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/Comoros_training/Comoros_cycle_20240427_0000UTC/Comoros_cycle_20240427_0000UTC/fim/${Commune}/stream_sat_stormlab/pluvial_overbank/prob_depth_ge_30cm_overbank.20240427.000000.tif",
+            "mask_below": "0",
+            "normalize": false
+           },
+           "rampName": "turbo",
+           "rampMin": "0",
+           "rampMax": "1"
+          },
+          "visible": false
+         },
+         "style": {
+          "color": [
+           "case",
+           [
+            "==",
+            [
+             "band",
+             2
+            ],
+            0
+           ],
+           [
+            0,
+            0,
+            0,
+            0
+           ],
+           [
+            "interpolate",
+            [
+             "linear"
+            ],
+            [
+             "band",
+             1
+            ],
+            0,
+            "#30123b",
+            0.03225806451612903,
+            "#362360",
+            0.06451612903225806,
+            "#3b3384",
+            0.0967741935483871,
+            "#4043a6",
+            0.12903225806451613,
+            "#4352bd",
+            0.16129032258064516,
+            "#4562d4",
+            0.1935483870967742,
+            "#4671e7",
+            0.22580645161290322,
+            "#447ff1",
+            0.25806451612903225,
+            "#438dfa",
+            0.2903225806451613,
+            "#3d9cfb",
+            0.3225806451612903,
+            "#34aaf4",
+            0.3548387096774194,
+            "#2bb8ed",
+            0.3870967741935484,
+            "#24c4e1",
+            0.41935483870967744,
+            "#1ed0d2",
+            0.45161290322580644,
+            "#18dcc4",
+            0.4838709677419355,
+            "#20e4b5",
+            0.5161290322580645,
+            "#2aeba5",
+            0.5483870967741935,
+            "#34f296",
+            0.5806451612903226,
+            "#49f683",
+            0.6129032258064516,
+            "#5efb70",
+            0.6451612903225806,
+            "#73fd5f",
+            0.6774193548387096,
+            "#88fc51",
+            0.7096774193548387,
+            "#9efb43",
+            0.7419354838709677,
+            "#b2f738",
+            0.7741935483870968,
+            "#c4ed32",
+            0.8064516129032258,
+            "#d6e42b",
+            0.8387096774193549,
+            "#e4d426",
+            0.8709677419354839,
+            "#eec222",
+            0.9032258064516129,
+            "#f8af1e",
+            0.9354838709677419,
+            "#d57b15",
+            0.967741935483871,
+            "#a83f0c",
+            1,
+            "#7a0403"
+           ]
+          ]
+         }
+        }
+       },
+       {
+        "configuration": {
+         "type": "WebGLTile",
+         "props": {
+          "name": "Probabilité d'inondation à 10 cm",
+          "opacity": ".5",
+          "source": {
+           "type": "GeoTIFF",
+           "props": {
+            "url": "https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/Comoros_training/Comoros_cycle_20240427_0000UTC/Comoros_cycle_20240427_0000UTC/fim/${Commune}/stream_sat_stormlab/pluvial_overbank/prob_depth_ge_10cm_overbank.20240427.000000.tif",
+            "mask_below": "0",
+            "normalize": false
+           },
+           "rampName": "turbo",
+           "rampMin": "0",
+           "rampMax": "1"
+          },
+          "visible": false
+         },
+         "style": {
+          "color": [
+           "case",
+           [
+            "==",
+            [
+             "band",
+             2
+            ],
+            0
+           ],
+           [
+            0,
+            0,
+            0,
+            0
+           ],
+           [
+            "interpolate",
+            [
+             "linear"
+            ],
+            [
+             "band",
+             1
+            ],
+            0,
+            "#30123b",
+            0.03225806451612903,
+            "#362360",
+            0.06451612903225806,
+            "#3b3384",
+            0.0967741935483871,
+            "#4043a6",
+            0.12903225806451613,
+            "#4352bd",
+            0.16129032258064516,
+            "#4562d4",
+            0.1935483870967742,
+            "#4671e7",
+            0.22580645161290322,
+            "#447ff1",
+            0.25806451612903225,
+            "#438dfa",
+            0.2903225806451613,
+            "#3d9cfb",
+            0.3225806451612903,
+            "#34aaf4",
+            0.3548387096774194,
+            "#2bb8ed",
+            0.3870967741935484,
+            "#24c4e1",
+            0.41935483870967744,
+            "#1ed0d2",
+            0.45161290322580644,
+            "#18dcc4",
+            0.4838709677419355,
+            "#20e4b5",
+            0.5161290322580645,
+            "#2aeba5",
+            0.5483870967741935,
+            "#34f296",
+            0.5806451612903226,
+            "#49f683",
+            0.6129032258064516,
+            "#5efb70",
+            0.6451612903225806,
+            "#73fd5f",
+            0.6774193548387096,
+            "#88fc51",
+            0.7096774193548387,
+            "#9efb43",
+            0.7419354838709677,
+            "#b2f738",
+            0.7741935483870968,
+            "#c4ed32",
+            0.8064516129032258,
+            "#d6e42b",
+            0.8387096774193549,
+            "#e4d426",
+            0.8709677419354839,
+            "#eec222",
+            0.9032258064516129,
+            "#f8af1e",
+            0.9354838709677419,
+            "#d57b15",
+            0.967741935483871,
+            "#a83f0c",
+            1,
+            "#7a0403"
+           ]
+          ]
          }
         }
        },
@@ -682,7 +490,7 @@
         "configuration": {
          "type": "VectorLayer",
          "props": {
-          "name": "Hazard classification",
+          "name": "Classification de l'aléa",
           "source": {
            "type": "GeoJSON",
            "props": {},
@@ -698,15 +506,16 @@
            }
           },
           "pluginSource": {
-           "source": "uffis_hazard_layer_antigua_barbuda",
+           "source": "uffis_hazard_layer_comoros",
            "args": {
-            "low_threshold": "${Low Threshold (P(≥10 cm))}",
-            "medium_threshold": "${Medium Threshold (P(≥30 cm))}",
-            "high_threshold": "${High Threshold (P(≥70 cm))}",
-            "severe_threshold": "${Severe Threshold (P(≥100 cm))}"
+            "seuil_faible": "${Seuil Faible (P(≥10 cm))}",
+            "seuil_moyen": "${Seuil Moyen (P(≥30 cm))}",
+            "seuil_eleve": "${Seuil Élevé (P(≥70 cm))}",
+            "seuil_severe": "${Seuil Sévère (P(≥100 cm))}",
+            "commune": "${Commune}"
            }
           },
-          "layerId": "9c9449eb-e752-48b7-896f-2b7a9e3bec97"
+          "layerId": "e2ce4999-0f25-48db-8020-9e0b95abe4fe"
          },
          "style": {
           "default": {
@@ -718,9 +527,9 @@
           },
           "rules": [
            {
-            "name": "Low",
+            "name": "Faible",
             "geometryType": "polygon",
-            "conditionField": "hazard",
+            "conditionField": "alea",
             "conditionType": "=",
             "conditionValue": "1",
             "fill": "green",
@@ -728,9 +537,9 @@
             "strokeWidth": "0"
            },
            {
-            "name": "Medium",
+            "name": "Moyen",
             "geometryType": "polygon",
-            "conditionField": "hazard",
+            "conditionField": "alea",
             "conditionType": "=",
             "conditionValue": "2",
             "fill": "yellow",
@@ -738,9 +547,9 @@
             "strokeWidth": "0"
            },
            {
-            "name": "High",
+            "name": "Élevé",
             "geometryType": "polygon",
-            "conditionField": "hazard",
+            "conditionField": "alea",
             "conditionType": "=",
             "conditionValue": "3",
             "fill": "red",
@@ -748,9 +557,9 @@
             "strokeWidth": "0"
            },
            {
-            "name": "Severe",
+            "name": "Sévère",
             "geometryType": "polygon",
-            "conditionField": "hazard",
+            "conditionField": "alea",
             "conditionType": "=",
             "conditionValue": "4",
             "fill": "purple",
@@ -758,29 +567,28 @@
             "strokeWidth": "0"
            }
           ]
-         },
-         "layerVisibility": false
+         }
         },
         "legend": {
-         "title": "Hazard",
+         "title": "Aléa",
          "items": [
           {
-           "label": "Low",
+           "label": "Faible",
            "color": "green",
            "symbol": "square"
           },
           {
-           "label": "Medium",
+           "label": "Moyen",
            "color": "yellow",
            "symbol": "square"
           },
           {
-           "label": "High",
+           "label": "Élevé",
            "color": "red",
            "symbol": "square"
           },
           {
-           "label": "Severe",
+           "label": "Sévère",
            "color": "purple",
            "symbol": "square"
           }
@@ -791,7 +599,7 @@
         "configuration": {
          "type": "VectorLayer",
          "props": {
-          "name": "Buildings and roads at risk",
+          "name": "Bâtiments et routes en danger",
           "source": {
            "type": "GeoJSON",
            "props": {},
@@ -807,15 +615,16 @@
            }
           },
           "pluginSource": {
-           "source": "uffis_impact_layer_antigua_barbuda",
+           "source": "uffis_impact_layer_comoros",
            "args": {
-            "low_threshold": "${Low Threshold (P(≥10 cm))}",
-            "medium_threshold": "${Medium Threshold (P(≥30 cm))}",
-            "high_threshold": "${High Threshold (P(≥70 cm))}",
-            "severe_threshold": "${Severe Threshold (P(≥100 cm))}"
+            "seuil_faible": "${Seuil Faible (P(≥10 cm))}",
+            "seuil_moyen": "${Seuil Moyen (P(≥30 cm))}",
+            "seuil_eleve": "${Seuil Élevé (P(≥70 cm))}",
+            "seuil_severe": "${Seuil Sévère (P(≥100 cm))}",
+            "commune": "${Commune}"
            }
           },
-          "layerId": "28a0e6ed-06d1-41cb-964d-0bc626da443b"
+          "layerId": "98dcb407-2af1-42b0-9ab9-0608af688e0b"
          },
          "style": {
           "default": {
@@ -831,9 +640,9 @@
           },
           "rules": [
            {
-            "name": "Low (buildings)",
+            "name": "Faible (bâtiments)",
             "geometryType": "polygon",
-            "conditionField": "hazard",
+            "conditionField": "alea",
             "conditionType": "=",
             "conditionValue": "1",
             "fill": "green",
@@ -841,18 +650,18 @@
             "strokeWidth": "1"
            },
            {
-            "name": "Low (roads)",
+            "name": "Faible (routes)",
             "geometryType": "linestring",
-            "conditionField": "hazard",
+            "conditionField": "alea",
             "conditionType": "=",
             "conditionValue": "1",
             "stroke": "green",
             "strokeWidth": "3"
            },
            {
-            "name": "Medium (buildings)",
+            "name": "Moyen (bâtiments)",
             "geometryType": "polygon",
-            "conditionField": "hazard",
+            "conditionField": "alea",
             "conditionType": "=",
             "conditionValue": "2",
             "fill": "yellow",
@@ -860,18 +669,18 @@
             "strokeWidth": "1"
            },
            {
-            "name": "Medium (roads)",
+            "name": "Moyen (routes)",
             "geometryType": "linestring",
-            "conditionField": "hazard",
+            "conditionField": "alea",
             "conditionType": "=",
             "conditionValue": "2",
             "stroke": "yellow",
             "strokeWidth": "3"
            },
            {
-            "name": "High (buildings)",
+            "name": "Élevé (bâtiments)",
             "geometryType": "polygon",
-            "conditionField": "hazard",
+            "conditionField": "alea",
             "conditionType": "=",
             "conditionValue": "3",
             "fill": "red",
@@ -879,18 +688,18 @@
             "strokeWidth": "1"
            },
            {
-            "name": "High (roads)",
+            "name": "Élevé (routes)",
             "geometryType": "linestring",
-            "conditionField": "hazard",
+            "conditionField": "alea",
             "conditionType": "=",
             "conditionValue": "3",
             "stroke": "red",
             "strokeWidth": "3"
            },
            {
-            "name": "Severe (buildings)",
+            "name": "Sévère (bâtiments)",
             "geometryType": "polygon",
-            "conditionField": "hazard",
+            "conditionField": "alea",
             "conditionType": "=",
             "conditionValue": "4",
             "fill": "purple",
@@ -898,9 +707,9 @@
             "strokeWidth": "1"
            },
            {
-            "name": "Severe (roads)",
+            "name": "Sévère (routes)",
             "geometryType": "linestring",
-            "conditionField": "hazard",
+            "conditionField": "alea",
             "conditionType": "=",
             "conditionValue": "4",
             "stroke": "purple",
@@ -910,25 +719,25 @@
          }
         },
         "legend": {
-         "title": "Hazard",
+         "title": "Aléa",
          "items": [
           {
-           "label": "Low",
+           "label": "Faible",
            "color": "green",
            "symbol": "square"
           },
           {
-           "label": "Medium",
+           "label": "Moyen",
            "color": "yellow",
            "symbol": "square"
           },
           {
-           "label": "High",
+           "label": "Élevé",
            "color": "red",
            "symbol": "square"
           },
           {
-           "label": "Severe",
+           "label": "Sévère",
            "color": "purple",
            "symbol": "square"
           }
@@ -937,7 +746,7 @@
        }
       ],
       "map_extent": {
-       "extent": "-6884999.19,1933749.93,13"
+       "extent": "4814984.15,-1312113.30,13.83"
       },
       "mapDrawing": {}
      },
@@ -953,66 +762,137 @@
      "h": 6,
      "source": "Variable Input",
      "args_string": {
-      "variable_name": "Base Map",
+      "variable_name": "Fond de Carte",
       "show_label": true,
       "variable_options_source": "Base Map Layers",
       "initial_value": "https://server.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer"
      },
      "metadata_string": {
-      "border": {
-       "border": "1px solid black"
-      },
       "backgroundColor": "#ffffff"
      }
     },
     {
      "i": "3",
-     "x": 17,
+     "x": 18,
      "y": 0,
-     "w": 14,
+     "w": 16,
      "h": 6,
      "source": "Variable Input",
      "args_string": {
-      "variable_name": "Storm",
+      "variable_name": "Commune",
       "show_label": true,
-      "variable_options_source": "number",
+      "variable_options_source": "dropdown",
       "variable_options_source.metadata": {
-       "min": 1,
-       "max": 199,
-       "step": 1,
-       "dataType": "Number",
-       "outputFormat": "{{n}}",
-       "rangeMode": false,
-       "speedOptions": [
-        2000,
-        1000,
-        500,
-        250,
-        100
-       ],
-       "initialValue": 150
+       "choices": [
+        {
+         "label": "Ngouengoe",
+         "value": "KM251_Ngouengoe"
+        },
+        {
+         "label": "Nioumagama",
+         "value": "KM252_Nioumagama"
+        },
+        {
+         "label": "Cembenoi Lac Salé",
+         "value": "KM261_CembenoiLacSale"
+        },
+        {
+         "label": "Cembenoi Sada Djoulamlima",
+         "value": "KM262_CembenoiSadaDjoulamlima"
+        },
+        {
+         "label": "Mitsamiouli",
+         "value": "KM263_Mitsamiouli"
+        },
+        {
+         "label": "Nyuma Komo",
+         "value": "KM264_NyumaKomo"
+        },
+        {
+         "label": "Nyumamro Kiblani",
+         "value": "KM265_NyumamroKiblani"
+        },
+        {
+         "label": "Nyumamro Souheili",
+         "value": "KM266_NyumamroSouheili"
+        },
+        {
+         "label": "Bambao Ya Hari",
+         "value": "KM271_BambaoYaHari"
+        },
+        {
+         "label": "Bambao Ya Mboini",
+         "value": "KM272_BambaoYaMboini"
+        },
+        {
+         "label": "Bambao Yadjou",
+         "value": "KM273_BambaoYadjou"
+        },
+        {
+         "label": "Moroni",
+         "value": "KM274_Moroni"
+        },
+        {
+         "label": "Dimani",
+         "value": "KM281_Dimani"
+        },
+        {
+         "label": "Oichili Yadjou",
+         "value": "KM282_OichiliYadjou"
+        },
+        {
+         "label": "Oichili Yamboini",
+         "value": "KM283_OichiliYamboini"
+        },
+        {
+         "label": "Cratère du Karthala",
+         "value": "KM291_CratereDuKarthala"
+        },
+        {
+         "label": "Djando",
+         "value": "KM311_Djando"
+        },
+        {
+         "label": "Fomboni",
+         "value": "KM321_Fomboni"
+        },
+        {
+         "label": "Moili Mdjini",
+         "value": "KM322_MoiliMdjini"
+        },
+        {
+         "label": "Moimbassa",
+         "value": "KM323_Moimbassa"
+        },
+        {
+         "label": "Mlédjélé",
+         "value": "KM331_Mledjele"
+        },
+        {
+         "label": "Moimbao",
+         "value": "KM332_Moimbao"
+        }
+       ]
       },
-      "initial_value": 150
+      "initial_value": "KM274_Moroni"
      },
      "metadata_string": {
-      "border": {
-       "border-right": "1px solid black"
-      },
       "backgroundColor": "#ffffff"
      }
     },
     {
-     "i": "4",
+     "i": "8",
      "x": 56,
      "y": 7,
      "w": 44,
      "h": 21,
-     "source": "uffis_impact_summary_antigua_barbuda",
+     "source": "uffis_impact_summary_comoros",
      "args_string": {
-      "low_threshold": "${Low Threshold (P(≥10 cm))}",
-      "medium_threshold": "${Medium Threshold (P(≥30 cm))}",
-      "high_threshold": "${High Threshold (P(≥70 cm))}",
-      "severe_threshold": "${Severe Threshold (P(≥100 cm))}"
+      "seuil_faible": "${Seuil Faible (P(≥10 cm))}",
+      "seuil_moyen": "${Seuil Moyen (P(≥30 cm))}",
+      "seuil_eleve": "${Seuil Élevé (P(≥70 cm))}",
+      "seuil_severe": "${Seuil Sévère (P(≥100 cm))}",
+      "commune": "${Commune}"
      },
      "metadata_string": {
       "border": {
@@ -1024,33 +904,17 @@
      }
     },
     {
-     "i": "5",
+     "i": "4",
      "x": 56,
      "y": 0,
      "w": 11,
      "h": 7,
      "source": "Variable Input",
      "args_string": {
-      "variable_name": "Low Threshold (P(≥10 cm))",
+      "variable_name": "Seuil Faible (P(≥10 cm))",
       "show_label": true,
       "variable_options_source": "number",
-      "variable_options_source.metadata": {
-       "min": 0,
-       "max": 1,
-       "step": 0.05,
-       "dataType": "Number",
-       "outputFormat": "{{n}}",
-       "rangeMode": false,
-       "speedOptions": [
-        2000,
-        1000,
-        500,
-        250,
-        100
-       ],
-       "initialValue": 0.3
-      },
-      "initial_value": 0.3
+      "initial_value": 0.8
      },
      "metadata_string": {
       "border": {
@@ -1061,33 +925,37 @@
      }
     },
     {
-     "i": "6",
+     "i": "5",
      "x": 67,
+     "y": 0,
+     "w": 12,
+     "h": 7,
+     "source": "Variable Input",
+     "args_string": {
+      "variable_name": "Seuil Moyen (P(≥30 cm))",
+      "show_label": true,
+      "variable_options_source": "number",
+      "initial_value": 0.8
+     },
+     "metadata_string": {
+      "border": {
+       "border-top": "1px solid black"
+      },
+      "backgroundColor": "#ffffff"
+     }
+    },
+    {
+     "i": "6",
+     "x": 79,
      "y": 0,
      "w": 11,
      "h": 7,
      "source": "Variable Input",
      "args_string": {
-      "variable_name": "Medium Threshold (P(≥30 cm))",
+      "variable_name": "Seuil Élevé (P(≥70 cm))",
       "show_label": true,
       "variable_options_source": "number",
-      "variable_options_source.metadata": {
-       "min": 0,
-       "max": 1,
-       "step": 0.05,
-       "dataType": "Number",
-       "outputFormat": "{{n}}",
-       "rangeMode": false,
-       "speedOptions": [
-        2000,
-        1000,
-        500,
-        250,
-        100
-       ],
-       "initialValue": 0.2
-      },
-      "initial_value": 0.2
+      "initial_value": 0.8
      },
      "metadata_string": {
       "border": {
@@ -1098,68 +966,16 @@
     },
     {
      "i": "7",
-     "x": 78,
+     "x": 90,
      "y": 0,
-     "w": 11,
+     "w": 10,
      "h": 7,
      "source": "Variable Input",
      "args_string": {
-      "variable_name": "High Threshold (P(≥70 cm))",
+      "variable_name": "Seuil Sévère (P(≥100 cm))",
       "show_label": true,
       "variable_options_source": "number",
-      "variable_options_source.metadata": {
-       "min": 0,
-       "max": 1,
-       "step": 0.05,
-       "dataType": "Number",
-       "outputFormat": "{{n}}",
-       "rangeMode": false,
-       "speedOptions": [
-        2000,
-        1000,
-        500,
-        250,
-        100
-       ],
-       "initialValue": 0.1
-      },
-      "initial_value": 0.1
-     },
-     "metadata_string": {
-      "border": {
-       "border-top": "1px solid black"
-      },
-      "backgroundColor": "#ffffff"
-     }
-    },
-    {
-     "i": "8",
-     "x": 89,
-     "y": 0,
-     "w": 11,
-     "h": 7,
-     "source": "Variable Input",
-     "args_string": {
-      "variable_name": "Severe Threshold (P(≥100 cm))",
-      "show_label": true,
-      "variable_options_source": "number",
-      "variable_options_source.metadata": {
-       "min": 0,
-       "max": 1,
-       "step": 0.05,
-       "dataType": "Number",
-       "outputFormat": "{{n}}",
-       "rangeMode": false,
-       "speedOptions": [
-        2000,
-        1000,
-        500,
-        250,
-        100
-       ],
-       "initialValue": 0.15
-      },
-      "initial_value": 0.15
+      "initial_value": 0.8
      },
      "metadata_string": {
       "border": {

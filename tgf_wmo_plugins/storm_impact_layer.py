@@ -54,16 +54,18 @@ class BaseStormImpactLayer(TethysDashPlugin):
 
         self.send_update(s["msg_sampling"], percentage_complete=40)
         flooded = banded_features(index).copy()
-        flooded["nivel"] = flooded.banda.map(s["bands"])
+        flooded = flooded.rename(columns={"banda": s["attr_band"],
+                                          "profundidad_m": s["attr_depth"]})
+        flooded[s["attr_level"]] = flooded[s["attr_band"]].map(s["bands"])
 
         self.send_update(
             s["msg_flooded"].format(count=len(flooded)), percentage_complete=100
         )
         columns = [
             "tipo",
-            "nivel",
-            "banda",
-            "profundidad_m",
+            s["attr_level"],
+            s["attr_band"],
+            s["attr_depth"],
             "poblacion",
             "area_m2",
             "longitud_m",
@@ -77,11 +79,11 @@ class BaseStormImpactLayer(TethysDashPlugin):
 
     @staticmethod
     def _style(s):
-        """Rule-based styling on `banda`. See hazard_layer._style for the shape."""
+        """Rule-based styling on the depth-band attribute. See hazard_layer._style."""
         rules = []
         for value, color, _floor in DEPTH_BANDS:
             condition = {
-                "conditionField": "banda",
+                "conditionField": s["attr_band"],
                 "conditionType": "=",
                 "conditionValue": str(value),
             }
@@ -113,19 +115,10 @@ class BaseStormImpactLayer(TethysDashPlugin):
         }
 
 
-class StormImpactLayerEN(BaseStormImpactLayer):
-    LANG = "en"
-    name = "wmo_storm_impact_layer_en"
-    label = f"{STRINGS['en']['storm_layer_label']} ({STRINGS['en']['language']})"
-    group = STRINGS["en"]["group"]
-    tags = ["flood", "impact", "zarr", "storm", "map_layer", "dynamic", "english"]
-    description = STRINGS["en"]["storm_layer_desc"]
-
-
-class StormImpactLayerES(BaseStormImpactLayer):
+class StormImpactLayerGuatemala(BaseStormImpactLayer):
     LANG = "es"
-    name = "wmo_storm_impact_layer_es"
-    label = f"{STRINGS['es']['storm_layer_label']} ({STRINGS['es']['language']})"
+    name = "uffis_storm_impact_layer_guatemala"
+    label = f"{STRINGS['es']['storm_layer_label']} (Guatemala)"
     group = STRINGS["es"]["group"]
     tags = ["inundación", "impacto", "zarr", "tormenta", "map_layer", "español"]
     description = STRINGS["es"]["storm_layer_desc"]
@@ -158,13 +151,16 @@ class BaseStormImpactLayerComoros(BaseStormImpactLayer):
 
         self.send_update(s["msg_sampling"], percentage_complete=40)
         flooded = comoros_banded_features(unit, index).copy()
-        flooded["nivel"] = flooded.banda.map(s["bands"])
+        flooded = flooded.rename(columns={"banda": s["attr_band"],
+                                          "profundidad_m": s["attr_depth"]})
+        flooded[s["attr_level"]] = flooded[s["attr_band"]].map(s["bands"])
         flooded = flooded.to_crs(OUTPUT_CRS)
 
         self.send_update(
             s["msg_flooded"].format(count=len(flooded)), percentage_complete=100
         )
-        columns = ["type", "nivel", "banda", "profundidad_m", *COMOROS_MEASURES]
+        columns = ["type", s["attr_level"], s["attr_band"], s["attr_depth"],
+                   *COMOROS_MEASURES]
         collection = json.loads(flooded[columns + ["geometry"]].to_json())
         collection["crs"] = {"type": "name", "properties": {"name": OUTPUT_CRS}}
         return collection

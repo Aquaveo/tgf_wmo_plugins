@@ -22,16 +22,19 @@ from tethysapp.tethysdash.plugin_helpers import (
     TethysDashPlugin,
 )
 
-from tgf_wmo_plugins.classification import LEVELS, ThresholdGates
+from tgf_wmo_plugins.classification import LEVELS, ComorosUnit, ThresholdGates
 from tgf_wmo_plugins.common import (
     ANTIGUA_BARBUDA_FEATURES_CSV_URL,
     COMOROS_FEATURES_URL,
+    COMOROS_UNIT_OPTIONS,
     FEATURES_URL,
     GPKG_LAYERS,
-    GPKG_WHERE,
     HAITI_FEATURES_CSV_URL,
     PROB_FIELDS,
+    TYPE_FIELD,
     cached_download,
+    comoros_receptors_url,
+    gpkg_where,
     scale_probabilities,
 )
 from tgf_wmo_plugins.strings import STRINGS, threshold_args
@@ -73,17 +76,18 @@ MEASURES = {
     ],
 }
 
-# Attributes carried through to the GeoJSON, per country. `peligro` drives the
-# styling rules and `nivel` is its translated label, so both are always present.
-FEATURE_COLUMNS = {
-    "guatemala": ["tipo", "nivel", "peligro", *MEASURES["guatemala"]],
-    "haiti": ["type", "nivel", "peligro", *MEASURES["haiti"]],
-    "antigua_barbuda": ["type", "nivel", "peligro", *MEASURES["antigua_barbuda"]],
-    "comoros": ["type", "nivel", "peligro", *MEASURES["comoros"]],
-}
+def feature_columns(country, s):
+    """Attributes carried through to the GeoJSON, per country and language.
+
+    The hazard-class attribute drives the styling rules and the level attribute
+    is its translated label, so both are always present. Both names come from
+    the language table: they are column headers in the attribute popup, so a
+    French plugin should not be emitting Spanish ones.
+    """
+    return [TYPE_FIELD[country], s["attr_level"], s["attr_hazard"], *MEASURES[country]]
 
 
-def _read_geopackage(url, country):
+def _read_geopackage(url, country, unit=None):
     """Both geopackage layers, stacked, with the probability fields aligned.
 
     The buildings layers store their severe extraction under `probability_30cm`,
@@ -107,7 +111,7 @@ def _read_geopackage(url, country):
             # selected in the driver rather than after 130,000 geometries have
             # been built. `where` is evaluated on the layer, so the column it
             # names does not have to be among `columns`.
-            where=GPKG_WHERE.get(country),
+            where=gpkg_where(country, unit),
             read_geometry=True,
             use_arrow=True,
         )
@@ -121,16 +125,18 @@ def _read_geopackage(url, country):
     return scale_probabilities(stacked, country)
 
 
-@lru_cache(maxsize=4)
-def _load(country):
+@lru_cache(maxsize=8)
+def _load(country, unit=None):
     """Source features for `country`, already in the output CRS.
 
     Cached: only the gates change between requests, and both the download and
-    the reprojection are wasted work to repeat.
+    the reprojection are wasted work to repeat. `unit` is part of the key because
+    a Comoros commune is a different set of features out of the same island file
+    -- without it the first commune read would be served to every other.
     """
-    url = FEATURES_URLS[country]
+    url = comoros_receptors_url(unit) if unit else FEATURES_URLS[country]
     if country in GPKG_LAYERS:
-        gdf = _read_geopackage(url, country)
+        gdf = _read_geopackage(url, country, unit)
     else:
         gdf = gpd.read_file(url)
     gdf = gdf.to_crs(OUTPUT_CRS)
@@ -166,34 +172,35 @@ class BaseImpactLayer(ThresholdGates, TethysDashPlugin):
         gates = self.gates()
 
         self.send_update(s["msg_loading_features"], percentage_complete=20)
-        gdf = _load(country).copy()
+        gdf = _load(country, self.unit() if isinstance(self, ComorosUnit) else None).copy()
 
         self.send_update(s["msg_classifying"], percentage_complete=60)
-        gdf["peligro"] = 0
+        hazard, level = s["attr_hazard"], s["attr_level"]
+        gdf[hazard] = 0
         for field, (value, _color) in zip(PROB_FIELDS[country], LEVELS):
-            gdf.loc[gdf[field] >= gates[value], "peligro"] = value
+            gdf.loc[gdf[field] >= gates[value], hazard] = value
 
-        exposed = gdf[gdf.peligro > 0].copy()
-        exposed["nivel"] = exposed.peligro.map(s["levels"])
+        exposed = gdf[gdf[hazard] > 0].copy()
+        exposed[level] = exposed[hazard].map(s["levels"])
 
         self.send_update(
             s["msg_at_risk"].format(count=len(exposed)), percentage_complete=100
         )
-        columns = FEATURE_COLUMNS[country]
+        columns = feature_columns(country, s)
         collection = json.loads(exposed[columns + ["geometry"]].to_json())
         collection["crs"] = {"type": "name", "properties": {"name": OUTPUT_CRS}}
         return collection
 
     @staticmethod
     def _style(s):
-        """Rule-based styling on `peligro`, for both polygons and lines.
+        """Rule-based styling on the hazard-class attribute, polygons and lines.
 
         See hazard_layer._style for why the rule shape is what it is.
         """
         rules = []
         for value, color in LEVELS:
             condition = {
-                "conditionField": "peligro",
+                "conditionField": s["attr_hazard"],
                 "conditionType": "=",
                 "conditionValue": str(value),
             }
@@ -258,10 +265,12 @@ class ImpactLayerAntiguaBarbuda(BaseImpactLayer):
     description = STRINGS[LANG]["impact_layer_desc"]
 
 
-class ImpactLayerComoros(BaseImpactLayer):
+class ImpactLayerComoros(ComorosUnit, BaseImpactLayer):
     LANG = "fr"
     country = "comoros"
-    args = threshold_args(LANG)
+    # The four gates plus the commune: the receptor geopackage covers a whole
+    # island, so which commune to cut out of it is a request-time choice.
+    args = {**threshold_args(LANG), "commune": COMOROS_UNIT_OPTIONS}
     name = "uffis_impact_layer_comoros"
     label = f"{STRINGS[LANG]['impact_layer_label']} (Comores)"
     group = STRINGS[LANG]["group"]

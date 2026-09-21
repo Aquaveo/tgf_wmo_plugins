@@ -3,13 +3,13 @@
 .. comes up: the depth library is per commune rather than national, so a second
 .. selector drives it; and the plugins are the francophone `_comoros` family, so
 .. their labels and output read in French inside an English-titled dashboard.
-.. The built dashboard is dashboards/Comoros/Comoros_Hands_On_2_English.json.
+.. The built dashboard is dashboards/Comoros/Comoros_Hands_On_2.json.
 
 ==============================================================
 Exercise 2 — Impact for a single storm
 ==============================================================
 
-Building **Comoros Hands On 2 (English)** step by step.
+Building **Comores Exercice 2** step by step.
 
 .. contents:: On this page
    :depth: 2
@@ -61,8 +61,8 @@ Step 1 — Create the dashboard
 #. Create a new dashboard (see
    `Creating a dashboard <getting_started.rst#creating-a-dashboard>`_) with:
 
-   * **Name**: ``Comoros Hands On 2 (English)``
-   * **Description**: ``Solution for WMO Comoros Hands On Exercise #2``
+   * **Name**: ``Comores Exercice 2``
+   * **Description**: ``Solution pour l'exercice pratique OMM Comores n°2``
 
 #. Find your dashboard on the landing page and double-click it to open. The
    dashboard is empty, so the preview shows a blank canvas.
@@ -95,7 +95,7 @@ least one.
       * - Argument
         - Value
       * - ``variable_name``
-        - ``Base Map``
+        - ``Fond de Carte``
       * - ``show_label``
         - ``True``
       * - ``variable_options_source``
@@ -168,7 +168,7 @@ least one.
       * - Argument
         - Value
       * - ``variable_name``
-        - ``Storm``
+        - ``Tempête``
       * - ``show_label``
         - ``True``
       * - ``variable_options_source``
@@ -208,7 +208,7 @@ Step 3 — Add the map with the Zarr depth layer
 
 #. In the **Base Map** argument, choose ``Base Map`` from the **Variable
    Inputs** section at the bottom of the dropdown. The value becomes
-   ``${Base Map}``.
+   ``${Fond de Carte}``.
 
 #. Turn **Layer Control** on.
 
@@ -223,7 +223,7 @@ Step 3 — Add the map with the Zarr depth layer
       * - Field
         - Value
       * - ``name``
-        - ``Flood Depth (m), commune library``
+        - ``Profondeur d'inondation (m), bibliothèque communale``
 
 #. On the **Source** tab, set **Source Type** to **Zarr** and fill in:
 
@@ -238,12 +238,12 @@ Step 3 — Add the map with the Zarr depth layer
       * - ``variable``
         - ``depth``
       * - ``index``
-        - ``${Storm}``
+        - ``${Tempête}``
       * - ``mask_below``
         - ``0.05``
 
    Two variables in one source, doing different jobs. ``${Commune}`` is spliced
-   into the URL, so changing it opens a **different store**. ``${Storm}`` is the
+   into the URL, so changing it opens a **different store**. ``${Tempête}`` is the
    whole ``index`` field, so changing it reads a **different slice** of the store
    already open. The store holds all 200 scenarios in one array and ``index``
    selects one — no duplicated layers, no separate files, and only one
@@ -272,7 +272,7 @@ Step 3 — Add the map with the Zarr depth layer
    :width: 100%
 
    **Screenshot:** the **Source** tab with **Source Type** Zarr, the store URL
-   carrying ``${Commune}``, ``variable`` depth, ``index`` ``${Storm}`` and
+   carrying ``${Commune}``, ``variable`` depth, ``index`` ``${Tempête}`` and
    ``mask_below`` 0.05.
 
 
@@ -300,19 +300,19 @@ returns the result.
       * - ``commune``
         - ``${Commune}``
       * - ``index``
-        - ``${Storm}``
+        - ``${Tempête}``
 
 #. Click **Fetch plugin defaults**.
 
    This is the step that saves the most work. The plugin's ``run()`` returns a
    ready-made scaffold — the layer name, the source binding, a rule-based style
-   keyed on the ``banda`` (depth band) attribute, and a matching legend. After
+   keyed on the ``bande`` (depth band) attribute, and a matching legend. After
    fetching you should see eight style rules and a four-item **Profondeur**
    legend, none of which you had to author. Authoring vector style rules by hand
    is error-prone: a rule in the wrong shape silently never matches and leaves
    every feature grey.
 
-#. Rename the layer to ``Flood Impact`` on the **Layer** tab if you want it to
+#. Rename the layer to ``Bâtiments et routes inondés`` on the **Layer** tab if you want it to
    match the shipped solution.
 
 #. Check the **Style** and **Legend** tabs to see what arrived. Colours run
@@ -351,7 +351,7 @@ returns the result.
    :width: 100%
 
    **Screenshot:** the **Style** tab after fetching, showing the eight rules on
-   the ``banda`` attribute.
+   the ``bande`` attribute.
 
 
 Step 5 — Add the summary table
@@ -374,7 +374,7 @@ Step 5 — Add the summary table
       * - ``commune``
         - ``${Commune}``
       * - ``index``
-        - ``${Storm}``
+        - ``${Tempête}``
 
    The table breaks the scenario's flooded features into depth bands, deepest
    first, with counts of buildings, population, area, road length and the share
@@ -402,7 +402,7 @@ Step 6 — Add the storm card
       * - ``commune``
         - ``${Commune}``
       * - ``index``
-        - ``${Storm}``
+        - ``${Tempête}``
 
    The card gives the headline figures — the scenario's rainfall total, the
    flooded area, the deepest water and the mean depth where wet — for someone who
@@ -519,11 +519,11 @@ You should now have:
 Talking points
 ==============
 
-* **Two variables, four consumers.** ``${Storm}`` appears in a Zarr source index,
+* **Two variables, four consumers.** ``${Tempête}`` appears in a Zarr source index,
   a plugin layer argument and two visualization arguments; ``${Commune}`` appears
   in all the same places plus the store URL. Nothing in the six items knows about
   the others; they all just declare a dependency on a name.
-* **Splicing versus substituting.** ``${Storm}`` is a whole field, so it resolves
+* **Splicing versus substituting.** ``${Tempête}`` is a whole field, so it resolves
   to a value with its type intact. ``${Commune}`` sits inside a longer URL, so it
   is spliced into the surrounding text. Same syntax, different behaviour, and it
   is what lets one layer reach 22 different stores.

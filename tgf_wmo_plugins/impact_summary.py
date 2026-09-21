@@ -11,24 +11,27 @@ import pandas as pd
 import pyogrio
 from tethysapp.tethysdash.plugin_helpers import TethysDashPlugin
 
-from tgf_wmo_plugins.classification import LEVELS, ThresholdGates
+from tgf_wmo_plugins.classification import LEVELS, ComorosUnit, ThresholdGates
 from tgf_wmo_plugins.common import (
     cached_download,
     GUATEMALA_FEATURES_CSV_URL,
     HAITI_FEATURES_CSV_URL,
     ANTIGUA_BARBUDA_FEATURES_CSV_URL,
     COMOROS_FEATURES_URL,
+    COMOROS_UNIT_OPTIONS,
+    COMOROS_UNIT_POPULATION,
     GPKG_LAYERS,
-    GPKG_WHERE,
     PROB_FIELDS,
     TOTAL_POPULATION,
+    comoros_receptors_url,
+    gpkg_where,
     scale_probabilities,
 )
 from tgf_wmo_plugins.strings import STRINGS, threshold_args
 
 
-@lru_cache(maxsize=4)
-def _load(url, country):
+@lru_cache(maxsize=8)
+def _load(url, country, unit=None):
     if country == "guatemala":
         return pd.read_csv(url)
 
@@ -40,7 +43,7 @@ def _load(url, country):
             layer=layer,
             # Only Comoros sets one: its geopackage covers a whole island, so the
             # commune is selected in the driver rather than afterwards.
-            where=GPKG_WHERE.get(country),
+            where=gpkg_where(country, unit),
             read_geometry=False,
             use_arrow=True,
         )
@@ -71,7 +74,12 @@ class BaseImpactSummary(ThresholdGates, TethysDashPlugin):
         elif country == "comoros":
             csv_url = COMOROS_FEATURES_URL
 
-        df = _load(csv_url, self.country).copy()
+        unit = self.unit() if isinstance(self, ComorosUnit) else None
+        if unit:
+            # The commune decides both which island file to read and which rows
+            # to keep out of it.
+            csv_url = comoros_receptors_url(unit)
+        df = _load(csv_url, self.country, unit).copy()
 
         if country == "haiti":
             for col in ["population", "surface_m2", "longueur_m"]:
@@ -91,6 +99,16 @@ class BaseImpactSummary(ThresholdGates, TethysDashPlugin):
         ]
         rows.append(self._row(s, s["row_total_hazard"], df[df.hazard > 0]))
         return {"title": s["hazard_summary_title"], "data": rows}
+
+    def _population(self):
+        """The denominator for the exposure share.
+
+        Comoros reports against the chosen commune; every other country has a
+        single domain and so a single constant.
+        """
+        if isinstance(self, ComorosUnit):
+            return COMOROS_UNIT_POPULATION[self.unit()]
+        return TOTAL_POPULATION[self.country]
 
     def _row(self, s, name, group):
         if self.country == "guatemala":
@@ -129,7 +147,7 @@ class BaseImpactSummary(ThresholdGates, TethysDashPlugin):
                 s["col_area"]: f"{group.building_area_m2.sum():,.0f}",
                 s["col_roads_km"]: f"{group.road_length_m.sum() / 1000:,.1f}",
                 s["col_pop_share"]: (
-                    f"{100 * group.population_per_building.sum() / TOTAL_POPULATION[self.country]:.2f}%"
+                    f"{100 * group.population_per_building.sum() / self._population():.2f}%"
                 ),
             }
 
@@ -178,10 +196,12 @@ class ImpactSummaryAntiguaBarbuda(BaseImpactSummary):
     description = STRINGS[LANG]["hazard_summary_desc"]
 
 
-class ImpactSummaryComoros(BaseImpactSummary):
+class ImpactSummaryComoros(ComorosUnit, BaseImpactSummary):
     LANG = "fr"
     country = "comoros"
-    args = threshold_args(LANG)
+    # The four gates plus the commune, which also sets the population the share
+    # is measured against.
+    args = {**threshold_args(LANG), "commune": COMOROS_UNIT_OPTIONS}
     name = "uffis_impact_summary_comoros"
     label = f"{STRINGS[LANG]['hazard_summary_label']} (Comores)"
     group = STRINGS[LANG]["group"]

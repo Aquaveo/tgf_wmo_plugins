@@ -4,7 +4,7 @@
 .. cycle publishes no single depth raster and one arbitrary member would not pair
 .. with the four ensemble probabilities; and the rasters are EPSG:5629, which the
 .. map cannot resolve until the code is registered -- see the warning below.
-.. The built dashboard is dashboards/Comoros/Comoros_Hands_On_1_English.json.
+.. The built dashboard is dashboards/Comoros/Comoros_Hands_On_1.json.
 
 ==============================================================
 Exercise 1 — A flood depth and probability map
@@ -109,8 +109,8 @@ Step 1 — Create the dashboard
 #. Create a new dashboard (see
    `Creating a dashboard <getting_started.rst#creating-a-dashboard>`_) with:
 
-   * **Name**: ``Comoros Hands On 1 (English)``
-   * **Description**: ``Solution for WMO Comoros Hands On Exercise #1``
+   * **Name**: ``Comores Exercice 1``
+   * **Description**: ``Solution pour l'exercice pratique OMM Comores n°1``
 
 #. Find your dashboard on the landing page and double-click it to open. The
    dashboard is empty, so the preview shows a blank canvas.
@@ -146,7 +146,7 @@ them by name and there has to be something to refer to. See
       * - Argument
         - Value
       * - ``variable_name``
-        - ``Base Map``
+        - ``Fond de Carte``
       * - ``show_label``
         - ``True``
       * - ``variable_options_source``
@@ -218,7 +218,7 @@ plain number, they are a list you supply.
    dashboard, ordered by pcode so the three islands group together — Anjouan
    (``KM1xx``), Grande Comore (``KM2xx``), Mohéli (``KM3xx``). Rather than typing
    them by hand, import the shipped item or copy the list out of
-   ``dashboards/Comoros/Comoros_Hands_On_1_English.json``.
+   ``dashboards/Comoros/Comoros_Hands_On_1.json``.
 
 #. On the **Settings** tab, set **Background Color** to ``#ffffff``.
 
@@ -248,7 +248,7 @@ plain number, they are a list you supply.
       * - Argument
         - Value
       * - ``variable_name``
-        - ``Probability Mask``
+        - ``Masque de Probabilité``
       * - ``show_label``
         - ``True``
       * - ``variable_options_source``
@@ -284,7 +284,7 @@ Step 3 — Add the map
 
 #. In the **Base Map** argument, choose ``Base Map`` from the **Variable
    Inputs** section at the bottom of the dropdown. The value becomes
-   ``${Base Map}``.
+   ``${Fond de Carte}``.
 
 #. Turn **Layer Control** on, so the four layers can be toggled individually.
 
@@ -296,7 +296,7 @@ on the map.
    :width: 100%
 
    **Screenshot:** the **Map** visualization's five arguments, with **Base Map**
-   bound to ``${Base Map}`` and **Layer Control** on.
+   bound to ``${Fond de Carte}`` and **Layer Control** on.
 
 
 Step 4 — Add the four probability layers
@@ -322,13 +322,13 @@ it is what lets one set of four layers serve all 55 communes:
 
    * - Layer **Name**
      - filename, appended to the prefix above
-   * - ``Flood Probability at 100 cm``
+   * - ``Probabilité d'inondation à 100 cm``
      - ``prob_depth_ge_100cm_overbank.20240427.000000.tif``
-   * - ``Flood Probability at 70 cm``
+   * - ``Probabilité d'inondation à 70 cm``
      - ``prob_depth_ge_70cm_overbank.20240427.000000.tif``
-   * - ``Flood Probability at 30 cm``
+   * - ``Probabilité d'inondation à 30 cm``
      - ``prob_depth_ge_30cm_overbank.20240427.000000.tif``
-   * - ``Flood Probability at 10 cm``
+   * - ``Probabilité d'inondation à 10 cm``
      - ``prob_depth_ge_10cm_overbank.20240427.000000.tif``
 
 These are the **overbank** variants, with Moroni's permanent standing water
@@ -373,11 +373,11 @@ For **each** of the four:
       * - ``url``
         - *see the table above, including the* ``${Commune}`` *segment*
       * - ``mask_below``
-        - ``${Probability Mask}``
+        - ``${Masque de Probabilité}``
 
    Both fields are free text, so both take the ``${Variable Name}`` form typed by
    hand, and the names inside the braces must match ``Commune`` and
-   ``Probability Mask`` exactly. They are substituted differently, and the
+   ``Masque de Probabilité`` exactly. They are substituted differently, and the
    difference is worth noticing: ``mask_below`` is *only* a placeholder, so it
    resolves to the number itself, while ``url`` has the placeholder embedded in a
    longer string, so the commune segment is spliced into the text around it.
@@ -411,7 +411,7 @@ For **each** of the four:
    :width: 100%
 
    **Screenshot:** the **Source** tab with **Source Type** GeoTIFF, one
-   probability URL, and ``mask_below`` bound to ``${Probability Mask}``.
+   probability URL, and ``mask_below`` bound to ``${Masque de Probabilité}``.
 
 .. figure:: images/ex1-layer-style-turbo.png
    :alt: The Style tab with the turbo ramp pinned to 0-1
@@ -457,7 +457,7 @@ Step 5 — Finish the map, then drive it
 
    **Screenshot:** the **Settings** tab with **Fill Viewport** on.
 
-**Try the mask.** Raise **Probability Mask** from ``0`` and watch all four layers
+**Try the mask.** Raise **Masque de Probabilité** from ``0`` and watch all four layers
 thin out together:
 
 .. list-table::
@@ -540,7 +540,7 @@ You should now have:
   changes what is drawn.
 * A legend control with one colour bar, on the 100 cm layer.
 * Three controls across the top: a base-map dropdown, a commune dropdown listing
-  all 55, and a **Probability Mask** number.
+  all 55, and a **Masque de Probabilité** number.
 * Raising the mask thins all four layers at once; setting it back to 0 restores
   them.
 * Changing the commune re-fetches all four layers — and leaves the view where it
@@ -562,7 +562,7 @@ Talking points
   read. Contrast this with depth, which has no natural upper bound and is
   normally left to auto-scale — one reason the two do not belong on the same map
   without care.
-* **Two variables, two kinds of substitution.** ``${Probability Mask}`` is a
+* **Two variables, two kinds of substitution.** ``${Masque de Probabilité}`` is a
   whole field, so it resolves to a number with its type intact.
   ``${Commune}`` sits inside a longer URL, so it is spliced into the surrounding
   text. Same syntax, and the app picks the right behaviour — but it is why a

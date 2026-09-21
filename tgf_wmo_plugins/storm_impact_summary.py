@@ -60,19 +60,10 @@ class BaseStormImpactSummary(TethysDashPlugin):
         }
 
 
-class StormImpactSummaryEN(BaseStormImpactSummary):
-    LANG = "en"
-    name = "wmo_storm_impact_summary_en"
-    label = f"{STRINGS['en']['storm_summary_label']} ({STRINGS['en']['language']})"
-    group = STRINGS["en"]["group"]
-    tags = ["flood", "impact", "zarr", "storm", "table", "english"]
-    description = STRINGS["en"]["storm_summary_desc"]
-
-
-class StormImpactSummaryES(BaseStormImpactSummary):
+class StormImpactSummaryGuatemala(BaseStormImpactSummary):
     LANG = "es"
-    name = "wmo_storm_impact_summary_es"
-    label = f"{STRINGS['es']['storm_summary_label']} ({STRINGS['es']['language']})"
+    name = "uffis_storm_impact_summary_guatemala"
+    label = f"{STRINGS['es']['storm_summary_label']} (Guatemala)"
     group = STRINGS["es"]["group"]
     tags = ["inundación", "impacto", "zarr", "tormenta", "tabla", "español"]
     description = STRINGS["es"]["storm_summary_desc"]

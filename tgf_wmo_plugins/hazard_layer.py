@@ -25,9 +25,12 @@ from tgf_wmo_plugins.classification import (
     LEVELS,
     NODATA,
     PROB_URLS,
+    ComorosUnit,
     ThresholdGates,
     clasificar_peligro,
+    comoros_prob_urls,
 )
+from tgf_wmo_plugins.common import COMOROS_UNIT_OPTIONS
 from tgf_wmo_plugins.strings import STRINGS, threshold_args
 
 # Vectorizing a heavily fragmented classification could produce a huge payload.
@@ -80,7 +83,8 @@ class BaseHazardLayer(ThresholdGates, TethysDashPlugin):
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
         s = STRINGS[cls.LANG]
-        cls.args = threshold_args(cls.LANG)
+        if "args" not in cls.__dict__:
+            cls.args = threshold_args(cls.LANG)
         cls.group = s["group"]
         cls.tags = list(s["hazard_layer_tags"])
         cls.description = s["hazard_layer_desc"]
@@ -112,10 +116,14 @@ class BaseHazardLayer(ThresholdGates, TethysDashPlugin):
         )
         return builder.build()
 
+    def prob_urls(self):
+        """The four rasters to classify. Fixed per country unless overridden."""
+        return PROB_URLS[self.country]
+
     def fetch_features(self):
         """Runtime features: re-run on load and on variable-input change."""
         s = STRINGS[self.LANG]
-        urls = PROB_URLS[self.country]
+        urls = self.prob_urls()
         gates = self.gates()
 
         self.send_update(s["msg_reading"], percentage_complete=10)
@@ -179,8 +187,8 @@ class BaseHazardLayer(ThresholdGates, TethysDashPlugin):
                 "type": "Feature",
                 "geometry": geometry,
                 "properties": {
-                    "peligro": int(value),
-                    "nivel": s["levels"].get(int(value), ""),
+                    s["attr_hazard"]: int(value),
+                    s["attr_level"]: s["levels"].get(int(value), ""),
                 },
             }
             for geometry, value in shapes(peligro, mask=mask, transform=transform)
@@ -195,7 +203,7 @@ class BaseHazardLayer(ThresholdGates, TethysDashPlugin):
 
     @staticmethod
     def _style(s):
-        """Rule-based styling keyed on the `peligro` attribute.
+        """Rule-based styling keyed on the hazard-class attribute.
 
         The shape matters: createJsonStyleFunction reads `geometryType` (not
         `geometry`), takes the condition from `conditionField`/`conditionType`
@@ -211,7 +219,7 @@ class BaseHazardLayer(ThresholdGates, TethysDashPlugin):
                 {
                     "name": s["levels"][value],
                     "geometryType": "polygon",
-                    "conditionField": "peligro",
+                    "conditionField": s["attr_hazard"],
                     "conditionType": "=",
                     "conditionValue": str(value),
                     "fill": color,
@@ -237,8 +245,14 @@ class HazardLayerAntiguaBarbuda(BaseHazardLayer):
     label = f"{STRINGS['en']['hazard_layer_label']} (Antigua and Barbuda)"
 
 
-class HazardLayerComoros(BaseHazardLayer):
+class HazardLayerComoros(ComorosUnit, BaseHazardLayer):
     LANG = "fr"
     country = "comoros"
     name = "uffis_hazard_layer_comoros"
     label = f"{STRINGS['fr']['hazard_layer_label']} (Comores)"
+    # The four gates plus the commune, because Comoros publishes one raster set
+    # per commune rather than one national grid.
+    args = {**threshold_args("fr"), "commune": COMOROS_UNIT_OPTIONS}
+
+    def prob_urls(self):
+        return comoros_prob_urls(self.unit())

@@ -607,7 +607,7 @@
            {
             "name": "Low",
             "geometryType": "polygon",
-            "conditionField": "peligro",
+            "conditionField": "hazard",
             "conditionType": "=",
             "conditionValue": "1",
             "fill": "green",
@@ -617,7 +617,7 @@
            {
             "name": "Medium",
             "geometryType": "polygon",
-            "conditionField": "peligro",
+            "conditionField": "hazard",
             "conditionType": "=",
             "conditionValue": "2",
             "fill": "yellow",
@@ -627,7 +627,7 @@
            {
             "name": "High",
             "geometryType": "polygon",
-            "conditionField": "peligro",
+            "conditionField": "hazard",
             "conditionType": "=",
             "conditionValue": "3",
             "fill": "red",
@@ -637,7 +637,7 @@
            {
             "name": "Severe",
             "geometryType": "polygon",
-            "conditionField": "peligro",
+            "conditionField": "hazard",
             "conditionType": "=",
             "conditionValue": "4",
             "fill": "purple",
@@ -719,7 +719,7 @@
            {
             "name": "Low (buildings)",
             "geometryType": "polygon",
-            "conditionField": "peligro",
+            "conditionField": "hazard",
             "conditionType": "=",
             "conditionValue": "1",
             "fill": "green",
@@ -729,7 +729,7 @@
            {
             "name": "Low (roads)",
             "geometryType": "linestring",
-            "conditionField": "peligro",
+            "conditionField": "hazard",
             "conditionType": "=",
             "conditionValue": "1",
             "stroke": "green",
@@ -738,7 +738,7 @@
            {
             "name": "Medium (buildings)",
             "geometryType": "polygon",
-            "conditionField": "peligro",
+            "conditionField": "hazard",
             "conditionType": "=",
             "conditionValue": "2",
             "fill": "yellow",
@@ -748,7 +748,7 @@
            {
             "name": "Medium (roads)",
             "geometryType": "linestring",
-            "conditionField": "peligro",
+            "conditionField": "hazard",
             "conditionType": "=",
             "conditionValue": "2",
             "stroke": "yellow",
@@ -757,7 +757,7 @@
            {
             "name": "High (buildings)",
             "geometryType": "polygon",
-            "conditionField": "peligro",
+            "conditionField": "hazard",
             "conditionType": "=",
             "conditionValue": "3",
             "fill": "red",
@@ -767,7 +767,7 @@
            {
             "name": "High (roads)",
             "geometryType": "linestring",
-            "conditionField": "peligro",
+            "conditionField": "hazard",
             "conditionType": "=",
             "conditionValue": "3",
             "stroke": "red",
@@ -776,7 +776,7 @@
            {
             "name": "Severe (buildings)",
             "geometryType": "polygon",
-            "conditionField": "peligro",
+            "conditionField": "hazard",
             "conditionType": "=",
             "conditionValue": "4",
             "fill": "purple",
@@ -786,7 +786,7 @@
            {
             "name": "Severe (roads)",
             "geometryType": "linestring",
-            "conditionField": "peligro",
+            "conditionField": "hazard",
             "conditionType": "=",
             "conditionValue": "4",
             "stroke": "purple",

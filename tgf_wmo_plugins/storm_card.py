@@ -88,19 +88,10 @@ class BaseStormCard(TethysDashPlugin):
         }
 
 
-class StormCardEN(BaseStormCard):
-    LANG = "en"
-    name = "wmo_storm_card_en"
-    label = f"{STRINGS['en']['storm_card_label']} ({STRINGS['en']['language']})"
-    group = STRINGS["en"]["group"]
-    tags = ["flood", "zarr", "storm", "card", "english"]
-    description = STRINGS["en"]["storm_card_desc"]
-
-
-class StormCardES(BaseStormCard):
+class StormCardGuatemala(BaseStormCard):
     LANG = "es"
-    name = "wmo_storm_card_es"
-    label = f"{STRINGS['es']['storm_card_label']} ({STRINGS['es']['language']})"
+    name = "uffis_storm_card_guatemala"
+    label = f"{STRINGS['es']['storm_card_label']} (Guatemala)"
     group = STRINGS["es"]["group"]
     tags = ["inundación", "zarr", "tormenta", "tarjeta", "español"]
     description = STRINGS["es"]["storm_card_desc"]

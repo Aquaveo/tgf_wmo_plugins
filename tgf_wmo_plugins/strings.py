@@ -20,6 +20,16 @@ STRINGS = {
         "group": "Flood Maps (English)",
         # Hazard levels, keyed by the `peligro` class value.
         "levels": {1: "Low", 2: "Medium", 3: "High", 4: "Severe"},
+        # Feature attribute names the plugins emit and their own style rules key
+        # on. These reach the viewer -- they are the column headers in the
+        # attribute popup -- so they are translated like any other string. They
+        # are also a published interface: a dashboard stores the field name in
+        # its style rules, so changing one means re-fetching plugin defaults on
+        # every dashboard already using it.
+        "attr_hazard": "hazard",
+        "attr_level": "level",
+        "attr_band": "band",
+        "attr_depth": "depth_m",
         # Depth bands, keyed by the `banda` class value.
         "bands": {
             1: "0.05 - 0.3 m",
@@ -103,6 +113,16 @@ STRINGS = {
         "language": "Español",
         "group": "Mapas de Inundación (Español)",
         "levels": {1: "Bajo", 2: "Medio", 3: "Alto", 4: "Severo"},
+        # Feature attribute names the plugins emit and their own style rules key
+        # on. These reach the viewer -- they are the column headers in the
+        # attribute popup -- so they are translated like any other string. They
+        # are also a published interface: a dashboard stores the field name in
+        # its style rules, so changing one means re-fetching plugin defaults on
+        # every dashboard already using it.
+        "attr_hazard": "peligro",
+        "attr_level": "nivel",
+        "attr_band": "banda",
+        "attr_depth": "profundidad_m",
         "bands": {
             1: "0.05 - 0.3 m",
             2: "0.3 - 1 m",
@@ -182,6 +202,16 @@ STRINGS = {
         "language": "Français",
         "group": "Cartes d'Inondation (Français)",
         "levels": {1: "Faible", 2: "Moyen", 3: "Élevé", 4: "Sévère"},
+        # Feature attribute names the plugins emit and their own style rules key
+        # on. These reach the viewer -- they are the column headers in the
+        # attribute popup -- so they are translated like any other string. They
+        # are also a published interface: a dashboard stores the field name in
+        # its style rules, so changing one means re-fetching plugin defaults on
+        # every dashboard already using it.
+        "attr_hazard": "alea",
+        "attr_level": "niveau",
+        "attr_band": "bande",
+        "attr_depth": "profondeur_m",
         "bands": {
             1: "0.05 - 0.3 m",
             2: "0.3 - 1 m",
