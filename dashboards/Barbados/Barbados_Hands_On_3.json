@@ -483,7 +483,7 @@
               },
               {
                 "configuration": {
-                  "type": "VectorLayer",
+                  "type": "VectorImageLayer",
                   "props": {
                     "name": "Hazard classification",
                     "layerId": "b84f960c-563f-4435-baba-049c51fe7bd5",
@@ -510,7 +510,8 @@
                         "severe_threshold": "${Severe Threshold (P(≥100 cm))}",
                         "parish": "${Parish}"
                       }
-                    }
+                    },
+                    "renderAsImage": true
                   },
                   "style": {
                     "default": {
@@ -592,7 +593,7 @@
               },
               {
                 "configuration": {
-                  "type": "VectorLayer",
+                  "type": "VectorImageLayer",
                   "props": {
                     "name": "Buildings and roads at risk",
                     "layerId": "c6a860a1-ec87-44a5-a5d2-41b52be1abd8",
@@ -619,16 +620,15 @@
                         "severe_threshold": "${Severe Threshold (P(≥100 cm))}",
                         "parish": "${Parish}"
                       }
-                    }
+                    },
+                    "renderAsImage": true
                   },
                   "style": {
                     "default": {
-                      "point": {
+                      "polygon": {
                         "fill": "#9e9e9e",
                         "stroke": "#9e9e9e",
-                        "strokeWidth": "1",
-                        "size": "3",
-                        "shape": "circle"
+                        "strokeWidth": "0"
                       },
                       "linestring": {
                         "stroke": "#9e9e9e",
@@ -638,10 +638,8 @@
                     "rules": [
                       {
                         "name": "Low (buildings)",
-                        "geometryType": "point",
+                        "geometryType": "polygon",
                         "strokeWidth": "1",
-                        "size": "4",
-                        "shape": "circle",
                         "conditionField": "hazard",
                         "conditionType": "=",
                         "conditionValue": "1",
@@ -659,10 +657,8 @@
                       },
                       {
                         "name": "Medium (buildings)",
-                        "geometryType": "point",
+                        "geometryType": "polygon",
                         "strokeWidth": "1",
-                        "size": "4",
-                        "shape": "circle",
                         "conditionField": "hazard",
                         "conditionType": "=",
                         "conditionValue": "2",
@@ -680,10 +676,8 @@
                       },
                       {
                         "name": "High (buildings)",
-                        "geometryType": "point",
+                        "geometryType": "polygon",
                         "strokeWidth": "1",
-                        "size": "4",
-                        "shape": "circle",
                         "conditionField": "hazard",
                         "conditionType": "=",
                         "conditionValue": "3",
@@ -701,10 +695,8 @@
                       },
                       {
                         "name": "Severe (buildings)",
-                        "geometryType": "point",
+                        "geometryType": "polygon",
                         "strokeWidth": "1",
-                        "size": "4",
-                        "shape": "circle",
                         "conditionField": "hazard",
                         "conditionType": "=",
                         "conditionValue": "4",

@@ -279,10 +279,17 @@ returns the result.
    and roads**, with eight style rules on the ``band`` attribute and a four-item
    **Depth** legend.
 
-   Look at the rules: four match **point** geometry for the buildings and four
+   Look at the rules: four match **polygon** geometry for the buildings and four
    match **linestring** for the roads. Fetching the defaults is what gets that
    pairing right — a rule whose geometry type does not match its features leaves
    them grey.
+
+#. On the **Layer** tab, turn on **Render as Image**. The layer is then drawn to
+   a single canvas and re-blitted while you pan, instead of every footprint being
+   re-styled and re-drawn each frame. With thousands of buildings on screen that
+   is the difference between choppy and smooth. The cost is a slight blur mid-
+   zoom that sharpens when the view settles, and approximate hit-detection when
+   you click a feature.
 
 #. Save the layer by clicking **Create**.
 
@@ -429,7 +436,7 @@ You should now have:
 * A map on the left with the base map, a depth layer and an impact layer.
 * Three selectors along the top: base map, parish and storm.
 * Depth drawn in blue, re-scaling as the storm changes.
-* Buildings drawn as coloured **points** and roads as coloured lines, with a
+* Buildings drawn as coloured **footprints** and roads as coloured lines, with a
   four-band **Depth** legend.
 * A summary table and a card on the right, both updating with either selector.
 * Changing the parish swapping the store, the receptors and the population the
@@ -457,10 +464,9 @@ Talking points
 * **Know what the table counts.** The receptor file is the full island stock, so
   the table answers "how many buildings on Barbados does this scenario flood" —
   an absolute exposure figure, and a fair comparison across scenarios.
-* **Analysed as footprints, drawn as points.** A building that spans several
-  30 m cells is sampled in each and takes its deepest — so the depth is the
-  footprint's — but it is serialised as one point. That is a deliberate split:
-  accuracy from the polygon, speed from the point.
+* **Footprints, not points.** A building that spans several 30 m cells is
+  sampled in each and takes its deepest, and is drawn as its own outline — so
+  both the depth and the size on screen are the building's own.
 * **One variable pair, four consumers.** ``${Parish}`` and ``${Storm}`` reach a
   Zarr source, a plugin layer argument and two visualization arguments. Nothing
   in the four items knows about the others; they all declare a dependency on a

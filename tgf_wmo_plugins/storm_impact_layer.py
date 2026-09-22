@@ -14,7 +14,6 @@ from tgf_wmo_plugins.common import (
     UNIT_STORM_OPTIONS,
     FIRST_WET_STORM,
     STORM_OPTIONS,
-    as_representative_points,
     coerce_index,
 )
 from tgf_wmo_plugins.storm_impact import (
@@ -33,9 +32,6 @@ class BaseStormImpactLayer(TethysDashPlugin):
     type = "map_layer"
     dynamic_map_layer = True
     args = {"index": STORM_OPTIONS}
-    # See BaseImpactLayer.buildings_as_points: one flag for the geometry that
-    # goes over the wire and the rules that colour it.
-    buildings_as_points = False
 
     def run(self):
         s = STRINGS[self.LANG]
@@ -82,13 +78,9 @@ class BaseStormImpactLayer(TethysDashPlugin):
         collection["crs"] = {"type": "name", "properties": {"name": crs}}
         return collection
 
-    @classmethod
-    def _style(cls, s):
-        """Rule-based styling on the depth-band attribute. See hazard_layer._style.
-
-        The building rules follow `buildings_as_points`, exactly as the hazard
-        impact layer's do.
-        """
+    @staticmethod
+    def _style(s):
+        """Rule-based styling on the depth-band attribute. See hazard_layer._style."""
         rules = []
         for value, color, _floor in DEPTH_BANDS:
             condition = {
@@ -99,7 +91,8 @@ class BaseStormImpactLayer(TethysDashPlugin):
             rules.append(
                 {
                     "name": f"{s['bands'][value]} ({s['buildings']})",
-                    **cls._building_rule(),
+                    "geometryType": "polygon",
+                    "strokeWidth": "1",
                     **condition,
                     "fill": color,
                     "stroke": color,
@@ -114,27 +107,13 @@ class BaseStormImpactLayer(TethysDashPlugin):
                     "strokeWidth": "3",
                 }
             )
-        return {"default": cls._default_style(), "rules": rules}
-
-    @classmethod
-    def _building_rule(cls):
-        """The geometry-dependent half of a building rule."""
-        if cls.buildings_as_points:
-            return {"geometryType": "point", "strokeWidth": "1",
-                    "size": "4", "shape": "circle"}
-        return {"geometryType": "polygon", "strokeWidth": "1"}
-
-    @classmethod
-    def _default_style(cls):
-        """What an unmatched feature falls back to, keyed by geometry bucket."""
-        buildings = (
-            {"point": {"fill": "#9e9e9e", "stroke": "#9e9e9e",
-                       "strokeWidth": "1", "size": "3", "shape": "circle"}}
-            if cls.buildings_as_points
-            else {"polygon": {"fill": "#9e9e9e", "stroke": "#9e9e9e",
-                              "strokeWidth": "0"}}
-        )
-        return {**buildings, "linestring": {"stroke": "#9e9e9e", "strokeWidth": "1"}}
+        return {
+            "default": {
+                "polygon": {"fill": "#9e9e9e", "stroke": "#9e9e9e", "strokeWidth": "0"},
+                "linestring": {"stroke": "#9e9e9e", "strokeWidth": "1"},
+            },
+            "rules": rules,
+        }
 
 
 class StormImpactLayerGuatemala(BaseStormImpactLayer):
@@ -180,8 +159,6 @@ class BaseStormImpactLayerUnit(BaseStormImpactLayer):
                                           "profundidad_m": s["attr_depth"]})
         flooded[s["attr_level"]] = flooded[s["attr_band"]].map(s["bands"])
         flooded = flooded.to_crs(OUTPUT_CRS)
-        if self.buildings_as_points:
-            flooded = as_representative_points(flooded)
 
         self.send_update(
             s["msg_flooded"].format(count=len(flooded)), percentage_complete=100
@@ -212,7 +189,6 @@ class StormImpactLayerBarbados(BaseStormImpactLayerUnit):
     unit_arg = "parish"
     default_unit = "BB08_SaintMichael"
     args = {"parish": BARBADOS_PARISH_OPTIONS, "index": UNIT_STORM_OPTIONS}
-    buildings_as_points = True
     name = "uffis_storm_impact_layer_barbados"
     label = f"{STRINGS['en']['storm_layer_label']} (Barbados)"
     group = STRINGS["en"]["group"]

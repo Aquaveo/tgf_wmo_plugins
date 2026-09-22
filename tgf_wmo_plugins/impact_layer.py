@@ -39,7 +39,6 @@ from tgf_wmo_plugins.common import (
     FEATURES_URL,
     GPKG_LAYERS,
     HAITI_FEATURES_CSV_URL,
-    as_representative_points,
     PROB_FIELDS,
     TYPE_FIELD,
     cached_download,
@@ -167,11 +166,6 @@ class BaseImpactLayer(ThresholdGates, TethysDashPlugin):
     country = None
     type = "map_layer"
     dynamic_map_layer = True
-    # Ship buildings as representative points instead of footprints. One flag
-    # drives both the geometry and the `geometryType` of the building rules,
-    # because a rule that names the wrong bucket never fires and the features it
-    # was meant for stay the default grey -- the two have to move together.
-    buildings_as_points = False
 
     def run(self):
         s = STRINGS[self.LANG]
@@ -206,8 +200,6 @@ class BaseImpactLayer(ThresholdGates, TethysDashPlugin):
 
         exposed = gdf[gdf[hazard] > 0].copy()
         exposed[level] = exposed[hazard].map(s["levels"])
-        if self.buildings_as_points:
-            exposed = as_representative_points(exposed)
 
         self.send_update(
             s["msg_at_risk"].format(count=len(exposed)), percentage_complete=100
@@ -217,14 +209,11 @@ class BaseImpactLayer(ThresholdGates, TethysDashPlugin):
         collection["crs"] = {"type": "name", "properties": {"name": OUTPUT_CRS}}
         return collection
 
-    @classmethod
-    def _style(cls, s):
-        """Rule-based styling on the hazard-class attribute, buildings and lines.
+    @staticmethod
+    def _style(s):
+        """Rule-based styling on the hazard-class attribute, polygons and lines.
 
-        See hazard_layer._style for why the rule shape is what it is. The
-        building rules follow `buildings_as_points`, so a plugin that serialises
-        points emits point rules and one that serialises footprints emits polygon
-        rules, without either being written out twice.
+        See hazard_layer._style for why the rule shape is what it is.
         """
         rules = []
         for value, color in LEVELS:
@@ -236,7 +225,8 @@ class BaseImpactLayer(ThresholdGates, TethysDashPlugin):
             rules.append(
                 {
                     "name": f"{s['levels'][value]} ({s['buildings']})",
-                    **cls._building_rule(),
+                    "geometryType": "polygon",
+                    "strokeWidth": "1",
                     **condition,
                     "fill": color,
                     "stroke": color,
@@ -251,28 +241,13 @@ class BaseImpactLayer(ThresholdGates, TethysDashPlugin):
                     "strokeWidth": "3",
                 }
             )
-        return {"default": cls._default_style(), "rules": rules}
-
-    @classmethod
-    def _building_rule(cls):
-        """The geometry-dependent half of a building rule. A point carries a size
-        and a shape that a polygon has no use for."""
-        if cls.buildings_as_points:
-            return {"geometryType": "point", "strokeWidth": "1",
-                    "size": "4", "shape": "circle"}
-        return {"geometryType": "polygon", "strokeWidth": "1"}
-
-    @classmethod
-    def _default_style(cls):
-        """What an unmatched feature falls back to, keyed by geometry bucket."""
-        buildings = (
-            {"point": {"fill": "#9e9e9e", "stroke": "#9e9e9e",
-                       "strokeWidth": "1", "size": "3", "shape": "circle"}}
-            if cls.buildings_as_points
-            else {"polygon": {"fill": "#9e9e9e", "stroke": "#9e9e9e",
-                              "strokeWidth": "0"}}
-        )
-        return {**buildings, "linestring": {"stroke": "#9e9e9e", "strokeWidth": "1"}}
+        return {
+            "default": {
+                "polygon": {"fill": "#9e9e9e", "stroke": "#9e9e9e", "strokeWidth": "0"},
+                "linestring": {"stroke": "#9e9e9e", "strokeWidth": "1"},
+            },
+            "rules": rules,
+        }
 
 
 class ImpactLayerGuatemala(BaseImpactLayer):
@@ -314,7 +289,6 @@ class ImpactLayerBarbados(BarbadosParish, BaseImpactLayer):
     # The four gates plus the parish: the receptor file is the whole island, so
     # which parish to cut out of it is a request-time choice.
     args = {**threshold_args(LANG), "parish": BARBADOS_PARISH_OPTIONS}
-    buildings_as_points = True
     name = "uffis_impact_layer_barbados"
     label = f"{STRINGS[LANG]['impact_layer_label']} (Barbados)"
     group = STRINGS[LANG]["group"]

@@ -2,8 +2,8 @@
 .. guide at ../Comoros/exercise_3.rst, and scoped by parish the same way that
 .. one is scoped by commune: the three plugins take a parish argument and read
 .. that parish's own product. Receptors are the full island stock as footprints,
-.. sampled as footprints and drawn as points, so the impact layer sets
-.. buildings_as_points and emits point rules to match.
+.. drawn as the footprints they are, on VectorImageLayer so the map stays
+.. responsive at parish scale.
 .. The built dashboard is dashboards/Barbados/Barbados_Hands_On_3.json.
 
 ==============================================================
@@ -96,8 +96,7 @@ parish you select. Three things about it shape what you can say:
   also what makes filtering on ``ADM1_PCODE`` give a clean parish count.
 * **Buildings are footprints**, so a building is classified on the maximum
   probability over its own outline, and one that spans several cells picks up the
-  worst of them. The layer then *draws* each as a single point: the classification
-  is the footprint's, the marker is just where to put it.
+  worst of them, and is drawn as that same outline.
 
 The share in the table's last column is against the **selected parish's**
 population — 77,395 for Saint Michael — not the island's 269,090. Changing the
@@ -273,6 +272,11 @@ Step 6 — Add the hazard classification layer
    styled with four rules on the ``hazard`` attribute, and given a four-item
    **Hazard** legend.
 
+#. On the **Layer** tab, turn on **Render as Image**, for the same reason the
+   affected-features layer uses it in the next step: this is a few thousand
+   merged polygons, and drawing them once to a canvas beats re-drawing them on
+   every pan.
+
 #. Save the layer by clicking **Create**.
 
 .. figure:: images/ex3-hazard-layer-source.png
@@ -297,10 +301,17 @@ Step 7 — Add the affected-features layer
 #. Click **Fetch plugin defaults**. The layer arrives as **Buildings and roads at
    risk** with eight rules and a **Hazard** legend.
 
-   Look at the rules: four match **point** geometry for the buildings and four
+   Look at the rules: four match **polygon** geometry for the buildings and four
    match **linestring** for the roads. Fetching the defaults is what gets that
    pairing right — a rule whose geometry type does not match its features never
    fires, and those features stay grey.
+
+#. On the **Layer** tab, turn on **Render as Image**. The layer is then drawn to
+   a single canvas and re-blitted while you pan, instead of every footprint being
+   re-styled and re-drawn each frame. With thousands of buildings on screen that
+   is the difference between choppy and smooth. The cost is a slight blur mid-
+   zoom that sharpens when the view settles, and approximate hit-detection when
+   you click a feature.
 
 #. Save the layer by clicking **Create**.
 
@@ -442,7 +453,7 @@ You should now have:
   rasters, two computed layers, and the base map).
 * The four probability rasters switched off on load, there to compare against.
 * Four labelled threshold inputs across the top.
-* Buildings drawn as coloured **points** and roads as coloured lines.
+* Buildings drawn as coloured **footprints** and roads as coloured lines.
 * Moving any threshold updating the hazard layer, the impact layer and the
   table together, with progress messages while they rebuild.
 
@@ -458,14 +469,17 @@ Talking points
 * **What the gate actually filters.** A threshold of 0.8 keeps cells where more
   than 40 of the forecast's 50 members reached that depth. It is an ensemble
   share for this cycle, not a calibrated probability.
-* **Analysed as footprints, drawn as points.** A building takes the worst
-  probability found anywhere under its outline — better than sampling one point
-  would give — and is then serialised as a single representative point. The
-  numbers come from the footprint; only the drawing is simplified.
+* **Footprints, not points.** A building takes the worst probability found
+  anywhere under its own outline — better than sampling one representative point
+  would give — and is drawn as that outline, so a large warehouse reads as large.
 * **Scope is a performance decision too.** Working a parish at a time is what
   keeps the map responsive: Saint Michael returns 5,583 features where the island
   returned 17,231, and most parishes far fewer. It is also the honest scope — the
   parish rasters are matched on that parish's own rainfall.
+* **Render as Image is the other half of that.** Scope decides how many features
+  cross the wire; **Render as Image** decides how often they are re-drawn once
+  they arrive. Together they are what let the layer keep true building footprints
+  rather than degrading them to points for speed.
 * **Vectorising a classification.** A map layer can only point at a URL, and
   nothing serves a computed raster, so the plugin vectorises the classified grid:
   adjacent cells of equal class merge into one polygon, about 1,600 of them for

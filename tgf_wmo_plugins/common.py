@@ -14,7 +14,6 @@ from functools import lru_cache
 from pathlib import Path
 
 import pandas as pd
-from shapely import set_precision
 
 BUCKET = "https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com"
 DEFAULT_STORE = f"{BUCKET}/floodmaps_test"
@@ -731,35 +730,3 @@ def cached_download(url):
         finally:
             Path(staged).unlink(missing_ok=True)
     return path
-
-
-# ~0.1 m of longitude at these latitudes: finer than any building is placed, and
-# it caps a coordinate at nine characters instead of the seventeen a raw float
-# prints. Same value impact_layer snaps its footprints to.
-POINT_PRECISION_DEG = 1e-6
-
-
-def as_representative_points(gdf, precision=POINT_PRECISION_DEG):
-    """Replace polygon geometries with a point that lies inside each one.
-
-    Applied at serialisation only. Sampling and classification have already run
-    against the real footprints by the time this is called, so every count, depth
-    and population figure is identical -- what changes is the payload. A building
-    here averages six vertices, and a whole island of them is the bulk of the
-    response; one coordinate pair each takes Barbados from about 11 MB to 5, and
-    the browser from drawing 25,000 filled rings to drawing 25,000 dots.
-
-    `representative_point` rather than `centroid`: a centroid can fall outside an
-    L-shaped or multipart building and put the marker in the street next door.
-    Lines are left alone -- a road collapsed to a point would lose the thing that
-    makes it legible -- so a collection can carry both, which is why the style
-    rules are per geometry type.
-    """
-    gdf = gdf.copy()
-    is_poly = gdf.geometry.geom_type.isin(["Polygon", "MultiPolygon"])
-    if is_poly.any():
-        points = gdf.loc[is_poly].geometry.representative_point()
-        # `representative_point` derives a fresh coordinate, so whatever
-        # precision the footprints were snapped to does not carry over to it.
-        gdf.loc[is_poly, "geometry"] = set_precision(points.values, precision)
-    return gdf
