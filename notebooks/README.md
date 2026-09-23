@@ -12,12 +12,23 @@ plugin class.
 | `Haiti/02_storm_impact.ipynb`, `Haiti/03_hazard_classification[_fr].ipynb` | The same two questions on the La Quinte data |
 | `Antigua_Barbuda/02_storm_impact.ipynb` | In one storm of the Saint John's flood-map library, how deep is the water on each building and road — and how does a forecast turn that library into probabilities? |
 | `Antigua_Barbuda/03_hazard_classification.ipynb` | What are the odds of at least 30 cm here in the Tropical Storm Jerry forecast, and which buildings, roads and parishes does that put at risk? |
+| `Barbados/02_storm_impact.ipynb` | In one storm of a parish flood-map library, how deep is the water on each building and road — and what else can that data be made to show? |
+| `Barbados/03_hazard_classification.ipynb` | What are the odds of at least 30 cm here in the Hurricane Tomas hindcast, and which buildings, roads and parishes does that put at risk? |
 
 `01_plugin_example[_es|_fr].ipynb`, at the top level, builds the simplest plugin
 from scratch and is country-independent.
 
 Each country notebook ends with the real plugin source and notes on how the
 notebook logic maps onto it.
+
+The **Barbados** pair is written to lead into the dashboards rather than to stand
+alone. Each one reproduces its dashboard's tiles in sections 1 to 7, then spends a
+section extending the same dataframe into charts no plugin ships — the point being
+that the dashboard is a starting point, not a ceiling — and closes with a table
+mapping every notebook section onto the tile and plugin that renders it in
+[docs/Barbados/exercise_2.rst](../docs/Barbados/exercise_2.rst) and
+[exercise_3.rst](../docs/Barbados/exercise_3.rst). Read them beside the exercise
+you are building.
 
 ## Running them
 
@@ -65,6 +76,15 @@ Things the notebooks deliberately flag rather than paper over:
   for it.
 - **Antigua and Barbuda: no storm plugin yet.** Section 10 of `02` explains what
   the Guatemala-bound `wmo_storm_*` family would need to serve a parish library.
+- **Barbados: depth saturates at 2.55 m**, for the same reason as Antigua and
+  Barbuda, and `02` sets its top band accordingly.
+- **Barbados: `population` on the buildings layer is the parish total repeated on
+  every row.** `population_per_building` beside it is the disaggregation you want.
+  `02` sums both side by side so the four-orders-of-magnitude difference is visible
+  rather than discovered later.
+- **Barbados: `hazard_flag` is not documented, so `03` recovers it.** A single gate
+  of 0.50 reproduces the column exactly, across all 227,236 receptors — which is a
+  stricter thing to be able to say than quoting a README.
 
 Section 5 of the Guatemala `03` also works through recovering an undocumented
 sampling method from the data itself, and stops at "~98% plus an open question"
