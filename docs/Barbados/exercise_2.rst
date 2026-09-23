@@ -89,20 +89,55 @@ Step 1 — Create the dashboard
    * **Name**: ``Barbados Hands On 2``
    * **Description**: ``Solution for WMO Barbados Hands On Exercise #2``
 
-#. Open it, turn on **Unrestricted Grid Item Movement** in **Dashboard
-   Settings**, and click **Edit Dashboard**.
+#. Find your dashboard on the landing page and double-click it to open.
 
 
 Step 2 — Add the three variable inputs
 ======================================
 
-**The base map selector** — as in exercise 1: ``variable_name`` ``Base Map``,
-``show_label`` ``True``, ``variable_options_source`` ``Base Map Layers``,
-background ``#ffffff``, initial value **World Imagery**. Drag it to the top-left.
+**The base map selector** 
+
+#. click **Edit Dashboard** in the top right to enter edit mode.
+
+#. Click the existing item's 3-dot menu, select **Edit**, and set the
+   **Visualization Type** to **Variable Input** (in the **Default** group).
+
+#. Fill in:
+
+   .. list-table::
+      :header-rows: 1
+      :widths: 32 68
+
+      * - Argument
+        - Value
+      * - ``variable_name``
+        - ``Base Map``
+      * - ``show_label``
+        - ``True``
+      * - ``variable_options_source``
+        - ``Base Map Layers``
+
+#. On the **Settings** tab, set **Background Color** to ``#ffffff``.
+
+#. Pick **World Imagery** as the initial value
+
+#. Save the item
+
+#. Resize the item to be a short dropdown along the top left.
+
+.. figure:: images/ex1-variable-input-basemap.png
+   :alt: The base map variable input configuration
+   :width: 100%
+
+   **Screenshot:** the **Variable Input** arguments for the base map selector.
 
 **The parish selector**
 
-#. Add an item, set the **Visualization Type** to **Variable Input**, and fill in:
+#. Click on **Add Dashboard Item** in the top right.
+
+#. Click on the new item's its 3-dot menu, select **Edit**
+
+#. Set the **Visualization Type** to **Variable Input**, and fill in:
 
    .. list-table::
       :header-rows: 1
@@ -115,26 +150,11 @@ background ``#ffffff``, initial value **World Imagery**. Drag it to the top-left
       * - ``show_label``
         - ``True``
       * - ``variable_options_source``
-        - ``dropdown``
-
-#. In the **choices** editor, each entry has a **label** the viewer reads and a
-   **value** that goes into the URL — the parish name and its path segment:
-
-   .. list-table::
-      :header-rows: 1
-      :widths: 40 60
-
-      * - Label
-        - Value
-      * - ``Christ Church``
-        - ``BB01_ChristChurch``
-      * - ``Saint Michael``
-        - ``BB08_SaintMichael``
-      * - …
-        - …
-
-   All eleven are in the shipped dashboard. The viewer never sees a pcode and the
-   URL never sees a display name.
+        - ``Flood Maps (English): Storm Impact Summary (Barbados) - Parish``
+   
+   The variable options source is generated from an existing plugin argument, in the
+   form ``<group>: <plugin label> - <Argument>``. Picking it means "offer the same 
+   choices the impact summary's ``parish`` argument offers", so the control is populated form the plugin.
 
 #. Background ``#ffffff``, initial value ``Saint Michael`` — the most populous
    parish, and where most of the exposure is. Drag it beside the base map.
@@ -147,7 +167,11 @@ background ``#ffffff``, initial value **World Imagery**. Drag it to the top-left
 
 **The storm selector**
 
-#. Add a third item, set it to **Variable Input**, and fill in:
+#. Click on **Add Dashboard Item** in the top right.
+
+#. Click on the new item's its 3-dot menu, select **Edit**
+
+#. Set the **Visualization Type** to **Variable Input**, and fill in:
 
    .. list-table::
       :header-rows: 1
@@ -165,19 +189,9 @@ background ``#ffffff``, initial value **World Imagery**. Drag it to the top-left
    That options source is generated from an existing plugin argument, in the
    form ``<group>: <plugin label> - <Argument>``. Picking it means "offer the
    same choices the impact summary's ``index`` argument offers", so the control
-   is populated from the plugin and cannot drift out of sync with it — the same
-   wiring the Guatemala and Comoros exercise 2 dashboards use.
+   is populated from the plugin.
 
-   The choices are the 200 positions in a parish's library, labelled by position.
-   They are not labelled in millimetres: a Barbados magnitude is the
-   area-weighted mean rainfall over one parish, so the same position is a
-   different total in each of the eleven. What is the same everywhere is the
-   ordering — every library holds 200 scenarios sorted by magnitude — and the
-   card reports the actual millimetres once a parish is chosen.
-
-#. Set the initial value to ``150``. Keeping the range and speed options in the
-   input's metadata makes the control playable, which is the quickest way to show
-   an audience how the flooded footprint grows.
+#. Set the initial value to ``150``.
 
 #. Background ``#ffffff``, and drag it to the far right of the top row.
 
@@ -191,9 +205,23 @@ background ``#ffffff``, initial value **World Imagery**. Drag it to the top-left
 Step 3 — Add the map with the Zarr depth layer
 ==============================================
 
-#. Add another item and set the **Visualization Type** to **Map**.
+#. Click on **Add Dashboard Item** in the top right.
+
+#. Click on the new item's its 3-dot menu, select **Edit**
+
+#. Set the **Visualization Type** to **Map** (under the **Default** section).
 
 #. Bind **Base Map** to ``${Base Map}`` and turn **Layer Control** on.
+
+#. In the **Map Extent** argument, choose **Use a Custom Extent** and enter:
+
+   .. code-block:: text
+
+      -6634889.03,1473048.86,13
+
+   That is ``centre-x,centre-y,zoom`` in EPSG:3857 metres, centred on Saint
+   Michael. A parish window is only a few kilometres across, so the zoom is
+   tighter than exercise 1's island view.
 
 #. Next to **Layers**, click **Add Layer**, and on the **Layer** tab set
    ``name`` to ``Flood Depth (m), parish library``.
@@ -223,19 +251,16 @@ Step 3 — Add the map with the Zarr depth layer
    worth of data crosses the wire.
 
    ``mask_below`` is ``0.05`` because that is the store's own
-   ``extent_threshold_m``: the model does not consider a cell flooded below 5 cm.
-   Reusing the number the data was built with beats inventing one.
 
 #. On the **Style** tab, leave the mode on **Continuous** and pick the **Blues**
    ramp (under **Single hue**). Leave **Min** and **Max** empty.
 
    Empty bounds mean "resolve them from the data at render time", so the ramp
-   re-stretches for each scenario as the storm changes. Depth is a property of
-   the particular scenario, so auto-scaling is right here — the opposite of
-   exercise 1's probability layers, which had to be pinned so they could be
-   compared with each other.
+   re-stretches for each scenario as the storm changes.
 
-#. On the **Legend** tab, select **Default Legend**, then click **Create**.
+#. On the **Legend** tab, select **Default Legend**
+
+#. Click **Create**.
 
 .. figure:: images/ex2-zarr-source.png
    :alt: The Source tab configured for the Zarr store
@@ -293,6 +318,9 @@ returns the result.
 
 #. Save the layer by clicking **Create**.
 
+#. Save the map and resize it to fill roughly the left 60% of the window, leaving
+   the right-hand strip for the table and the card.
+
 .. figure:: images/ex2-dynamic-layer-source.png
    :alt: The Source tab with the storm impact layer selected
    :width: 100%
@@ -304,8 +332,11 @@ returns the result.
 Step 5 — Add the summary table and the card
 ===========================================
 
-#. Add a dashboard item, open its 3-dot menu and select **Edit**, and set the
-   **Visualization Type** to **Storm Impact Summary (Barbados)** (in the
+#. Click on **Add Dashboard Item** in the top right.
+
+#. Click on the new item's its 3-dot menu, select **Edit**
+
+#. Set the **Visualization Type** to **Storm Impact Summary (Barbados)** (in the
    **Flood Maps (English)** group).
 
 #. Bind ``parish`` to ``${Parish}`` and ``index`` to ``${Storm}``.
@@ -315,10 +346,13 @@ Step 5 — Add the summary table and the card
    share of the **parish's** population — which is why the parish has to reach
    the plugin as an argument rather than being baked in.
 
-#. Save the item and drag it to the upper right of the dashboard.
+#. Save the item and drag it to the right of the dashboard.
 
-#. Add another item and set the **Visualization Type** to
-   **Storm Summary (Barbados)**, binding the same two arguments.
+#. Click on **Add Dashboard Item** in the top right.
+
+#. Click on the new item's its 3-dot menu, select **Edit**
+
+#. Set the **Visualization Type** to **Storm Summary (Barbados)**, binding the same two arguments.
 
    The card gives the headline figures — the scenario's rainfall total over the
    parish, the flooded area, the deepest water and the mean depth where wet — for
@@ -333,35 +367,7 @@ Step 5 — Add the summary table and the card
    **Screenshot:** the summary table and card for one scenario.
 
 
-Step 6 — Finish the map
-=======================
-
-#. In the **Map Extent** argument, choose **Use a Custom Extent** and enter:
-
-   .. code-block:: text
-
-      -6634889.03,1473048.86,13
-
-   That is ``centre-x,centre-y,zoom`` in EPSG:3857 metres, centred on Saint
-   Michael. A parish window is only a few kilometres across, so the zoom is
-   tighter than exercise 1's island view.
-
-#. Save the item and resize the map to fill roughly the left 60% of the window,
-   leaving the right-hand strip for the table and the card. Unlike exercise 1
-   this map does **not** fill the viewport — it shares the window.
-
-#. If the map covers the three inputs, use **Order → Send to Back**.
-
-#. Save the dashboard.
-
-**Warning** — **The extent does not follow the parish.** Switch to Saint Lucy or
-Saint Philip and the layer reloads correctly but the view stays over Saint
-Michael until you pan. There is no variable holding per-parish coordinates, so
-the choices are to pan by hand, clear the custom extent and let the map auto-fit
-to the layer, or keep one parish per dashboard.
-
-
-Step 7 — Test the wiring
+Step 6 — Test the wiring
 ========================
 
 Change the **Storm** number. All four items update: the depth layer re-reads its
@@ -382,50 +388,6 @@ Worth doing once with the numbers in view: at Saint Michael, scenario 150 floods
 33,008 people. That scenario is 397 mm against Tomas's 229 mm island mean, so it
 is a considerably wetter event than the one the historical maps describe, and the
 table says so in absolute terms rather than as a share of some smaller subset.
-
-
-Item positions
-==============
-
-.. list-table::
-   :header-rows: 1
-   :widths: 46 13 13 13 15
-
-   * - Item
-     - ``x``
-     - ``y``
-     - ``w``
-     - ``h``
-   * - Map
-     - 0
-     - 0
-     - 60
-     - 44
-   * - Base Map (variable input)
-     - 60
-     - 0
-     - 13
-     - 6
-   * - Parish (variable input)
-     - 74
-     - 0
-     - 13
-     - 6
-   * - Storm (variable input)
-     - 89
-     - 0
-     - 11
-     - 6
-   * - Storm Impact Summary (table)
-     - 60
-     - 9
-     - 40
-     - 20
-   * - Storm Summary (card)
-     - 62
-     - 29
-     - 37
-     - 12
 
 
 Checkpoint
@@ -450,13 +412,6 @@ Talking points
   to a value with its type intact. ``${Parish}`` sits inside a longer URL, so it
   is spliced into the surrounding text. Same syntax, different behaviour, and it
   is what lets one layer reach eleven different stores.
-* **Auto-scaled versus pinned, again.** Depth auto-scales because its range is a
-  property of this scenario; probability was pinned because its range is fixed by
-  definition. The two rules look contradictory until you ask what the number
-  means.
-* **The 2.55 m ceiling.** Depth was packed into a byte upstream. Anything reading
-  2.55 means "at least 2.55", so a top band above about 2 m cannot be trusted to
-  be distinct. Worth saying before someone reads a maximum off the colour bar.
 * **Magnitude orders the library; it does not order the impact.** Stepping the
   storm is the fastest way to show that, and it is why the forecast matches a
   member to a storm by total and then reads the impact off the depth map, never
@@ -464,9 +419,6 @@ Talking points
 * **Know what the table counts.** The receptor file is the full island stock, so
   the table answers "how many buildings on Barbados does this scenario flood" —
   an absolute exposure figure, and a fair comparison across scenarios.
-* **Footprints, not points.** A building that spans several 30 m cells is
-  sampled in each and takes its deepest, and is drawn as its own outline — so
-  both the depth and the size on screen are the building's own.
 * **One variable pair, four consumers.** ``${Parish}`` and ``${Storm}`` reach a
   Zarr source, a plugin layer argument and two visualization arguments. Nothing
   in the four items knows about the others; they all declare a dependency on a
