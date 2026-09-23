@@ -83,20 +83,7 @@ What the receptor file is, and is not
 
 The two computed layers and the table read
 ``04_ibf_island_deduplicated/barbados_ibf_receptors_full…gpkg``, filtered to the
-parish you select. Three things about it shape what you can say:
-
-* **It is the full island stock** — 204,727 buildings and 22,509 road segments,
-  across all eleven parishes, with nothing removed by severity. A count from it
-  is exposure for Barbados, not exposure within a subset something else already
-  flagged.
-* **Each receptor appears once.** The run writes per-parish impact folders, but
-  those windows are parish-plus-buffer and overlap, so a receptor near a boundary
-  appears in up to five of them. This file keeps each once, from the window of
-  its own parish, matching the published per-parish counts exactly — which is
-  also what makes filtering on ``ADM1_PCODE`` give a clean parish count.
-* **Buildings are footprints**, so a building is classified on the maximum
-  probability over its own outline, and one that spans several cells picks up the
-  worst of them, and is drawn as that same outline.
+parish you select. 
 
 The share in the table's last column is against the **selected parish's**
 population — 77,395 for Saint Michael — not the island's 269,090. Changing the
@@ -112,55 +99,51 @@ Step 1 — Create the dashboard
    * **Name**: ``Barbados Hands On 3``
    * **Description**: ``Solution for WMO Barbados Hands On Exercise #3``
 
-#. Open it, turn on **Unrestricted Grid Item Movement**, and click **Edit
-   Dashboard**.
+
+Step 2 — Reusing items from other dashboards
+============================================
+
+Dashboard items can be exported from one dashboard and imported into another. This 
+is the quickest way to reuse the base map and the parish selector from exercises 1 
+and 2, and the four probability rasters from exercise 1. If you built those dashboards, 
+you can follow the steps below to reuse them here:
+
+#. Open the dashboard that contains the item you want to reuse
+
+#. Click on the 3 dots menu of the item and select **Export**. This will download a JSON file of the item to your computer.
+
+#. Do this for each of the items you want to reuse (base map selector, parish selector, and the map).
+
+#. Open the new dashboard you created in Step 1.
+
+#. Click on the **Edit Dashboard** button in the top right corner.
+
+#. Select **Import Dashboard Item** from the toolbar at the top of the dashboard.
+
+#. Browse to the JSON files you downloaded and select them all.
+
+#. Click **Import** to add the items to the new dashboard.
+
+#. If the map covers the inputs, use the 3 dot menu and use **Order → Send to Back**.
+
+#. Update each of the four probability rasters and make them invisible by default in the layer tabs, so they are there for comparison but do not obscure the computed layers.
+
+You may see an error on the map that says "Probability Mask variable is empty". This is because the map from 
+exercise 1 was bound to a variable that does not exist in this dashboard. You can import the probability mask
+variable input or just update the map layers and replace the variable input reference with a new static
+value of 0. This will allow the map to function correctly in the new dashboard.
+
+If you did not build those dashboards, add the base map selector, parish selector and the map from 
+scratch as described in exercises 1 and 2, then carry on.
+
+.. figure:: images/ex3-imported-items.png
+   :alt: The 3 dashboard items imported from exercises 1 and 2, including the base map selector, parish selector, and the map with four probability rasters
+   :width: 100%
+
+   **Screenshot:** The three imported items in the new dashboard, ready to be configured.
 
 
-Step 2 — Add the base map selector
-==================================
-
-As in exercise 1 — ``variable_name`` ``Base Map``, ``show_label`` ``True``,
-``variable_options_source`` ``Base Map Layers``, background ``#ffffff``, initial
-value **World Imagery**. Drag it to the top-left. If you built exercise 1, the
-quickest route is **Export** on its 3-dot menu and **Import Dashboard Item**
-here.
-
-
-Step 3 — Add the parish selector
-================================
-
-All three plugins in this exercise work one parish at a time, so they need a
-parish to work on. This is the same selector exercise 2 uses, so **Export** it
-from that dashboard's 3-dot menu and **Import Dashboard Item** here if you built
-it.
-
-Otherwise add a **Variable Input** with:
-
-.. list-table::
-   :header-rows: 1
-   :widths: 40 60
-
-   * - Field
-     - Value
-   * - ``variable_name``
-     - ``Parish``
-   * - ``show_label``
-     - ``True``
-   * - ``variable_options_source``
-     - ``dropdown``
-   * - ``initial_value``
-     - ``BB08_SaintMichael``
-
-The eleven choices pair a value with a label: ``BB01_ChristChurch`` →
-*Christ Church*, ``BB02_SaintAndrew`` → *Saint Andrew*, and so on through
-``BB11_SaintThomas``. The value is what the plugins receive; they take the
-``BB08`` half to filter receptors and the ``SaintMichael`` half to build the
-raster path.
-
-Drag it onto the top row, to the right of the base map selector.
-
-
-Step 4 — Add the four threshold inputs
+Step 3 — Add the four threshold inputs
 ======================================
 
 Build all four before the layers that consume them. Each is a **Variable Input**
@@ -176,20 +159,33 @@ with ``variable_options_source`` set to ``number``:
    * - ``High Threshold (P(≥70 cm))``
    * - ``Severe Threshold (P(≥100 cm))``
 
+There are 2 ways to do this. You can create each one separately or create the first one and then make a copy to edit:
+
 For **each** of the four:
 
-#. Add a dashboard item, set the **Visualization Type** to **Variable Input**,
-   and fill in ``variable_name`` from the table, ``show_label`` ``True``,
-   ``variable_options_source`` ``number``.
+From Scratch:
+  #. Click on **Add Dashboard Item** in the top right.
 
-#. On the **Settings** tab, set **Background Color** to ``#ffffff`` and add a
-   top border, changing its style to ``solid`` so it shows. Give the leftmost
-   input a left border and the rightmost a right border, so the four read as one
-   strip.
+  #. Click on the new item's its 3-dot menu, select **Edit**
 
-#. Set the initial value to ``0.8``.
+  #. Set the **Visualization Type** to **Variable Input**,
+    and fill in ``variable_name`` from the table, ``show_label`` ``True``,
+    ``variable_options_source`` ``number``.
 
-#. Save, and drag it into place along the top of the dashboard.
+  #. On the **Settings** tab, set **Background Color** to ``#ffffff``.
+
+  #. Set the initial value to ``0.8``.
+
+  #. Save, and drag it into place along the top of the dashboard.
+
+From Copy:
+  #. Click on the 3-dot menu of the first threshold input and select **Copy**.
+
+  #. Click on the new item's its 3-dot menu, select **Edit**
+
+  #. Change the ``variable_name`` to the next threshold from the table.
+
+  #. Save, and drag it into place along the top of the dashboard.
 
 The names carry the depth they gate because the plugin argument they bind to is
 called only ``low_threshold``. Without the depth in the variable name, nothing on
@@ -202,41 +198,10 @@ the dashboard says which threshold does what.
    **Screenshot:** the four threshold inputs side by side.
 
 
-Step 5 — Add the map and the four probability rasters
-=====================================================
-
-If you have exercise 1, reuse its map:
-
-#. Open the exercise 1 dashboard, **Export** the map item, and **Import
-   Dashboard Item** here.
-
-#. Edit the map item. For each of the four rasters, open the layer and turn off
-   **Default Visibility** on the **Layer** tab, so the classification is what
-   shows on load and the rasters are there to switch on for comparison.
-
-#. On each raster's **Source** tab, set ``mask_below`` back to ``0``. Exercise 1
-   bound it to a ``Probability Mask`` input that does not exist here — the
-   thresholds do that filtering now — and an unresolved variable leaves the field
-   empty.
-
-#. If the map covers the inputs, use **Order → Send to Back**.
-
-If you do not have exercise 1, build the map and the four rasters from scratch as
-described there, then carry on.
-
-These four stay on the **island mosaic**, while the two computed layers below
-read the selected parish's own window. That is deliberate: the rasters are
-context, they are GPU-drawn and cost nothing to leave island-wide, and inside a
-parish the mosaic and that parish's window agree — the mosaic was built from
-them. They differ only in the buffer fringe each window carries past its parish
-boundary, which is also why the classification shading runs a little wider than
-the parish while the counts do not: receptors are filtered on ``ADM1_PCODE``.
-
-
-Step 6 — Add the hazard classification layer
+Step 4 — Add the hazard classification layer
 ============================================
 
-#. In edit mode, open the map item's 3-dot menu and select **Edit**.
+#. Open the map item's 3-dot menu and select **Edit**.
 
 #. Next to **Layers**, click **Add Layer**, and go straight to the **Source**
    tab.
@@ -287,7 +252,7 @@ Step 6 — Add the hazard classification layer
    parish bound to variables.
 
 
-Step 7 — Add the affected-features layer
+Step 5 — Add the affected-features layer
 ========================================
 
 #. Next to **Layers**, click **Add Layer** again.
@@ -315,35 +280,22 @@ Step 7 — Add the affected-features layer
 
 #. Save the layer by clicking **Create**.
 
+#. Save the map
+
 The two layers answer different questions from the same thresholds: the hazard
 layer classifies *ground*, this one classifies *assets*. Keeping them separate
 lets a viewer turn off the ground shading and look only at what is affected.
 
 
-Step 8 — Finish the map
-=======================
-
-#. In the **Map Extent** argument, choose **Use a Custom Extent** and enter:
-
-   .. code-block:: text
-
-      -6627467.73,1481452.68,11.5
-
-#. On the **Settings** tab, turn on **Fill Viewport**.
-
-#. Save the item, resize the map to fill the window, and move any threshold input
-   you displaced back into place.
-
-#. Save the dashboard.
-
-
-Step 9 — Add the impact summary table
+Step 6 — Add the impact summary table
 =====================================
+#. Click on **Add Dashboard Item** in the top right.
 
-#. Add another item and set the **Visualization Type** to
-   **Flood Impact Summary (Barbados)** (in the **Flood Maps (English)** group).
+#. Click on the new item's its 3-dot menu, select **Edit**
 
-#. Bind the same five arguments to the same five variables as in step 6.
+#. Set the **Visualization Type** to **Flood Impact Summary (Barbados)** (in the **Flood Maps (English)** group).
+
+#. Bind the same five arguments to the same five variables as in step 4.
 
 #. On the **Settings** tab, set **Background Color** to ``#ffffff`` and add
    borders on the left, right and bottom, so it joins the strip of threshold
@@ -361,7 +313,7 @@ Step 9 — Add the impact summary table
    variables and the parish.
 
 
-Step 10 — Test the wiring
+Step 7 — Test the wiring
 =========================
 
 Change a threshold. The hazard shading, the affected features and the table
@@ -390,60 +342,6 @@ Saint Joseph, which Tomas largely spared, returns 114.
    **Screenshot:** the same view after lowering it.
 
 
-Item positions
-==============
-
-.. list-table::
-   :header-rows: 1
-   :widths: 46 13 13 13 15
-
-   * - Item
-     - ``x``
-     - ``y``
-     - ``w``
-     - ``h``
-   * - Map
-     - 0
-     - 0
-     - 99
-     - 41
-   * - Base Map (variable input)
-     - 0
-     - 0
-     - 17
-     - 6
-   * - Parish (variable input)
-     - 17
-     - 0
-     - 14
-     - 6
-   * - Low Threshold (variable input)
-     - 56
-     - 0
-     - 11
-     - 7
-   * - Medium Threshold (variable input)
-     - 67
-     - 0
-     - 12
-     - 7
-   * - High Threshold (variable input)
-     - 79
-     - 0
-     - 11
-     - 7
-   * - Severe Threshold (variable input)
-     - 90
-     - 0
-     - 10
-     - 7
-   * - Flood Impact Summary (table)
-     - 56
-     - 7
-     - 44
-     - 21
-
-
 Checkpoint
 ==========
 
@@ -469,13 +367,6 @@ Talking points
 * **What the gate actually filters.** A threshold of 0.8 keeps cells where more
   than 40 of the forecast's 50 members reached that depth. It is an ensemble
   share for this cycle, not a calibrated probability.
-* **Footprints, not points.** A building takes the worst probability found
-  anywhere under its own outline — better than sampling one representative point
-  would give — and is drawn as that outline, so a large warehouse reads as large.
-* **Scope is a performance decision too.** Working a parish at a time is what
-  keeps the map responsive: Saint Michael returns 5,583 features where the island
-  returned 17,231, and most parishes far fewer. It is also the honest scope — the
-  parish rasters are matched on that parish's own rainfall.
 * **Render as Image is the other half of that.** Scope decides how many features
   cross the wire; **Render as Image** decides how often they are re-drawn once
   they arrive. Together they are what let the layer keep true building footprints
@@ -485,17 +376,3 @@ Talking points
   adjacent cells of equal class merge into one polygon, about 1,600 of them for
   Saint Michael at the default gates. Normal and NoData are dropped — most of the grid — because a
   basemap shows unaffected ground better than a coloured layer does.
-* **Denominators are a choice.** 8.86 percent is against Saint Michael's 77,395
-  people. The same 4,970 buildings would be 1.85 percent of the island's 269,090,
-  and a larger share still against only the buildings the forecast flags. The
-  parish selector makes this visible: switch parishes and watch both halves of
-  the fraction move. Always say which denominator you are using.
-
-
-Next
-====
-
-The three exercises together cover the cycle's probability rasters, the parish
-scenario libraries and the classification. The notebooks in
-``notebooks/Barbados/`` — when written — will derive the same numbers as plain
-Python.

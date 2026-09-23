@@ -323,55 +323,7 @@
           "args_string": {
             "variable_name": "Parish",
             "show_label": true,
-            "variable_options_source": "dropdown",
-            "variable_options_source.metadata": {
-              "choices": [
-                {
-                  "value": "BB01_ChristChurch",
-                  "label": "Christ Church"
-                },
-                {
-                  "value": "BB02_SaintAndrew",
-                  "label": "Saint Andrew"
-                },
-                {
-                  "value": "BB03_SaintGeorge",
-                  "label": "Saint George"
-                },
-                {
-                  "value": "BB04_SaintJames",
-                  "label": "Saint James"
-                },
-                {
-                  "value": "BB05_SaintJohn",
-                  "label": "Saint John"
-                },
-                {
-                  "value": "BB06_SaintJoseph",
-                  "label": "Saint Joseph"
-                },
-                {
-                  "value": "BB07_SaintLucy",
-                  "label": "Saint Lucy"
-                },
-                {
-                  "value": "BB08_SaintMichael",
-                  "label": "Saint Michael"
-                },
-                {
-                  "value": "BB09_SaintPeter",
-                  "label": "Saint Peter"
-                },
-                {
-                  "value": "BB10_SaintPhilip",
-                  "label": "Saint Philip"
-                },
-                {
-                  "value": "BB11_SaintThomas",
-                  "label": "Saint Thomas"
-                }
-              ]
-            },
+            "variable_options_source": "Flood Maps (English): Storm Impact Summary (Barbados) - Parish",
             "initial_value": "BB08_SaintMichael"
           },
           "metadata_string": {
