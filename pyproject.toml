@@ -48,6 +48,8 @@ uffis_storm_impact_summary_guatemala = "tgf_wmo_plugins.storm_impact_summary:Sto
 uffis_storm_card_barbados = "tgf_wmo_plugins.storm_card:StormCardBarbados"
 uffis_storm_impact_layer_barbados = "tgf_wmo_plugins.storm_impact_layer:StormImpactLayerBarbados"
 uffis_storm_impact_summary_barbados = "tgf_wmo_plugins.storm_impact_summary:StormImpactSummaryBarbados"
+uffis_precip_layer_guatemala = "tgf_wmo_plugins.precip_layer:PrecipLayerGuatemala"
+uffis_cycle_times_guatemala = "tgf_wmo_plugins.precip_layer:CycleTimesGuatemala"
 
 [tool.setuptools.packages.find]
 include = ["tgf_wmo_plugins*"]
