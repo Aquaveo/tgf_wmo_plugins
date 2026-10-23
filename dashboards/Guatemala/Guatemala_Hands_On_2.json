@@ -309,7 +309,7 @@
      "args_string": {
       "variable_name": "Tormenta",
       "show_label": true,
-      "variable_options_source": "Mapas de Inundación (Español): Resumen de Impacto por Tormenta (Español) - Index",
+      "variable_options_source": "Mapas de Inundación (Español): Resumen de Impacto por Tormenta (Guatemala) - Index",
       "variable_options_source.metadata": {
        "min": 2,
        "max": 199,

@@ -1,196 +1,63 @@
 """Buildings and roads coloured by flood depth for one storm, as a map layer."""
 
-import json
+from tethysapp.tethysdash.plugin_helpers import LayerConfigurationBuilder
 
-from tethysapp.tethysdash.plugin_helpers import (
-    LayerConfigurationBuilder,
-    TethysDashPlugin,
-)
-
-from tgf_wmo_plugins.common import (
-    BARBADOS_PARISH_OPTIONS,
-    COMOROS_UNIT_OPTIONS,
-    COMOROS_UNITS,
-    UNIT_STORM_OPTIONS,
-    FIRST_WET_STORM,
-    STORM_OPTIONS,
-    coerce_index,
-)
-from tgf_wmo_plugins.storm_impact import (
-    DEPTH_BANDS,
-    UNIT_DEFAULT_STORM,
-    UNIT_MEASURES,
-    banded_features,
-    store_grid,
-    unit_banded_features,
-)
-from tgf_wmo_plugins.strings import STRINGS
+from tgf_wmo_plugins.base import CountryPlugin
+from tgf_wmo_plugins.countries import BARBADOS, COMOROS, GUATEMALA
+from tgf_wmo_plugins.impact_layer import feature_collection, feature_style
+from tgf_wmo_plugins.receptors import for_display
+from tgf_wmo_plugins.storm_impact import DEPTH_BANDS, StormIndex, banded_features
 
 
-class BaseStormImpactLayer(TethysDashPlugin):
-    LANG = None
+class BaseStormImpactLayer(StormIndex, CountryPlugin):
+    family = "storm_impact_layer"
+    strings_key = "storm_layer"
     type = "map_layer"
     dynamic_map_layer = True
-    args = {"index": STORM_OPTIONS}
 
     def run(self):
-        s = STRINGS[self.LANG]
+        s = self.strings
         builder = LayerConfigurationBuilder(s["storm_layer_name"], "GeoJSON")
         builder.set_plugin_source(self.name, self.received_args)
-        builder.set_style(self._style(s))
+        colors = [(value, color) for value, color, _floor in DEPTH_BANDS]
+        builder.set_style(feature_style(s, "attr_band", s["bands"], colors))
         builder.set_legend(
             {
                 "title": s["depth_legend"],
                 "items": [
                     {"label": s["bands"][value], "color": color, "symbol": "square"}
-                    for value, color, _floor in DEPTH_BANDS
+                    for value, color in colors
                 ],
             }
         )
         return builder.build()
 
     def fetch_features(self):
-        s = STRINGS[self.LANG]
-        index = coerce_index(self.get_arg("index", FIRST_WET_STORM), FIRST_WET_STORM)
-
+        s = self.strings
         self.send_update(s["msg_sampling"], percentage_complete=40)
-        flooded = banded_features(index).copy()
-        flooded = flooded.rename(columns={"banda": s["attr_band"],
-                                          "profundidad_m": s["attr_depth"]})
+        flooded = banded_features(self.country.key, self.unit(), self.storm_index())
+        flooded = flooded.rename(columns={"band": s["attr_band"],
+                                          "depth_m": s["attr_depth"]})
         flooded[s["attr_level"]] = flooded[s["attr_band"]].map(s["bands"])
+        flooded = for_display(flooded)
 
         self.send_update(
             s["msg_flooded"].format(count=len(flooded)), percentage_complete=100
         )
-        columns = [
-            "tipo",
-            s["attr_level"],
-            s["attr_band"],
-            s["attr_depth"],
-            "poblacion",
-            "area_m2",
-            "longitud_m",
-        ]
-        collection = json.loads(flooded[columns + ["geometry"]].to_json())
-        # The store's grid is already EPSG:3857, which OpenLayers resolves
-        # natively -- no proj4 needed and no reprojection on the way out.
-        _transform, _shape, crs = store_grid()
-        collection["crs"] = {"type": "name", "properties": {"name": crs}}
-        return collection
-
-    @staticmethod
-    def _style(s):
-        """Rule-based styling on the depth-band attribute. See hazard_layer._style."""
-        rules = []
-        for value, color, _floor in DEPTH_BANDS:
-            condition = {
-                "conditionField": s["attr_band"],
-                "conditionType": "=",
-                "conditionValue": str(value),
-            }
-            rules.append(
-                {
-                    "name": f"{s['bands'][value]} ({s['buildings']})",
-                    "geometryType": "polygon",
-                    "strokeWidth": "1",
-                    **condition,
-                    "fill": color,
-                    "stroke": color,
-                }
-            )
-            rules.append(
-                {
-                    "name": f"{s['bands'][value]} ({s['roads']})",
-                    "geometryType": "linestring",
-                    **condition,
-                    "stroke": color,
-                    "strokeWidth": "3",
-                }
-            )
-        return {
-            "default": {
-                "polygon": {"fill": "#9e9e9e", "stroke": "#9e9e9e", "strokeWidth": "0"},
-                "linestring": {"stroke": "#9e9e9e", "strokeWidth": "1"},
-            },
-            "rules": rules,
-        }
+        cols = self.country.receptors.columns
+        return feature_collection(
+            flooded,
+            [cols.type, s["attr_level"], s["attr_band"], s["attr_depth"], *cols.measures],
+        )
 
 
 class StormImpactLayerGuatemala(BaseStormImpactLayer):
-    LANG = "es"
-    name = "uffis_storm_impact_layer_guatemala"
-    label = f"{STRINGS['es']['storm_layer_label']} (Guatemala)"
-    group = STRINGS["es"]["group"]
-    tags = ["inundación", "impacto", "zarr", "tormenta", "map_layer", "español"]
-    description = STRINGS["es"]["storm_layer_desc"]
+    country = GUATEMALA
 
 
-# Vector output is EPSG:4326 for every country. The raster loaders resolve a
-# published CRS on demand from the generated EPSG table, but `loadGeoJSON` hands
-# `crs.properties.name` straight to OpenLayers without that lookup, so a
-# plugin-returned collection has to name a projection the map already holds.
-# This is the same OUTPUT_CRS impact_layer settles on, for the same reason.
-OUTPUT_CRS = "EPSG:4326"
+class StormImpactLayerBarbados(BaseStormImpactLayer):
+    country = BARBADOS
 
 
-class BaseStormImpactLayerUnit(BaseStormImpactLayer):
-    """One unit's flooded buildings and roads, for one storm of its library.
-
-    Only the two ends differ from the Guatemala layer: which features are
-    sampled, and that the result is reprojected into a CRS the frontend resolves.
-    The legend and the run() scaffold are inherited; every country here draws
-    polygon buildings and linestring roads, so the shared style covers them all.
-    """
-
-    country = None
-    unit_arg = "unit"
-    default_unit = None
-
-    def fetch_features(self):
-        s = STRINGS[self.LANG]
-        unit = self.get_arg(self.unit_arg, self.default_unit)
-        index = coerce_index(
-            self.get_arg("index", UNIT_DEFAULT_STORM), UNIT_DEFAULT_STORM
-        )
-
-        self.send_update(s["msg_sampling"], percentage_complete=40)
-        flooded = unit_banded_features(self.country, unit, index).copy()
-        flooded = flooded.rename(columns={"banda": s["attr_band"],
-                                          "profundidad_m": s["attr_depth"]})
-        flooded[s["attr_level"]] = flooded[s["attr_band"]].map(s["bands"])
-        flooded = flooded.to_crs(OUTPUT_CRS)
-
-        self.send_update(
-            s["msg_flooded"].format(count=len(flooded)), percentage_complete=100
-        )
-        columns = ["type", s["attr_level"], s["attr_band"], s["attr_depth"],
-                   *UNIT_MEASURES]
-        collection = json.loads(flooded[columns + ["geometry"]].to_json())
-        collection["crs"] = {"type": "name", "properties": {"name": OUTPUT_CRS}}
-        return collection
-
-
-class StormImpactLayerComoros(BaseStormImpactLayerUnit):
-    LANG = "fr"
-    country = "comoros"
-    unit_arg = "commune"
-    default_unit = COMOROS_UNITS[0][0]
-    args = {"commune": COMOROS_UNIT_OPTIONS, "index": UNIT_STORM_OPTIONS}
-    name = "uffis_storm_impact_layer_comoros"
-    label = f"{STRINGS['fr']['storm_layer_label']} (Comores)"
-    group = STRINGS["fr"]["group"]
-    tags = ["inondation", "impact", "zarr", "tempête", "map_layer", "français"]
-    description = STRINGS["fr"]["storm_layer_desc"]
-
-
-class StormImpactLayerBarbados(BaseStormImpactLayerUnit):
-    LANG = "en"
-    country = "barbados"
-    unit_arg = "parish"
-    default_unit = "BB08_SaintMichael"
-    args = {"parish": BARBADOS_PARISH_OPTIONS, "index": UNIT_STORM_OPTIONS}
-    name = "uffis_storm_impact_layer_barbados"
-    label = f"{STRINGS['en']['storm_layer_label']} (Barbados)"
-    group = STRINGS["en"]["group"]
-    tags = ["flood", "impact", "zarr", "storm", "map_layer", "dynamic", "english"]
-    description = STRINGS["en"]["storm_layer_desc"]
+class StormImpactLayerComoros(BaseStormImpactLayer):
+    country = COMOROS

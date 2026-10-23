@@ -1,9 +1,9 @@
 """Every user-facing string, in English, Spanish and French.
 
-The plugins come in an `_en`, an `_es` and an `_fr` variant. Keeping the text in
-one table rather than in parallel sets of modules is what stops the variants
-drifting: a new string has to be added to every dictionary or `check_parity()`
-fails, and nothing that computes a number lives here.
+Each country's plugins speak that country's language (`Country.lang`). Keeping
+the text in one table is what stops the languages drifting: a new string has to
+be added to every dictionary or `check_parity()` fails, and nothing that
+computes a number lives here.
 
 Hazard levels and depth bands are keyed by their numeric class value, which is
 what the raster and the feature attributes actually carry, so a translation can
@@ -104,10 +104,48 @@ STRINGS = {
         "msg_done": "Done",
         "msg_at_risk": "{count:,} elements at risk",
         "msg_flooded": "{count:,} elements flooded",
-        # Search tags for the hazard layer; the plugin adds nothing else.
+        # Live TITO cycles.
+        "cycle_latest": "Latest cycle",
+        "cycle_training": "Training data",
+        "variants": {
+            "combined_overbank": "Combined (overbank)",
+            "combined": "Combined",
+            "pluvial_overbank": "Pluvial (overbank)",
+            "pluvial": "Pluvial",
+            "fluvial_overbank": "Fluvial (overbank)",
+            "fluvial": "Fluvial",
+        },
+        "msg_not_triggered": "{site}: no flood mapping triggered in the {cycle} cycle",
+        "msg_no_receptors": "{site}: no buildings or roads published in the {cycle} cycle",
+        "msg_no_training": "There is no training data for this plugin; choose a cycle",
+        "discharge_label": "River Discharge Forecast",
+        "discharge_desc": (
+            "Forecast discharge at a river gauge for one TITO cycle: the range "
+            "and median of each rainfall forcing's members."
+        ),
+        "discharge_tags": ["flood", "discharge", "hydrograph", "forecast", "plotly", "english"],
+        "discharge_title": "Discharge forecast — {gauge}",
+        "axis_discharge": "Discharge (m³/s)",
+        "axis_time": "Time (UTC)",
+        "forcings": {
+            "stream_sat": "Satellite rainfall (STREAM-SAT)",
+            "scampr": "Nowcast (SCaMPR)",
+            "stormlab": "Forecast (StormLab)",
+        },
+        "members": "{n} members",
+        "median_peaks": "Median peaks",
+        "peak_at": "{value:.1f} m³/s at {time}",
+        "observed": "Observed",
+        "msg_no_gauge": "{gauge}: no forecast published in the {cycle} cycle",
+        # Search tags, one list per plugin family.
         "hazard_layer_tags": [
             "flood", "hazard", "EF5", "map_layer", "dynamic", "english"
         ],
+        "hazard_summary_tags": ["flood", "impact", "IBF", "exposure", "table", "english"],
+        "impact_layer_tags": ["flood", "impact", "IBF", "map_layer", "dynamic", "english"],
+        "storm_summary_tags": ["flood", "impact", "zarr", "storm", "table", "english"],
+        "storm_layer_tags": ["flood", "impact", "zarr", "storm", "map_layer", "dynamic", "english"],
+        "storm_card_tags": ["flood", "zarr", "storm", "card", "english"],
     },
     "es": {
         "language": "Español",
@@ -194,9 +232,46 @@ STRINGS = {
         "msg_done": "Listo",
         "msg_at_risk": "{count:,} elementos en peligro",
         "msg_flooded": "{count:,} elementos inundados",
+        "cycle_latest": "Último ciclo",
+        "cycle_training": "Datos de capacitación",
+        "variants": {
+            "combined_overbank": "Combinada (desborde)",
+            "combined": "Combinada",
+            "pluvial_overbank": "Pluvial (desborde)",
+            "pluvial": "Pluvial",
+            "fluvial_overbank": "Fluvial (desborde)",
+            "fluvial": "Fluvial",
+        },
+        "msg_not_triggered": "{site}: no se activó el mapeo de inundaciones en el ciclo {cycle}",
+        "msg_no_receptors": "{site}: no se publicaron edificios ni carreteras en el ciclo {cycle}",
+        "msg_no_training": "No hay datos de capacitación para este complemento; elija un ciclo",
+        "discharge_label": "Pronóstico de Caudal",
+        "discharge_desc": (
+            "Caudal pronosticado en una estación para un ciclo de TITO: el rango "
+            "y la mediana de los miembros de cada forzante de lluvia."
+        ),
+        "discharge_tags": ["inundación", "caudal", "hidrograma", "pronóstico", "plotly", "español"],
+        "discharge_title": "Pronóstico de caudal — {gauge}",
+        "axis_discharge": "Caudal (m³/s)",
+        "axis_time": "Hora (UTC)",
+        "forcings": {
+            "stream_sat": "Lluvia satelital (STREAM-SAT)",
+            "scampr": "Pronóstico inmediato (SCaMPR)",
+            "stormlab": "Pronóstico (StormLab)",
+        },
+        "members": "{n} miembros",
+        "median_peaks": "Picos de la mediana",
+        "peak_at": "{value:.1f} m³/s a las {time}",
+        "observed": "Observado",
+        "msg_no_gauge": "{gauge}: no se publicó pronóstico en el ciclo {cycle}",
         "hazard_layer_tags": [
             "inundación", "peligro", "EF5", "map_layer", "dinámico", "español"
         ],
+        "hazard_summary_tags": ["inundación", "impacto", "IBF", "exposición", "tabla", "español"],
+        "impact_layer_tags": ["inundación", "impacto", "IBF", "map_layer", "dinámico", "español"],
+        "storm_summary_tags": ["inundación", "impacto", "zarr", "tormenta", "tabla", "español"],
+        "storm_layer_tags": ["inundación", "impacto", "zarr", "tormenta", "map_layer", "dinámico", "español"],
+        "storm_card_tags": ["inundación", "zarr", "tormenta", "tarjeta", "español"],
     },
     "fr": {
         "language": "Français",
@@ -284,9 +359,46 @@ STRINGS = {
         "msg_done": "Terminé",
         "msg_at_risk": "{count:,} éléments en danger",
         "msg_flooded": "{count:,} éléments inondés",
+        "cycle_latest": "Dernier cycle",
+        "cycle_training": "Données de formation",
+        "variants": {
+            "combined_overbank": "Combinée (débordement)",
+            "combined": "Combinée",
+            "pluvial_overbank": "Pluviale (débordement)",
+            "pluvial": "Pluviale",
+            "fluvial_overbank": "Fluviale (débordement)",
+            "fluvial": "Fluviale",
+        },
+        "msg_not_triggered": "{site} : aucune cartographie d'inondation déclenchée au cycle {cycle}",
+        "msg_no_receptors": "{site} : aucun bâtiment ni route publié au cycle {cycle}",
+        "msg_no_training": "Aucune donnée de formation pour ce module ; choisissez un cycle",
+        "discharge_label": "Prévision de Débit",
+        "discharge_desc": (
+            "Débit prévu à une station pour un cycle TITO : l'étendue et la "
+            "médiane des membres de chaque forçage de pluie."
+        ),
+        "discharge_tags": ["inondation", "débit", "hydrogramme", "prévision", "plotly", "français"],
+        "discharge_title": "Prévision de débit — {gauge}",
+        "axis_discharge": "Débit (m³/s)",
+        "axis_time": "Heure (UTC)",
+        "forcings": {
+            "stream_sat": "Pluie satellitaire (STREAM-SAT)",
+            "scampr": "Prévision immédiate (SCaMPR)",
+            "stormlab": "Prévision (StormLab)",
+        },
+        "members": "{n} membres",
+        "median_peaks": "Pics de la médiane",
+        "peak_at": "{value:.1f} m³/s à {time}",
+        "observed": "Observé",
+        "msg_no_gauge": "{gauge} : aucune prévision publiée au cycle {cycle}",
         "hazard_layer_tags": [
             "inondation", "aléa", "EF5", "map_layer", "dynamique", "français"
         ],
+        "hazard_summary_tags": ["inondation", "impact", "IBF", "exposition", "tableau", "français"],
+        "impact_layer_tags": ["inondation", "impact", "IBF", "map_layer", "dynamique", "français"],
+        "storm_summary_tags": ["inondation", "impact", "zarr", "tempête", "tableau", "français"],
+        "storm_layer_tags": ["inondation", "impact", "zarr", "tempête", "map_layer", "dynamique", "français"],
+        "storm_card_tags": ["inondation", "zarr", "tempête", "carte", "français"],
     },
 }
 
@@ -320,6 +432,14 @@ THRESHOLD_ARGS = {
 }
 
 
+# Argument names for the live-data choices, one per language like the gates.
+LIVE_ARGS = {
+    "en": {"cycle": "cycle", "variant": "flood_source", "gauge": "gauge"},
+    "es": {"cycle": "ciclo", "variant": "fuente_inundacion", "gauge": "estacion"},
+    "fr": {"cycle": "cycle", "variant": "source_inondation", "gauge": "station"},
+}
+
+
 def threshold_args(lang):
     """The four gate arguments as a plugin `args` schema, in `lang`."""
     return {name: "number" for name in THRESHOLD_ARGS[lang].values()}
@@ -345,10 +465,12 @@ def check_parity():
                 f"strings out of sync -- missing from {lang}: "
                 f"{sorted(en - other)}, missing from en: {sorted(other - en)}"
             )
-        for key in ("levels", "bands"):
+        for key in ("levels", "bands", "variants", "forcings"):
             if set(STRINGS["en"][key]) != set(STRINGS[lang][key]):
                 raise ValueError(f"{key} class values differ in {lang}")
 
+    if set(LIVE_ARGS) != set(LANGUAGES):
+        raise ValueError("LIVE_ARGS does not cover every language")
     if set(THRESHOLD_ARGS) != set(LANGUAGES):
         raise ValueError("THRESHOLD_ARGS does not cover every language")
     values = [set(names) for names in THRESHOLD_ARGS.values()]
