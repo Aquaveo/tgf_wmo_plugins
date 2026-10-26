@@ -27,6 +27,7 @@ class BaseCycleTimes(TethysDashPlugin):
     country = None
     group = "UFFIS Live"
     type = "variable_input"
+    publishes = "Date"  # the variable a dashboard binds with ${Date}
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
@@ -44,7 +45,7 @@ class BaseCycleTimes(TethysDashPlugin):
     def run(self):
         cycles = available_cycles(self.country.live.slug)
         return {
-            "variable_name": "Date",
+            "variable_name": self.publishes,
             "initial_value": cycles[0],
             "variable_options_source": "dropdown",
             "metadata": {

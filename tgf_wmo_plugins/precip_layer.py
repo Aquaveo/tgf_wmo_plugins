@@ -1,4 +1,4 @@
-"""Rainfall accumulation for Guatemala from the live TITO workflow, as a map layer.
+"""Rainfall accumulation from the live TITO workflow, as a map layer.
 
 The ensemble summary rasters sit at
 <grid>/summary/qpeaccum_<period>_<statistic>.<cycle>.tif; see tito.py for how
@@ -20,12 +20,8 @@ from tgf_wmo_plugins.tito import (
     resolve_cycle,
 )
 
-SLUG = "guatemala"
+from tgf_wmo_plugins.countries import ANTIGUA_BARBUDA, COMOROS, GUATEMALA, HAITI
 
-GRIDS = [
-    {"value": "guatemala_900m", "label": "900 m (national)"},
-    {"value": "guatemala_90m", "label": "90 m (flood sites)"},
-]
 STATISTICS = [
     {"value": "median", "label": "Median"},
     {"value": "min", "label": "Minimum"},
@@ -62,25 +58,43 @@ def _choice(value, options):
     return value if value in values else values[0]
 
 
-class PrecipLayerGuatemala(TethysDashPlugin):
-    name = "uffis_precip_layer_guatemala"
+class BasePrecipLayer(TethysDashPlugin):
+    """Set `country`; its `live.rain_grids` name the grids to offer.
+
+    The labels are English in every country, like the cycle inputs, as they
+    were when only the Guatemala layer existed.
+    """
+
+    country = None
     group = "UFFIS Live"
-    label = "Rainfall Accumulation (Guatemala)"
     type = "map_layer"
-    tags = ["uffis", "tito", "rainfall", "guatemala"]
-    description = (
-        "Ensemble rainfall accumulation from one hourly TITO cycle for "
-        "Guatemala. Bind the cycle to an Available Cycles input, or leave it "
-        "at 'latest'."
-    )
-    # `cycle` takes the stamp an Available Cycles input carries; it is not a
-    # "date" arg, which would parse the stamp as a datetime.
-    args = {
-        "cycle": [{"value": LATEST, "label": "Latest cycle"}],
-        "grid": GRIDS,
-        "statistic": STATISTICS,
-        "period": PERIODS,
-    }
+
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        country = cls.__dict__.get("country")
+        if country is None:
+            return
+        cls.name = f"uffis_precip_layer_{country.key}"
+        cls.label = f"Rainfall Accumulation ({country.label_name})"
+        cls.tags = ["uffis", "tito", "rainfall", country.key]
+        cls.description = (
+            f"Ensemble rainfall accumulation from one hourly TITO cycle for "
+            f"{country.label_name}. Bind the cycle to an Available Cycles input, "
+            "or leave it at 'latest'."
+        )
+        # `cycle` takes the stamp an Available Cycles input carries; it is not
+        # a "date" arg, which would parse the stamp as a datetime.
+        cls.args = {
+            "cycle": [{"value": LATEST, "label": "Latest cycle"}],
+            "grid": cls.grids(),
+            "statistic": STATISTICS,
+            "period": PERIODS,
+        }
+
+    @classmethod
+    def grids(cls):
+        return [{"value": g, "label": label} for g, label in cls.country.live.rain_grids]
+
     dynamic_map_layer = True
     dynamic_map_layer_source = "GeoTIFF"
 
@@ -109,20 +123,37 @@ class PrecipLayerGuatemala(TethysDashPlugin):
 
     def fetch_source(self):
         """Runtime source: the cycle's raster, re-fetched when a binding changes."""
-        grid = _choice(self.get_arg("grid"), GRIDS)
+        slug = self.country.live.slug
+        grid = _choice(self.get_arg("grid"), self.grids())
         statistic = _choice(self.get_arg("statistic"), STATISTICS)
         period = _choice(self.get_arg("period"), PERIODS)
-        cycle = resolve_cycle(self.get_arg("cycle"), SLUG)
+        cycle = resolve_cycle(self.get_arg("cycle"), slug)
         if cycle == TRAINING:
-            cycle = latest_cycle(SLUG)
+            cycle = latest_cycle(slug)
 
         path = f"{grid}/summary/qpeaccum_{period}_{statistic}.{cycle}.tif"
-        if path not in cycle_files(SLUG, cycle):
+        if path not in cycle_files(slug, cycle):
             raise ValueError(f"cycle {cycle} published no {period} {statistic} rainfall on {grid}")
         # Under 1 mm, the -9999 nodata included, is left transparent.
-        return geotiff_source(file_url(SLUG, cycle, path), mask_below=BREAKS_MM[0])
+        return geotiff_source(file_url(slug, cycle, path), mask_below=BREAKS_MM[0])
 
     @staticmethod
     def _labels():
         pairs = zip(BREAKS_MM, BREAKS_MM[1:])
         return [f"{lo} - {hi}" for lo, hi in pairs] + [f"{BREAKS_MM[-1]} or more"]
+
+
+class PrecipLayerGuatemala(BasePrecipLayer):
+    country = GUATEMALA
+
+
+class PrecipLayerHaiti(BasePrecipLayer):
+    country = HAITI
+
+
+class PrecipLayerAntiguaBarbuda(BasePrecipLayer):
+    country = ANTIGUA_BARBUDA
+
+
+class PrecipLayerComoros(BasePrecipLayer):
+    country = COMOROS

@@ -25,11 +25,11 @@ subclass per family its data supports, registered as `uffis_<family>_<country>`.
 
 | country | language | hazard family | storm family | unit argument | live TITO data |
 |---|---|---|---|---|---|
-| Guatemala | es | ✓ | ✓ (one national library) | — | ✓ |
-| Haiti | fr | ✓ (hazard layer live only) | — | — | ✓, `site` La Quinte or Gris |
-| Antigua and Barbuda | en | ✓ | — | — | ✓ |
-| Barbados | en | ✓ | ✓ (one library per parish) | `parish` | — |
-| Comoros | fr | ✓ | ✓ (one library per commune) | `commune` | ✓ |
+| Guatemala | es | ✓ | ✓ live | — | ✓ |
+| Haiti | fr | ✓ (hazard layer live only) | ✓ live | — | ✓, `site` La Quinte or Gris |
+| Antigua and Barbuda | en | ✓ | ✓ live | — | ✓ |
+| Barbados | en | ✓ | ✓ training library, per parish | `parish` | — |
+| Comoros | fr | ✓ | ✓ live (no receptors published) | `commune` | ✓ |
 
 The map layers are `dynamic_map_layer`s: they re-fetch whenever a bound
 variable input changes, which is what makes the thresholds and the storm slider
@@ -74,16 +74,50 @@ Two more live plugins take the same `cycle` binding:
   cycle start is marked. Antigua's one gauge is a placeholder that never
   flows, and Comoros has none, so neither has the plot.
 
+## Warnings (SFFS/FGS risk matrix)
+
+Four live plugins per TITO country follow the Scottish Flood Forecasting
+Service and Flood Guidance Statement standard (Speight et al., 2018), as the
+[AHWA IBF viewer](https://ahwalab.github.io/ibf_viz/guatemala/) does:
+
+- `uffis_risk_matrix_<country>`: the likelihood × severity matrix, the four
+  warning colours and the cycle's overall warning (the highest district level).
+- `uffis_risk_filter_<country>`: a dropdown -- All, Yellow and up, Amber and
+  up, Red only -- for the layer below.
+- `uffis_risk_layer_<country>`: buildings and roads coloured VERY LOW to HIGH.
+  "All" means every feature with a reportable probability (P(≥ 0.1 m) ≥ 5%);
+  the never-wet rest of the stock is left out, since it runs to a third of a
+  million features in Haiti Gris.
+- `uffis_event_summary_<country>`: buildings, road km and districts at each
+  warning level, and the population in buildings at yellow or worse.
+
+A feature's warning is the highest the matrix gives across its P(≥ 0.1 m),
+P(≥ 0.3 m) and P(≥ 0.7 m) -- Minor, Significant and Severe -- with likelihood
+bands at 20 / 40 / 60 % and probabilities under 5 % ignored. This reproduces
+the `risk_class` TITO writes on every feature, and the counts match its
+`ibf_summary.json`. District warnings are TITO's own, since its district rule
+counts properties per district. These plugins sit beside the threshold-based
+hazard and impact plugins, which are unchanged.
+
 ## Two products, two questions
 
 - **Hazard** (`hazard_layer`, `impact_summary`, `impact_layer`) works from four
   EF5 **exceedance-probability** rasters. Each hazard level has its own
   probability gate, and a feature takes the level of the deepest flood threshold
   it clears. It answers *"what are the odds of at least 30 cm here"*.
-- **Storm** (`storm_card`, `storm_impact_summary`, `storm_impact_layer`) samples
-  **depth** from one storm of a 200-storm flood-map library. It answers
-  *"in storm 150, how deep is the water on this building"*. Depth is a physical
-  quantity, so the bands need no reference to a threshold.
+- **Storm** (`storm_card`, `storm_impact_summary`, `storm_impact_layer`)
+  answers *"how deep is the water likely to get on this building"*. For every
+  country TITO runs, it reads the live cycle: a feature's likely depth is the
+  deepest of 10 / 30 / 70 / 100 cm it reaches with at least the chosen
+  probability (`min_probability` / `probabilidad_minima` /
+  `probabilite_minimale`, default 0.5), and the card adds the trigger status,
+  forecast rainfall, the area likely to flood and the *expected* people and
+  buildings with at least 0.3 m (each feature counted by its probability).
+  TITO's live flood-map libraries are not published -- the copies in the S3
+  bucket do not reproduce its forecasts -- so the depth of the storm a member
+  matched cannot be shown. Barbados, which TITO does not run, keeps the
+  training version: depth sampled from one storm of a 200-storm library,
+  chosen by `index`.
 
 ## Adding a country
 
@@ -120,6 +154,22 @@ hands-on exercises, whose guides live in `docs/<country>/`. Import them from the
 landing page once the plugins are installed and the server has restarted.
 Exercise 1 uses no plugins, exercise 2 uses the storm family and exercise 3 the
 hazard family.
+
+Each TITO country also has a live dashboard, with a cycle dropdown driving
+every panel:
+
+| file | language |
+|---|---|
+| `Guatemala/Guatemala_Hands_On_2_English.json` | English (plugin text in Spanish) |
+| `Haiti/Haiti_Live.json` | French, with a La Quinte / Gris site selector |
+| `Antigua_Barbuda/Antigua_Barbuda_Live.json` | English |
+| `Comoros/Comoros_Live.json` | French, with a commune selector |
+
+The first tab has rainfall, hazard and likely flood depth on the map, the
+forecast card and the depth and hazard tables (and the discharge forecast
+where there are gauges); the second has the SFFS/FGS warnings. Antigua's gauge
+is a placeholder and Comoros has none, so neither shows discharge, and TITO
+publishes no Comoros buildings, so its impact panels stay empty.
 
 Antigua and Barbuda has no storm plugins, so its exercise 2 binds a `Storm`
 number input straight to a Zarr layer on the Saint John's flood-map library.

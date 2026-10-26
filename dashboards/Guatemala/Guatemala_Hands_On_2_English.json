@@ -1,6 +1,6 @@
 {
   "name": "Guatemala Live Flood Forecast (English)",
-  "description": "Live TITO flood forecast for Santa Inés Petapa, Guatemala: rainfall, hazard, impact and river discharge for any published cycle",
+  "description": "Live TITO flood forecast for Santa Inés Petapa, Guatemala: forecast summary, likely flood depth on buildings and roads, hazard, rainfall and river discharge for any published cycle",
   "publicDashboard": false,
   "userPermission": "admin",
   "permissions": [
@@ -30,8 +30,39 @@
           "metadata_string": {}
         },
         {
-          "i": "2",
+          "i": "6",
           "x": 22,
+          "y": 0,
+          "w": 18,
+          "h": 6,
+          "source": "Variable Input",
+          "args_string": {
+            "variable_name": "Probability",
+            "show_label": true,
+            "variable_options_source": "number",
+            "variable_options_source.metadata": {
+              "min": 0.05,
+              "max": 1,
+              "step": 0.05,
+              "dataType": "Number",
+              "outputFormat": "{{n}}",
+              "rangeMode": false,
+              "speedOptions": [
+                2000,
+                1000,
+                500,
+                250,
+                100
+              ],
+              "initialValue": 0.5
+            },
+            "initial_value": 0.5
+          },
+          "metadata_string": {}
+        },
+        {
+          "i": "2",
+          "x": 40,
           "y": 0,
           "w": 15,
           "h": 6,
@@ -49,7 +80,7 @@
           "x": 0,
           "y": 6,
           "w": 55,
-          "h": 44,
+          "h": 48,
           "source": "Map",
           "args_string": {
             "baseMap": "${Base Map}",
@@ -396,7 +427,8 @@
                         "strokeWidth": "3"
                       }
                     ]
-                  }
+                  },
+                  "layerVisibility": false
                 },
                 "legend": {
                   "title": "Hazard",
@@ -423,6 +455,399 @@
                     }
                   ]
                 }
+              },
+              {
+                "configuration": {
+                  "type": "VectorLayer",
+                  "props": {
+                    "name": "Likely flood depth on buildings and roads",
+                    "source": {
+                      "type": "GeoJSON",
+                      "props": {},
+                      "geojson": {
+                        "type": "FeatureCollection",
+                        "features": [],
+                        "crs": {
+                          "type": "name",
+                          "properties": {
+                            "name": "EPSG:4326"
+                          }
+                        }
+                      }
+                    },
+                    "pluginSource": {
+                      "source": "uffis_storm_impact_layer_guatemala",
+                      "args": {
+                        "ciclo": "${Date}",
+                        "probabilidad_minima": "${Probability}"
+                      }
+                    },
+                    "layerId": "286ba87c-92d7-4404-ac28-53166c281e54"
+                  },
+                  "style": {
+                    "default": {
+                      "polygon": {
+                        "fill": "#9e9e9e",
+                        "stroke": "#9e9e9e",
+                        "strokeWidth": "0"
+                      },
+                      "linestring": {
+                        "stroke": "#9e9e9e",
+                        "strokeWidth": "1"
+                      }
+                    },
+                    "rules": [
+                      {
+                        "name": "0.1 - 0.3 m (buildings)",
+                        "geometryType": "polygon",
+                        "strokeWidth": "1",
+                        "conditionField": "banda",
+                        "conditionType": "=",
+                        "conditionValue": "1",
+                        "fill": "green",
+                        "stroke": "green"
+                      },
+                      {
+                        "name": "0.1 - 0.3 m (roads)",
+                        "geometryType": "linestring",
+                        "conditionField": "banda",
+                        "conditionType": "=",
+                        "conditionValue": "1",
+                        "stroke": "green",
+                        "strokeWidth": "3"
+                      },
+                      {
+                        "name": "0.3 - 0.7 m (buildings)",
+                        "geometryType": "polygon",
+                        "strokeWidth": "1",
+                        "conditionField": "banda",
+                        "conditionType": "=",
+                        "conditionValue": "2",
+                        "fill": "yellow",
+                        "stroke": "yellow"
+                      },
+                      {
+                        "name": "0.3 - 0.7 m (roads)",
+                        "geometryType": "linestring",
+                        "conditionField": "banda",
+                        "conditionType": "=",
+                        "conditionValue": "2",
+                        "stroke": "yellow",
+                        "strokeWidth": "3"
+                      },
+                      {
+                        "name": "0.7 - 1 m (buildings)",
+                        "geometryType": "polygon",
+                        "strokeWidth": "1",
+                        "conditionField": "banda",
+                        "conditionType": "=",
+                        "conditionValue": "3",
+                        "fill": "red",
+                        "stroke": "red"
+                      },
+                      {
+                        "name": "0.7 - 1 m (roads)",
+                        "geometryType": "linestring",
+                        "conditionField": "banda",
+                        "conditionType": "=",
+                        "conditionValue": "3",
+                        "stroke": "red",
+                        "strokeWidth": "3"
+                      },
+                      {
+                        "name": "1 m or more (buildings)",
+                        "geometryType": "polygon",
+                        "strokeWidth": "1",
+                        "conditionField": "banda",
+                        "conditionType": "=",
+                        "conditionValue": "4",
+                        "fill": "purple",
+                        "stroke": "purple"
+                      },
+                      {
+                        "name": "1 m or more (roads)",
+                        "geometryType": "linestring",
+                        "conditionField": "banda",
+                        "conditionType": "=",
+                        "conditionValue": "4",
+                        "stroke": "purple",
+                        "strokeWidth": "3"
+                      }
+                    ]
+                  }
+                },
+                "legend": {
+                  "title": "Depth",
+                  "items": [
+                    {
+                      "label": "0.1 - 0.3 m",
+                      "color": "green",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "0.3 - 0.7 m",
+                      "color": "yellow",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "0.7 - 1 m",
+                      "color": "red",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "1 m or more",
+                      "color": "purple",
+                      "symbol": "square"
+                    }
+                  ]
+                }
+              }
+            ],
+            "map_extent": {
+              "extent": "-10078413.13,1629754.90,13.5"
+            },
+            "mapDrawing": {}
+          },
+          "metadata_string": {
+            "border": {
+              "border": "1px solid black"
+            },
+            "backgroundColor": "#ffffff"
+          }
+        },
+        {
+          "i": "7",
+          "x": 55,
+          "y": 0,
+          "w": 45,
+          "h": 10,
+          "source": "uffis_storm_card_guatemala",
+          "args_string": {
+            "ciclo": "${Date}",
+            "probabilidad_minima": "${Probability}"
+          },
+          "metadata_string": {}
+        },
+        {
+          "i": "8",
+          "x": 55,
+          "y": 10,
+          "w": 45,
+          "h": 22,
+          "source": "uffis_storm_impact_summary_guatemala",
+          "args_string": {
+            "ciclo": "${Date}",
+            "probabilidad_minima": "${Probability}"
+          },
+          "metadata_string": {}
+        },
+        {
+          "i": "4",
+          "x": 55,
+          "y": 32,
+          "w": 45,
+          "h": 22,
+          "source": "uffis_impact_summary_guatemala",
+          "args_string": {
+            "ciclo": "${Date}"
+          },
+          "metadata_string": {}
+        },
+        {
+          "i": "5",
+          "x": 0,
+          "y": 54,
+          "w": 100,
+          "h": 30,
+          "source": "uffis_discharge_guatemala",
+          "args_string": {
+            "ciclo": "${Date}",
+            "estacion": "cuenca_villalobos_out"
+          },
+          "metadata_string": {}
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "name": "Warnings (SFFS/FGS)",
+      "gridItems": [
+        {
+          "i": "1",
+          "x": 0,
+          "y": 0,
+          "w": 22,
+          "h": 6,
+          "source": "uffis_cycle_times_guatemala",
+          "args_string": {},
+          "metadata_string": {}
+        },
+        {
+          "i": "2",
+          "x": 22,
+          "y": 0,
+          "w": 18,
+          "h": 6,
+          "source": "uffis_risk_filter_guatemala",
+          "args_string": {},
+          "metadata_string": {}
+        },
+        {
+          "i": "3",
+          "x": 0,
+          "y": 6,
+          "w": 55,
+          "h": 50,
+          "source": "Map",
+          "args_string": {
+            "baseMap": "${Base Map}",
+            "layerControl": true,
+            "layers": [
+              {
+                "configuration": {
+                  "type": "VectorLayer",
+                  "props": {
+                    "name": "Buildings and roads by warning level",
+                    "source": {
+                      "type": "GeoJSON",
+                      "props": {},
+                      "geojson": {
+                        "type": "FeatureCollection",
+                        "features": [],
+                        "crs": {
+                          "type": "name",
+                          "properties": {
+                            "name": "EPSG:4326"
+                          }
+                        }
+                      }
+                    },
+                    "pluginSource": {
+                      "source": "uffis_risk_layer_guatemala",
+                      "args": {
+                        "ciclo": "${Date}",
+                        "nivel_riesgo_minimo": "${Nivel de riesgo}"
+                      }
+                    },
+                    "layerId": "de3d9606-a1de-450f-b2fb-d74bff0f8424"
+                  },
+                  "style": {
+                    "default": {
+                      "polygon": {
+                        "fill": "#9e9e9e",
+                        "stroke": "#9e9e9e",
+                        "strokeWidth": "0"
+                      },
+                      "linestring": {
+                        "stroke": "#9e9e9e",
+                        "strokeWidth": "1"
+                      }
+                    },
+                    "rules": [
+                      {
+                        "name": "VERY LOW (buildings)",
+                        "geometryType": "polygon",
+                        "strokeWidth": "1",
+                        "conditionField": "alerta",
+                        "conditionType": "=",
+                        "conditionValue": "0",
+                        "fill": "#63BE5F",
+                        "stroke": "#63BE5F"
+                      },
+                      {
+                        "name": "VERY LOW (roads)",
+                        "geometryType": "linestring",
+                        "conditionField": "alerta",
+                        "conditionType": "=",
+                        "conditionValue": "0",
+                        "stroke": "#63BE5F",
+                        "strokeWidth": "3"
+                      },
+                      {
+                        "name": "LOW (buildings)",
+                        "geometryType": "polygon",
+                        "strokeWidth": "1",
+                        "conditionField": "alerta",
+                        "conditionType": "=",
+                        "conditionValue": "1",
+                        "fill": "#FFD500",
+                        "stroke": "#FFD500"
+                      },
+                      {
+                        "name": "LOW (roads)",
+                        "geometryType": "linestring",
+                        "conditionField": "alerta",
+                        "conditionType": "=",
+                        "conditionValue": "1",
+                        "stroke": "#FFD500",
+                        "strokeWidth": "3"
+                      },
+                      {
+                        "name": "MEDIUM (buildings)",
+                        "geometryType": "polygon",
+                        "strokeWidth": "1",
+                        "conditionField": "alerta",
+                        "conditionType": "=",
+                        "conditionValue": "2",
+                        "fill": "#F58220",
+                        "stroke": "#F58220"
+                      },
+                      {
+                        "name": "MEDIUM (roads)",
+                        "geometryType": "linestring",
+                        "conditionField": "alerta",
+                        "conditionType": "=",
+                        "conditionValue": "2",
+                        "stroke": "#F58220",
+                        "strokeWidth": "3"
+                      },
+                      {
+                        "name": "HIGH (buildings)",
+                        "geometryType": "polygon",
+                        "strokeWidth": "1",
+                        "conditionField": "alerta",
+                        "conditionType": "=",
+                        "conditionValue": "3",
+                        "fill": "#DA291C",
+                        "stroke": "#DA291C"
+                      },
+                      {
+                        "name": "HIGH (roads)",
+                        "geometryType": "linestring",
+                        "conditionField": "alerta",
+                        "conditionType": "=",
+                        "conditionValue": "3",
+                        "stroke": "#DA291C",
+                        "strokeWidth": "3"
+                      }
+                    ]
+                  }
+                },
+                "legend": {
+                  "title": "Warning level",
+                  "items": [
+                    {
+                      "label": "VERY LOW",
+                      "color": "#63BE5F",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "LOW",
+                      "color": "#FFD500",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "MEDIUM",
+                      "color": "#F58220",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "HIGH",
+                      "color": "#DA291C",
+                      "symbol": "square"
+                    }
+                  ]
+                }
               }
             ],
             "map_extent": {
@@ -442,8 +867,8 @@
           "x": 55,
           "y": 0,
           "w": 45,
-          "h": 22,
-          "source": "uffis_impact_summary_guatemala",
+          "h": 24,
+          "source": "uffis_risk_matrix_guatemala",
           "args_string": {
             "ciclo": "${Date}"
           },
@@ -452,13 +877,12 @@
         {
           "i": "5",
           "x": 55,
-          "y": 22,
+          "y": 24,
           "w": 45,
-          "h": 28,
-          "source": "uffis_discharge_guatemala",
+          "h": 22,
+          "source": "uffis_event_summary_guatemala",
           "args_string": {
-            "ciclo": "${Date}",
-            "estacion": "cuenca_villalobos_out"
+            "ciclo": "${Date}"
           },
           "metadata_string": {}
         }

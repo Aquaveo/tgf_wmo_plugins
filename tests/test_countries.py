@@ -10,7 +10,7 @@ from tgf_wmo_plugins.strings import STRINGS
 HAZARD_FAMILIES = {"hazard_layer"}
 RECEPTOR_FAMILIES = {"impact_summary", "impact_layer"}
 STORM_FAMILIES = {"storm_card", "storm_impact_layer", "storm_impact_summary"}
-LIVE_FAMILIES = {"cycle_times"}
+LIVE_FAMILIES = {"cycle_times", "precip_layer", "risk_matrix", "risk_filter", "risk_layer", "event_summary"}
 
 REGISTERED = {
     ep.name for ep in entry_points(group="intake.drivers")
@@ -23,7 +23,8 @@ def expected_families(country):
     # Live cycles publish the rasters even where the training data has none.
     if country.prob_urls is not None or country.live is not None:
         families |= HAZARD_FAMILIES
-    if country.storms is not None:
+    # Live cycles stand in for a storm library: depth by probability.
+    if country.storms is not None or country.live is not None:
         families |= STORM_FAMILIES
     if country.live is not None:
         families |= LIVE_FAMILIES
