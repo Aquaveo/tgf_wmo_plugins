@@ -13,18 +13,15 @@ first choice and the initial value instead.
 
 from tethysapp.tethysdash.plugin_helpers import TethysDashPlugin
 
-from tgf_wmo_plugins.base import country_group, country_label
+from tgf_wmo_plugins.base import LabelledInput, country_group, country_label
 from tgf_wmo_plugins.countries import ANTIGUA_BARBUDA, COMOROS, GUATEMALA, HAITI
 from tgf_wmo_plugins.strings import LIVE_ARGS, STRINGS
 from tgf_wmo_plugins.tito import LATEST, SAMPLE, available_cycles, cycle_label
 
 
-class BaseCycleTimes(TethysDashPlugin):
+class BaseCycleTimes(LabelledInput, TethysDashPlugin):
     """Set `country`; everything else follows from it, in the country's language.
-
-    The published variable stays `Date` in every language: every dashboard
-    binds ${Date}.
-    """
+    The published variable is `Date` unless a dashboard sets another label."""
 
     country = None
     type = "variable_input"
@@ -41,21 +38,29 @@ class BaseCycleTimes(TethysDashPlugin):
         cls.group = country_group(country)
         cls.tags = list(s["cycle_times_tags"])
         cls.description = s["cycle_times_desc"]
+        names = LIVE_ARGS[country.lang]
+        cls.args = {}
         # Where a sample exists, a demo dashboard can open on it instead.
         if country.live.sample:
-            cls.args = {LIVE_ARGS[country.lang]["start"]: [
+            cls.args[names["start"]] = [
                 {"value": LATEST, "label": s["start_latest"]},
                 {"value": SAMPLE, "label": s["start_sample"]},
-            ]}
+            ]
+        cls.args.update(cls.label_args(country))
 
     def run(self):
         live, s = self.country.live, STRINGS[self.country.lang]
         cycles = available_cycles(live.slug)
-        # The sample cycles go after every live one.
-        samples = available_cycles(live.slug, sample=True) if live.sample else []
+        # The sample cycles go after every live one. A sample that cannot be
+        # read must not take the live cycles down with it.
+        try:
+            samples = available_cycles(live.slug, sample=True) if live.sample else []
+        except ValueError:
+            samples = []
         start_on_sample = samples and self.get_arg(LIVE_ARGS[self.country.lang]["start"]) == SAMPLE
         return {
-            "variable_name": self.publishes,
+            "variable_name": self.variable_name(self.received_args),
+            "show_label": self.label_shown(),
             "initial_value": samples[0] if start_on_sample else cycles[0],
             "variable_options_source": "dropdown",
             "metadata": {

@@ -1,13 +1,14 @@
 .. Comoros hands-on exercise 1 solution, English. Adapted from the Guatemala
 .. guide at ../Guatemala/exercise_1_en.rst. Two things differ from that original
 .. and are explained where they come up: there is no depth layer, because the
-.. cycle publishes no single depth raster and one arbitrary member would not pair
-.. with the four ensemble probabilities; and the rasters are EPSG:5629, which the
-.. map cannot resolve until the code is registered -- see the warning below.
+.. cycle publishes no depth raster to pair with the four ensemble probabilities;
+.. and the rasters are EPSG:5629, which the map cannot resolve until the code is
+.. registered (see the warning below). The data is the TITO sample cycle of
+.. 27 April 2024.
 .. The built dashboard is dashboards/Comoros/Comoros_Hands_On_1.json.
 
 ==============================================================
-Exercise 1 — A flood depth and probability map
+Exercise 1: A flood depth and probability map
 ==============================================================
 
 Building **Comoros Hands On 1** step by step.
@@ -25,8 +26,8 @@ One map filling the window, carrying the four exceedance-probability rasters of
 the forecast cycle, and three controls across the top: a dropdown that switches
 the base map underneath them, a second that picks which of the country's 55
 communes to draw, and a number that sets how much probability a cell needs
-before it is drawn at all. It opens on **Moroni** (KM274), the capital, on
-Grande Comore.
+before it is drawn at all. It opens on **Moroni**, the capital, on Grande
+Comore.
 
 .. figure:: images/ex1-finished.png
    :alt: The finished exercise 1 dashboard
@@ -37,15 +38,16 @@ Grande Comore.
 
 This exercise is about raster layers: where the URL goes, why a probability ramp
 has to be pinned rather than auto-scaled, and how a variable input can drive the
-same setting on four layers at once — including one that rewrites part of each
+same setting on four layers at once, including one that rewrites part of each
 layer's URL.
 
-There is deliberately **no depth layer**. The cycle publishes no single depth
-raster — only one per forecast member — and dropping one arbitrary member next to
-four ensemble-wide probabilities would invite the reader to compare quantities
-that are not comparable. Exercise 2 opens the depth library properly.
+There is deliberately **no depth layer**. The cycle publishes no depth raster,
+only the four probabilities counted across its 50 forecast members, and a depth
+from any one storm next to four ensemble-wide probabilities would invite the
+reader to compare quantities that are not comparable. Exercise 2 turns the same
+probabilities into a likely depth on each building and road instead.
 
-**Warning** — **The Comoros rasters are EPSG:5629 (Moznet / UTM zone 38S), and
+**Warning:** **The Comoros rasters are EPSG:5629 (Moznet / UTM zone 38S), and
 the map cannot resolve that code yet.** OpenLayers handles EPSG:4326, EPSG:3857
 and the WGS84 UTM zones on its own; anything else has to be registered, and the
 table in ``reactapp/components/map/projections.js`` currently holds only
@@ -55,7 +57,7 @@ Indian Ocean.
 Adding it is a table entry plus a control point, as that file's own comments
 describe. Nothing else in this guide changes when it is done.
 
-**Note** — Screenshots in this guide are placeholders. Each ``figure`` block
+**Note:** Screenshots in this guide are placeholders. Each ``figure`` block
 names what the image should show; drop a PNG at the given path under
 ``docs/Comoros/images/`` and it will render. ``images/README.md`` lists them all.
 
@@ -63,48 +65,54 @@ names what the image should show; drop a PNG at the given path under
 The data
 ========
 
-Everything comes from one public bucket:
+Everything comes from TITO's **sample cycle** for the Comoros, the forecast of
+27 April 2024 at 00:00 UTC:
 
 .. code-block:: text
 
-   https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com
+   https://tito.uffis.org/sample/comoros/20240427.000000/
+
+A sample cycle is a past event kept for demonstrations and training. It is laid
+out exactly like the live cycles TITO publishes every hour under
+``https://tito.uffis.org/outputs/comoros/<cycle>/``, so everything in this guide
+carries over to live data: only the root and the cycle stamp change. Live cycles
+are kept for about a day, which is why the exercises are built on the sample.
 
 The Comoros forecast products are written **one set per ADM3 commune**, not one
-national grid, so every path below names a commune. That name is a single path
-segment combining the pcode and the commune — ``KM274_Moroni`` — and swapping it
-is all that separates one commune's rasters from another's. Step 2 turns that
-segment into a dropdown, so the dashboard can reach all 55 without editing a URL.
+national grid, so every path below names a commune. TITO calls each commune's
+folder a *site* and names it ``Comoros_`` plus the commune, such as
+``Comoros_Moroni``. Swapping that one path segment is all that separates one
+commune's rasters from another's. Step 2 turns it into a dropdown, so the
+dashboard can reach all 55 without editing a URL.
 
 .. list-table::
    :header-rows: 1
-   :widths: 26 74
+   :widths: 40 60
 
-   * - Prefix
+   * - Path under the cycle root
      - Contents
-   * - ``Comoros_training/Comoros_cycle_20240427_0000UTC/``
-     - The forecast cycle of 27 April 2024, and everything this exercise draws.
-       ``fim/<commune>/stream_sat_stormlab/`` holds the four
-       exceedance-probability rasters this exercise draws, and
-       ``fim/<commune>/member_depths/`` the 50 per-member depth rasters they are
-       counted from. The receptor geopackages exercise 3 reads are in ``ibf/``.
-   * - ``Comoros_IBF/Comoros/``
-     - The scenario stores, one Zarr per commune
-       (``fim_store_KM274_Moroni_v1.zarr``), each holding all 200 synthetic
-       storms of maximum depth. Exercise 2 opens Moroni's.
+   * - ``comoros_30m/fim/stream_sat_stormlab/<site>/``
+     - The commune's flood maps. ``pluvial_overbank/`` holds the four
+       exceedance-probability rasters this exercise draws, and ``pluvial/`` the
+       same four without the permanent-water subtraction (see step 4).
+   * - ``comoros_30m/ibf/<site>/``
+     - The receptor geopackage, ``ibf_receptors.20240427.000000.gpkg``: every
+       building and road in the commune with its four probabilities. Exercises 2
+       and 3 read it through their plugins.
 
 Two properties of this data shape the exercise:
 
 * **Pluvial only.** The island models were run with rainfall forcing and no
   upstream boundary discharge, so a hazard level here means rain that has not
   drained, never a river rising.
-* **A projected grid.** EPSG:5629 at 30.57 m, the island model's own grid rather
-  than a reprojected copy. That is what the warning above is about, and it is a
+* **A projected grid.** EPSG:5629 at about 30.57 m, the island model's own grid
+  rather than a reprojected copy. That is what the warning above is about, and it is a
   real difference from Guatemala, whose rasters were copied into EPSG:3857
   precisely so the map could read them.
 
 
-Step 1 — Create the dashboard
-=============================
+Step 1: Create the dashboard
+============================
 
 #. Create a new dashboard (see
    `Creating a dashboard <getting_started.rst#creating-a-dashboard>`_) with:
@@ -122,8 +130,8 @@ Step 1 — Create the dashboard
    corner to enter edit mode.
 
 
-Step 2 — Add the three variable inputs
-======================================
+Step 2: Add the three variable inputs
+=====================================
 
 All three controls are built first, because the layers in step 4 refer to two of
 them by name and there has to be something to refer to. See
@@ -152,15 +160,15 @@ them by name and there has to be something to refer to. See
       * - ``variable_options_source``
         - ``Base Map Layers``
 
-   ``Base Map Layers`` is a built-in options source — it fills the dropdown with
+   ``Base Map Layers`` is a built-in options source: it fills the dropdown with
    the base maps the instance offers, so you do not enumerate them yourself.
 
 #. On the **Settings** tab, set **Background Color** to ``#FFFFFF``. Without it
    the dropdown floats on the map with no backing and is hard to read.
 
 #. Select an initial value from the preview on the right of the editor. The
-   shipped solution uses **World Imagery** — aerial imagery makes it easy to see
-   which buildings sit under the flooded cells — but any base map is fine.
+   shipped solution uses **World Imagery** (aerial imagery makes it easy to see
+   which buildings sit under the flooded cells), but any base map is fine.
 
 #. Save the item, drag it to the top-left corner, and resize it to about 14
    columns wide and 5 rows tall.
@@ -195,8 +203,8 @@ plain number, they are a list you supply.
         - ``dropdown``
 
 #. Choosing ``dropdown`` reveals a **choices** editor. Each entry has a **label**
-   — what the viewer reads — and a **value** — what gets substituted into the
-   URL. For the Comoros those are the commune's name and its path segment:
+   (what the viewer reads) and a **value** (what gets substituted into the URL).
+   For the Comoros those are the commune's name and its site folder:
 
    .. list-table::
       :header-rows: 1
@@ -205,18 +213,18 @@ plain number, they are a list you supply.
       * - Label
         - Value
       * - ``Moroni``
-        - ``KM274_Moroni``
+        - ``Comoros_Moroni``
       * - ``Mutsamudu``
-        - ``KM134_Mutsamudu``
+        - ``Comoros_Mutsamudu``
       * - ``Fomboni``
-        - ``KM321_Fomboni``
+        - ``Comoros_Fomboni``
       * - …
         - …
 
-   The split between the two is the point. The viewer never sees a pcode, and the
-   URL never sees a display name. All **55** communes are in the shipped
-   dashboard, ordered by pcode so the three islands group together — Anjouan
-   (``KM1xx``), Grande Comore (``KM2xx``), Mohéli (``KM3xx``). Rather than typing
+   The split between the two is the point. The viewer never sees a folder name,
+   and the URL never sees a display name with its accents and spaces. All **55**
+   communes are in the shipped dashboard, in pcode order so the three islands
+   group together: Anjouan, then Grande Comore, then Mohéli. Rather than typing
    them by hand, import the shipped item or copy the list out of
    ``dashboards/Comoros/Comoros_Hands_On_1.json``.
 
@@ -271,8 +279,8 @@ plain number, they are a list you supply.
    with ``variable_options_source`` ``number`` and an initial value of 0.
 
 
-Step 3 — Add the map
-====================
+Step 3: Add the map
+===================
 
 #. Set the dashboard in edit mode, add another item, then open its 3-dot menu
    and select **Edit**.
@@ -288,7 +296,7 @@ Step 3 — Add the map
 
 #. Turn **Layer Control** on, so the four layers can be toggled individually.
 
-Leave **Map Extent** for step 5 — it is easier to pick once there is something
+Leave **Map Extent** for step 5: it is easier to pick once there is something
 on the map.
 
 .. figure:: images/ex1-map-args.png
@@ -299,22 +307,21 @@ on the map.
    bound to ``${Fond de Carte}`` and **Layer Control** on.
 
 
-Step 4 — Add the four probability layers
-========================================
+Step 4: Add the four probability layers
+=======================================
 
 These four are identical except for the URL and the name, so build one and
 repeat. Add them in this order, so the deepest threshold ends up lowest in the
-stack and the shallowest — which covers the largest area — ends up on top.
+stack and the shallowest, which covers the largest area, ends up on top.
 
 All four paths share one prefix; only the depth in the filename changes. Note
-the ``${Commune}`` in the middle — that is the commune segment from step 2, and
-it is what lets one set of four layers serve all 55 communes:
+the ``${Commune}`` in the middle: that is the site folder from step 2, and it is
+what lets one set of four layers serve all 55 communes:
 
 .. code-block:: text
 
-   https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/
-     Comoros_training/Comoros_cycle_20240427_0000UTC/Comoros_cycle_20240427_0000UTC/
-     fim/${Commune}/stream_sat_stormlab/pluvial_overbank/
+   https://tito.uffis.org/sample/comoros/20240427.000000/
+     comoros_30m/fim/stream_sat_stormlab/${Commune}/pluvial_overbank/
 
 .. list-table::
    :header-rows: 1
@@ -332,10 +339,15 @@ it is what lets one set of four layers serve all 55 communes:
      - ``prob_depth_ge_10cm_overbank.20240427.000000.tif``
 
 These are the **overbank** variants, with Moroni's permanent standing water
-removed — the ``pluvial/`` folder alongside holds the same four without that
-subtraction. For this commune the two differ in exactly 47 cells, so the choice
+removed; the ``pluvial/`` folder alongside holds the same four without that
+subtraction. For this commune the two differ in at most 47 cells, so the choice
 barely shows here, but it is the right one: a product that drew permanent water
 as flooding would cry wolf every cycle.
+
+The cycle stamp, ``20240427.000000``, appears twice in each URL: once in the
+path and once in the filename. On live data the same layer would read
+``https://tito.uffis.org/outputs/comoros/<cycle>/...`` with that cycle's stamp in
+both places.
 
 For **each** of the four:
 
@@ -384,12 +396,12 @@ For **each** of the four:
 
    ``mask_below`` hides cells at or below the value given. At ``0`` every cell
    with any chance at all is drawn. Raise it and the map keeps only the cells
-   that clear that likelihood — the whole point of step 5.
+   that clear that likelihood, which is the whole point of step 5.
 
 #. On the **Style** tab, leave the mode on **Continuous** and pick the **turbo**
    ramp. Set **Min** = ``0`` and **Max** = ``1``.
 
-   Pinning Min and Max to 0–1 is the whole point of these four layers.
+   Pinning Min and Max to 0-1 is the whole point of these four layers.
    Probability has a fixed, meaningful range, and all four must use the same one
    or they cannot be compared. Left to auto-scale, each layer would stretch its
    ramp over its own range and 0.2 would look like a different severity on each.
@@ -427,8 +439,8 @@ For **each** of the four:
    **Screenshot:** the **Layers** list with all four layers, deepest first.
 
 
-Step 5 — Finish the map, then drive it
-======================================
+Step 5: Finish the map, then drive it
+=====================================
 
 #. In the **Map Extent** argument, choose **Use a Custom Extent** and enter:
 
@@ -473,19 +485,19 @@ thin out together:
    * - ``0.5``
      - Only cells more than half the members agree on.
    * - ``0.9``
-     - The handful of cells almost every member floods.
+     - Only the cells almost every member floods.
 
 **Try the commune.** Change **Commune** and all four layers re-fetch from a
 different folder. Mutsamudu and Jimlimé on Anjouan, Fomboni on Mohéli, and
 Moroni here are four quite different places.
 
-**Warning** — **The map extent does not follow the commune.** It is a fixed
+**Warning:** **The map extent does not follow the commune.** It is a fixed
 string centred on Moroni, so switching to a commune on another island leaves the
 view over open sea until you pan. There is no variable holding per-commune
 coordinates and a 55-entry lookup is not something a variable input can express,
 so the choices are to pan by hand, clear the custom extent and let the map
 auto-fit to the layer, or keep one commune per dashboard. The shipped solution
-keeps the fixed extent and expects you to pan — worth raising as a design
+keeps the fixed extent and expects you to pan. It is worth raising as a design
 question rather than treating as a defect.
 
 
@@ -493,7 +505,7 @@ Item positions
 ==============
 
 The shipped solution, for reference. You do not need to match these to the
-pixel — drag to something close and adjust.
+pixel: drag to something close and adjust.
 
 .. list-table::
    :header-rows: 1
@@ -525,7 +537,7 @@ pixel — drag to something close and adjust.
      - 20
      - 20
 
-The three inputs sit in one row across the top — left, centre, right — over a map
+The three inputs sit in one row across the top (left, centre, right) over a map
 that has **Fill Viewport** on, so the map's own width and height matter less than
 its stacking order.
 
@@ -543,9 +555,9 @@ You should now have:
   all 55, and a **Masque de Probabilité** number.
 * Raising the mask thins all four layers at once; setting it back to 0 restores
   them.
-* Changing the commune re-fetches all four layers — and leaves the view where it
+* Changing the commune re-fetches all four layers, and leaves the view where it
   was, for the reason in the warning above.
-* The 10 cm layer covering a visibly larger footprint than the 100 cm one — in
+* The 10 cm layer covering a visibly larger footprint than the 100 cm one: in
   Moroni, roughly 7,600 cells against 59.
 
 If instead the layers fail to place, or the map jumps somewhere far from the
@@ -556,38 +568,39 @@ and the code has to be registered before any of this renders.
 Talking points
 ==============
 
-* **Why probability ramps must be pinned.** All four layers are fixed to 0–1
+* **Why probability ramps must be pinned.** All four layers are fixed to 0-1
   because the range is meaningful and identical for each; without that, the same
   colour would mean a different number on each layer and the stack could not be
   read. Contrast this with depth, which has no natural upper bound and is
-  normally left to auto-scale — one reason the two do not belong on the same map
-  without care.
+  normally left to auto-scale, which is one reason the two do not belong on the
+  same map without care.
 * **Two variables, two kinds of substitution.** ``${Masque de Probabilité}`` is a
   whole field, so it resolves to a number with its type intact.
   ``${Commune}`` sits inside a longer URL, so it is spliced into the surrounding
-  text. Same syntax, and the app picks the right behaviour — but it is why a
+  text. Same syntax, and the app picks the right behaviour, but it is why a
   variable can rewrite part of a path, which is what turns one map into 55.
 * **Label versus value.** The commune dropdown shows ``Moroni`` and stores
-  ``KM274_Moroni``. Presenting a readable label over an opaque key is nearly
-  always worth the indirection, and it means the pcode scheme can change without
-  the viewer ever noticing.
+  ``Comoros_Moroni``. Presenting a readable label over an opaque key is nearly
+  always worth the indirection, and it means the folder naming can change without
+  the viewer ever noticing. It did change: an earlier version of this dashboard
+  stored pcodes such as ``KM274_Moroni``, and only the values had to be edited.
 * **What the mask actually filters.** Raising it to 0.2 does not keep "cells with
   a 20% chance of flooding". It keeps cells where **more than 10 of the forecast's
-  50 members** reached that depth. Those 50 members collapse to 16 distinct
-  library scenarios, so the values are coarse — the 10 cm layer takes only 41
-  distinct values across the whole commune — and the layer therefore thins in
-  visible jumps rather than smoothly. Worth demonstrating: it is the clearest way
-  to show an audience that the number is an ensemble share, not a calibrated
+  50 members** reached that depth. Every value is a count out of 50, a multiple
+  of 0.02, so the values are coarse (the 10 cm layer takes only 41 distinct
+  values across the whole commune, zero included), and the layer therefore thins
+  in visible jumps rather than smoothly. Worth demonstrating: it is the clearest
+  way to show an audience that the number is an ensemble share, not a calibrated
   probability.
 * **Layer order is draw order, and the thresholds are nested.** The first layer
-  in the list draws lowest and each later one paints over it, so the 10 cm layer —
-  added last, largest footprint — sits on top. Anywhere the 100 cm layer has a
+  in the list draws lowest and each later one paints over it, so the 10 cm layer
+  (added last, largest footprint) sits on top. Anywhere the 100 cm layer has a
   value the 10 cm layer has one too, so at full opacity the three deeper layers
   would be invisible. The ``.5`` opacity is what keeps the nesting readable;
   the layer control is still the way to isolate one threshold.
 * **Overbank versus pluvial.** The four layers here have the commune's permanent
   standing water subtracted. For Moroni that is only 47 cells, so swapping one for
-  its ``pluvial/`` twin barely shows — but the principle is the point, and other
+  its ``pluvial/`` twin barely shows, but the principle is the point, and other
   communes carry a larger baseline.
 * **The projection constraint.** Guatemala's rasters were copied into EPSG:3857
   so the map could read them. The Comoros products were not copied, so the
@@ -598,6 +611,7 @@ Talking points
 Next
 ====
 
-Exercise 2 opens the commune's Zarr flood-map library — all 200 scenarios, not
-just the 16 this cycle matched — and puts the storm on a variable input, so the
-depth this exercise deliberately left out arrives with the context to read it.
+Exercise 2 stays on the same sample cycle and turns its probabilities into
+impact: a cycle dropdown, a probability input, and the likely flood depth on
+every building and road, so the depth this exercise deliberately left out arrives
+with the context to read it.

@@ -154,8 +154,6 @@ def file_url(slug, cycle, path):
     return f"{_root(cycle)}/{slug}/{stamp(cycle)}/{path}"
 
 
-
-
 def cycle_label(cycle, sample_tag="SAMPLE"):
     """`2026-10-16 19:00 UTC`, marked when it is a sample rather than live."""
     label = f"{cycle_time(cycle):%Y-%m-%d %H:%M} UTC"

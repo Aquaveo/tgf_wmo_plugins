@@ -2,12 +2,12 @@
 .. alongside this file as exercise_3_es.rst.
 
 ==============================================================
-Exercise 3 — Hazard classification with adjustable thresholds
+Exercise 3: Hazard classification with adjustable thresholds
 ==============================================================
 
 Building **Guatemala Hands On 3 (English)** step by step.
 
-**Start here** — This exercise reuses the five raster layers from
+**Start here:** This exercise reuses the four raster layers from
 `Exercise 1 <exercise_1_en.rst>`_, so building that one first will save you time.
 
 .. contents:: On this page
@@ -19,7 +19,7 @@ Building **Guatemala Hands On 3 (English)** step by step.
 What you are building
 =====================
 
-A full-window map carrying the five rasters from exercise 1 plus two computed
+A full-window map carrying the four rasters from exercise 1 plus two computed
 layers: a hazard classification and the buildings and roads that fall inside it.
 Four number inputs across the top set the probability threshold for each hazard
 level, and an impact table sits under them. Change a threshold and the
@@ -29,13 +29,14 @@ classification, the affected features and the table all recompute.
    :alt: The finished exercise 3 dashboard
    :width: 100%
 
-   **Screenshot:** the finished dashboard — full-window map, four threshold
+   **Screenshot:** the finished dashboard: full-window map, four threshold
    inputs along the top, impact table on the right.
 
-**Tip** — ``notebooks/Guatemala/03_hazard_classification.ipynb`` derives this
+**Tip:** ``notebooks/Guatemala/03_hazard_classification.ipynb`` derives this
 classification as plain Python, including the gate sweep that shows what each
 threshold controls. Worth running first if you want to understand the analysis
-before assembling the interface.
+before assembling the interface. The notebook still uses the earlier training
+files, so its numbers differ from this dashboard's.
 
 
 Understanding the four thresholds
@@ -51,38 +52,52 @@ probability gate:
    * - Level
      - Driven by
      - Colour
-     - Notebook default gate
+     - Default gate
    * - Low
-     - P(≥ 7.6 cm)
+     - P(≥ 10 cm)
      - green
      - 0.8
    * - Medium
-     - P(≥ 10 cm)
+     - P(≥ 30 cm)
      - yellow
      - 0.8
    * - High
-     - P(≥ 30 cm)
+     - P(≥ 70 cm)
      - red
      - 0.8
    * - Severe
-     - P(≥ 76 cm)
+     - P(≥ 100 cm)
      - purple
      - 0.8
 
 A cell takes the level of the **deepest** threshold whose gate it clears.
 
-**Warning** — Two things to know before you present this, both covered at length
-in ``notebooks/Guatemala/03_hazard_classification.ipynb``:
+**Every level is reachable on the sample.** The probabilities are fractions of
+50 ensemble members, so every value is a multiple of 0.02, and each of the four
+rasters reaches 1.0 somewhere. At the default gates of 0.8, the number of cells
+that clear their gate is:
 
-**The 76 cm raster contains only the values 0 and 0.2.** At most 20% of the
-ensemble members ever reached that depth anywhere in the domain. So any Severe
-gate above 0.2 makes the Severe class *unreachable* — the colour simply never
-appears, and a viewer moving that slider gets no feedback distinguishing
-"nothing qualifies" from "the control is broken".
+.. list-table::
+   :header-rows: 1
+   :widths: 25 25 25 25
+
+   * - P(≥ 10 cm)
+     - P(≥ 30 cm)
+     - P(≥ 70 cm)
+     - P(≥ 100 cm)
+   * - 3,900
+     - 3,155
+     - 2,880
+     - 2,646
+
+So all four colours appear at the defaults. Lowering a gate only lets more cells
+clear it: at the four depths, 15,877, 12,269, 10,219 and 9,315 cells
+respectively have any chance at all. A cell that clears several gates is shown
+at the deepest, so these counts overlap rather than add up.
 
 
-Step 1 — Create the dashboard
-=============================
+Step 1: Create the dashboard
+============================
 
 #. Create a new dashboard (see
    `Creating a dashboard <getting_started_en.rst#creating-a-dashboard>`_) with:
@@ -100,8 +115,8 @@ Step 1 — Create the dashboard
    corner to enter edit mode.
 
 
-Step 2 — Add the base map selector
-==================================
+Step 2: Add the base map selector
+=================================
 
 The base map is a variable input so the viewer can switch it without editing
 anything. Build the input first, then point the map at it.
@@ -127,15 +142,15 @@ anything. Build the input first, then point the map at it.
       * - ``variable_options_source``
         - ``Base Map Layers``
 
-   ``Base Map Layers`` is a built-in options source — it fills the dropdown with
+   ``Base Map Layers`` is a built-in options source: it fills the dropdown with
    the base maps the instance offers, so you do not enumerate them yourself.
 
 #. On the **Settings** tab, set **Background Color** to ``#ffffff``. Without it
    the dropdown floats on the map with no backing and is hard to read.
 
 #. Select an initial value for the dropdown from the preview on the right side
-   of the editor. The shipped solution uses ``World Light Gray Base``, but any
-   base map is fine.
+   of the editor. The shipped solution uses ``World Imagery``, but any base
+   map is fine.
 
 #. Save the item by clicking **Save** in the bottom-right corner of the item
    editor.
@@ -155,8 +170,8 @@ anything. Build the input first, then point the map at it.
    **Screenshot:** the **Variable Input** arguments for the base map selector.
 
 
-Step 3 — Add the four threshold inputs
-======================================
+Step 3: Add the four threshold inputs
+=====================================
 
 Build all four before the layers that consume them. Each is a **Variable Input**
 with ``variable_options_source`` set to ``number``:
@@ -166,10 +181,10 @@ with ``variable_options_source`` set to ``number``:
    :widths: 100
 
    * - ``Variable Name``
-   * - ``Low Threshold (P(≥7.6 cm))``
-   * - ``Medium Threshold (P(≥10 cm))``
-   * - ``High Threshold (P(≥30 cm))``
-   * - ``Severe Threshold (P(≥76 cm))``
+   * - ``Low Threshold (P(≥10 cm))``
+   * - ``Medium Threshold (P(≥30 cm))``
+   * - ``High Threshold (P(≥70 cm))``
+   * - ``Severe Threshold (P(≥100 cm))``
 
 For **each** of the four:
 
@@ -225,10 +240,11 @@ For **each** of the four:
    label and value.
 
 
-Step 4 — Add the map and the five rasters
-=========================================
+Step 4: Add the map and the four rasters
+========================================
+
 If you have exercise 1 then do the following. If you do not have exercise 1,
-build the map and the five rasters from scratch as in `Exercise 1 <exercise_1_en.rst>`_.
+build the map and the four rasters from scratch as in `Exercise 1 <exercise_1_en.rst>`_.
 
 #. Open the dashboard from exercise 1
 
@@ -241,11 +257,11 @@ build the map and the five rasters from scratch as in `Exercise 1 <exercise_1_en
 #. Click the **Import Dashboard Item** in the top-right corner and import the
    dashboard item from exercise 1.
 
-#. If the map is covering the storm selector and base map selector, click on
-   the 3-dot menu, hover over **Order**, and select **Send to Back**. The
-   selectors should now be visible on top of the map.
+#. If the map is covering the base map selector and the threshold inputs, click
+   on the 3-dot menu, hover over **Order**, and select **Send to Back**. The
+   inputs should now be visible on top of the map.
 
-#. Edit the map item. For each of the five rasters, edit the layer and turn off the
+#. Edit the map item. For each of the four rasters, edit the layer and turn off the
    **Default Visibility** in the **Layer** tab. This will hide the layers when the dashboard is first loaded.
    Make sure to save the layer after editing it.
 
@@ -253,8 +269,8 @@ build the map and the five rasters from scratch as in `Exercise 1 <exercise_1_en
    the dashboard editor.
 
 
-Step 5 — Add the hazard classification layer
-============================================
+Step 5: Add the hazard classification layer
+===========================================
 
 #. Set the dashboard in edit mode by clicking on the **Edit Dashboard** button
    in the top-right corner.
@@ -264,10 +280,11 @@ Step 5 — Add the hazard classification layer
 
 #. Next to **Layers**, click **Add Layer**.
 
-#. Go straight to the **Source** tab and set **Source Type** to **Flood Hazard
-   Layer (English)**.
+#. Go straight to the **Source** tab and set **Source Type** to
+   **Guatemala: Capa de Peligro** (Flood Hazard Layer, in the
+   **UFFIS: Guatemala** group).
 
-#. The plugin's arguments appear. Fill in:
+#. The plugin's arguments appear, with Spanish names. Fill in:
 
    .. list-table::
       :header-rows: 1
@@ -275,18 +292,28 @@ Step 5 — Add the hazard classification layer
 
       * - Argument
         - Value
-      * - ``Low Threshold``
-        - ``${Low Threshold (P(≥7.6 cm))}``
-      * - ``Medium Threshold``
-        - ``${Medium Threshold (P(≥10 cm))}``
-      * - ``High Threshold``
-        - ``${High Threshold (P(≥30 cm))}``
-      * - ``Severe Threshold``
-        - ``${Severe Threshold (P(≥76 cm))}``
+      * - ``Umbral Bajo``
+        - ``${Low Threshold (P(≥10 cm))}``
+      * - ``Umbral Medio``
+        - ``${Medium Threshold (P(≥30 cm))}``
+      * - ``Umbral Alto``
+        - ``${High Threshold (P(≥70 cm))}``
+      * - ``Umbral Severo``
+        - ``${Severe Threshold (P(≥100 cm))}``
+      * - ``Ciclo``
+        - **Evento de muestra** (``sample``)
 
-#. Click **Fetch plugin defaults**. The layer is named **Hazard
-   classification**, styled with four rules on the ``peligro`` attribute, and
-   given a four-item **Hazard** legend.
+   ``Ciclo`` picks the TITO cycle the plugin classifies. **Evento de muestra**
+   is the country's published sample cycle, the same one the four raster layers
+   come from. Left empty, the plugin reads the latest live cycle instead, and the
+   hazard would no longer match the rasters underneath. Leave
+   ``Fuente Inundacion`` empty; its default is the combined overbank source the
+   rasters use.
+
+#. Click **Fetch plugin defaults**. The layer is named **Clasificación de
+   peligro** (hazard classification), styled with four rules on the ``peligro``
+   attribute, and given a four-item **Peligro** legend (Bajo, Medio, Alto,
+   Severo). Rename the layer on the **Layer** tab if you want an English name.
 
 #. Save the layer by clicking **Create** at the bottom of the layer editor.
 
@@ -295,23 +322,23 @@ Step 5 — Add the hazard classification layer
    :width: 100%
 
    **Screenshot:** the **Source** tab for the hazard layer, four arguments bound
-   to the four threshold variables.
+   to the four threshold variables and ``Ciclo`` set to **Evento de muestra**.
 
 
-Step 6 — Add the affected-features layer
-========================================
+Step 6: Add the affected-features layer
+=======================================
 
 #. Next to **Layers**, click **Add Layer** again.
 
-#. Go straight to the **Source** tab and set **Source Type** to **Flood Impact
-   Layer (English)**.
+#. Go straight to the **Source** tab and set **Source Type** to
+   **Guatemala: Capa de Impacto** (Flood Impact Layer).
 
 #. Bind the same four arguments to the same four variables as in the previous
-   step.
+   step, and set ``Ciclo`` to **Evento de muestra** again.
 
-#. Click **Fetch plugin defaults**. The layer arrives as **Buildings and roads
-   at risk** with eight rules (polygon and linestring per level) and a **Hazard**
-   legend.
+#. Click **Fetch plugin defaults**. The layer arrives as **Edificios y
+   carreteras en peligro** (buildings and roads at risk) with eight rules
+   (polygon and linestring per level) and a **Peligro** legend.
 
 #. Save the layer by clicking **Create** at the bottom of the layer editor.
 
@@ -320,8 +347,8 @@ layer classifies *ground*, this one classifies *assets*. Keeping them separate
 lets a viewer turn off the ground shading and look only at what is affected.
 
 
-Step 7 — Finish the map
-=======================
+Step 7: Finish the map
+======================
 
 #. In the **Map Extent** argument, choose **Use a Custom Extent** and enter:
 
@@ -343,15 +370,15 @@ Step 7 — Finish the map
 #. Save the dashboard by clicking **Save Changes** in the top-right corner of
    the dashboard editor.
 
-**Important** — The rasters must be the ``PBI_Actividad_2`` EPSG:3857 copies. If
-any layer points at a ``Guatemala_IBF`` UTM original, the map will auto-fit to
-that raster's projection, jump somewhere far from Guatemala, and the vector
-layers will appear to load and then vanish. This exact bug cost real debugging
-time on this dashboard.
+**Important:** The rasters must be in EPSG:3857 (or EPSG:4326), as the sample
+rasters are. If any layer points at a raster in another projection, such as UTM,
+the map will auto-fit to that raster's projection, jump somewhere far from
+Guatemala, and the vector layers will appear to load and then vanish. This exact
+bug cost real debugging time on this dashboard.
 
 
-Step 8 — Add the impact summary table
-=====================================
+Step 8: Add the impact summary table
+====================================
 
 #. Set the dashboard in edit mode by clicking on the **Edit Dashboard** button
    in the top-right corner.
@@ -360,10 +387,14 @@ Step 8 — Add the impact summary table
 
 #. Click on the 3-dot menu of the new item and select **Edit**.
 
-#. Set the **Visualization Type** to **Flood Impact Summary (English)** (in the
-   **Flood Maps (English)** group).
+#. Set the **Visualization Type** to **Guatemala: Resumen de Impacto** (Flood
+   Impact Summary, in the **UFFIS: Guatemala** group).
 
-#. Bind the same four arguments to the same four variables as in step 5.
+#. Bind the same four arguments to the same four variables as in step 5, and set
+   ``Ciclo`` to **Evento de muestra**.
+
+   The table counts the people, buildings and roads in each hazard level, using
+   the same gates as the map, and ends with a **TOTAL en peligro** row.
 
 #. On the **Settings** tab, set **Background Color** to ``#ffffff`` and add
    borders on the left, right and bottom, so it joins the strip of threshold
@@ -379,19 +410,21 @@ Step 8 — Add the impact summary table
    the dashboard editor.
 
 .. figure:: images/ex3-impact-summary.png
-   :alt: The dashboard before and after lowering a threshold
+   :alt: The impact summary table arguments bound to the four thresholds
    :width: 100%
 
-   **Screenshot:** the impact summary table arguments bound to the four threshold variables.
+   **Screenshot:** the impact summary table arguments bound to the four
+   threshold variables, with ``Ciclo`` set to **Evento de muestra**.
 
 
-Step 9 — Test the wiring
-========================
+Step 9: Test the wiring
+=======================
 
 Update a threshold. The hazard shading, the affected features
 and the table should all recompute together, with progress messages while the
-layers rebuild. As a demonstration, lower the Severe threshold to 0.2. The purple Severe class
-expands to cover most of the stream, and the table shows more affected buildings and roads.
+layers rebuild. As a demonstration, lower the Severe threshold to 0.2. The purple
+Severe class spreads further along the stream, and the table shows more
+buildings and roads in the Severe row.
 
 .. figure:: images/ex3-thresholds-before.png
    :alt: The dashboard before lowering a threshold
@@ -411,31 +444,89 @@ Checkpoint
 
 You should now have:
 
-* A map filling the window, with eight layers in the layer control (including
-  the base map).
+* A map filling the window, with seven layers in the layer control (four
+  rasters, the two computed layers and the base map).
 * Four labelled threshold inputs across the top, each stepping by 0.05.
+* At the default gates of 0.8: 1,127 hazard polygons showing all four colours,
+  453 buildings and roads at risk, and an impact table whose
+  **TOTAL en peligro** row shows 342 buildings and 886 people.
 * Moving any threshold updates the hazard layer, the impact layer and the table.
-* Raising the Severe threshold above 0.2 makes purple disappear entirely — and
-  it should, for the reason in the warning above.
 * Progress messages while the layers recompute.
 
 
 Talking points
 ==============
 
-* **Four gates on four different questions.** "Severe" means P(≥76 cm) ≥ 0.15
-  while "High" means P(≥30 cm) ≥ 0.1. Those are different questions with
+* **Four gates on four different questions.** With unequal gates, "Severe"
+  might mean P(≥100 cm) ≥ 0.15 while "High" means P(≥70 cm) ≥ 0.1. Those are different questions with
   different cutoffs, so the level names are not comparable to each other and
   "severe" carries no meaning on its own. Setting all four gates equal is a good
   demonstration: the levels then differ only by depth, which is far easier to
   explain.
-* **An unreachable class is an interface problem.** The Severe gate can be set
-  where nothing can qualify, and the interface gives no hint. Ask attendees how
-  they would fix it — cap the input at 0.2? show the value range? annotate the
-  legend? There is no single right answer, and the discussion is the point.
+* **An empty class is an interface problem.** On the sample every level is
+  reachable, but on a smaller event a deep threshold may never get near the
+  gate, and then that colour simply never appears. A viewer moving that input
+  gets no feedback distinguishing "nothing qualifies" from "the control is
+  broken". Ask attendees how they would fix it: show the value range? annotate
+  the legend? There is no single right answer, and the discussion is the point.
+* **Probabilities come in steps of 0.02.** With 50 members, a probability can only
+  be a multiple of 0.02, so a gate of 0.8 means "at least 40 of the 50 members".
+  Framing a gate as a count of members is often easier to explain than a
+  probability.
 * **Vectorising a classification.** A map layer can only point at a URL, and
   nothing here serves a computed raster, so the plugin vectorises the classified
-  grid into roughly 600 polygons. Adjacent cells of equal class merge, so this is
-  exact rather than an approximation. Normal and NoData are dropped — about 90%
-  of the grid — because a basemap shows unaffected ground better than a coloured
-  layer does.
+  grid into polygons (1,127 at the default gates). Adjacent cells of equal class
+  merge, so this is exact rather than an approximation. Normal and NoData cells,
+  most of the grid, are dropped, because a basemap shows unaffected ground better
+  than a coloured layer does.
+
+
+Item positions
+==============
+
+The shipped solution places its items as follows, on the 100-column grid:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 15 15 15 15
+
+   * - Item
+     - ``x``
+     - ``y``
+     - ``w``
+     - ``h``
+   * - Map
+     - 0
+     - 0
+     - 99
+     - 41
+   * - Base Map input
+     - 0
+     - 0
+     - 17
+     - 6
+   * - Low Threshold input
+     - 56
+     - 0
+     - 11
+     - 7
+   * - Medium Threshold input
+     - 67
+     - 0
+     - 11
+     - 7
+   * - High Threshold input
+     - 78
+     - 0
+     - 11
+     - 7
+   * - Severe Threshold input
+     - 89
+     - 0
+     - 11
+     - 7
+   * - Impact summary table
+     - 56
+     - 7
+     - 44
+     - 26

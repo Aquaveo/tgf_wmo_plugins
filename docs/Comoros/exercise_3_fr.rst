@@ -4,15 +4,17 @@
 .. choisit la commune, car tout produit des Comores est par commune ; le seuil
 .. Sévère n'a besoin d'aucun cas particulier ici ; et les plugins sont la famille
 .. francophone `_comoros`, si bien que leurs libellés se lisent en français.
+.. Chaque plugin lit le cycle d'exemple TITO du 27 avril 2024 (``cycle`` =
+.. ``sample``).
 .. Le tableau de bord construit est dashboards/Comoros/Comoros_Hands_On_3.json.
 
 ==============================================================
-Exercice 3 — Classification de l'aléa à seuils ajustables
+Exercice 3 : Classification de l'aléa à seuils ajustables
 ==============================================================
 
 Construction de **Comores Exercice 3**, pas à pas.
 
-**Commencez ici** — Cet exercice réutilise les quatre couches de probabilité de
+**Commencez ici :** Cet exercice réutilise les quatre couches de probabilité de
 l'`Exercice 1 <exercise_1_fr.rst>`_ : le construire d'abord vous fera gagner du
 temps.
 
@@ -40,14 +42,16 @@ tous.
    :alt: Le tableau de bord terminé de l'exercice 3
    :width: 100%
 
-   **Capture :** le tableau de bord terminé — carte plein écran, quatre entrées de
+   **Capture :** le tableau de bord terminé : carte plein écran, quatre entrées de
    seuil en haut, sélecteur de commune en haut à gauche, tableau d'impact à
    droite.
 
-**Astuce** — ``notebooks/Comoros/03_hazard_classification.ipynb`` dérive cette
+**Astuce :** ``notebooks/Comoros/03_hazard_classification.ipynb`` dérive cette
 classification en Python simple, y compris le piège de l'échelle en pourcentage
 et le filtre par commune que les plugins gèrent désormais pour vous. À exécuter
-d'abord si vous voulez comprendre l'analyse avant d'assembler l'interface.
+d'abord si vous voulez comprendre l'analyse avant d'assembler l'interface. Le
+notebook lit encore les anciens fichiers de formation plutôt que le cycle
+d'exemple : ses chiffres peuvent donc différer de ceux du tableau de bord.
 
 
 Comprendre les quatre seuils
@@ -84,17 +88,19 @@ porte de probabilité :
 Une cellule prend le niveau du seuil le **plus profond** dont elle franchit la
 porte.
 
-**Remarque** — **Les quatre portes peuvent toutes rester à 0,8 ici, et cela mérite
+**Remarque :** **Les quatre portes peuvent toutes rester à 0,8 ici, et cela mérite
 d'être dit à voix haute** si vous avez déjà enseigné la version du Guatemala.
 Là-bas, le raster à 76 cm ne contient jamais que 0 ou 0,2 : sa porte Sévère doit
-donc être abaissée à 0,2, sans quoi la classe ne peut jamais apparaître. Chaque
-couche des Comores atteint 1,0 quelque part : rien n'a donc à être affaibli pour
-que le niveau supérieur ait un sens. La leçon survit à la différence : vérifiez
+donc être abaissée à 0,2, sans quoi la classe ne peut jamais apparaître. À
+Moroni, chaque couche du cycle d'exemple atteint 1,0, et des cellules franchissent
+0,8 à chaque profondeur (861 cellules à 10 cm, 82 à 30 cm, 8 à 70 cm et 2 à
+100 cm) : rien n'a donc à être affaibli pour que le niveau supérieur ait un
+sens. La leçon survit à la différence : vérifiez
 quelle plage une couche peut réellement atteindre avant d'exposer un contrôle
 pour elle.
 
 
-Étape 1 — Créer le tableau de bord
+Étape 1 : Créer le tableau de bord
 ==================================
 
 #. Créez un nouveau tableau de bord (voir
@@ -113,7 +119,7 @@ pour elle.
    mode édition.
 
 
-Étape 2 — Ajouter les sélecteurs de fond de carte et de commune
+Étape 2 : Ajouter les sélecteurs de fond de carte et de commune
 ===============================================================
 
 Les deux sont exactement comme dans l'exercice 1 : si vous avez construit ce
@@ -135,21 +141,25 @@ Pour les construire de zéro :
    ``variable_options_source`` ``dropdown``.
 
 #. Remplissez l'éditeur de **choices** avec les communes, étiquette et valeur
-   comme dans l'exercice 1 — ``Moroni`` / ``KM274_Moroni``, et ainsi de suite.
+   comme dans l'exercice 1 : ``Moroni`` / ``Comoros_Moroni``, et ainsi de suite.
+   La valeur est le dossier de site TITO, parce que les quatre URL raster
+   l'insèrent dans leur chemin ; les plugins des étapes 5, 6 et 8 acceptent
+   aussi cette forme (ainsi que la forme pcode, ``KM274_Moroni``), si bien qu'un
+   seul ``${Commune}`` alimente les deux.
 
-   **Remarque** — La solution livrée porte les **22 communes** dont les
-   bibliothèques Zarr existent, parce qu'elle a été copiée du sélecteur de
-   l'exercice 2. Cet exercice ne lit que les rasters de probabilité et le
-   geopackage de récepteurs, et **ceux-ci existent pour les 55** : la liste peut
-   donc être élargie sans risque ici. L'exercice 1 propose déjà les 55 si vous
-   préférez importer cet élément.
+   **Remarque :** La solution livrée ne porte que **22 communes**, toutes celles
+   à partir de ``Comoros_Ngouengoe``, une liste héritée d'une version antérieure
+   de l'exercice 2. Cet exercice ne lit que les rasters de probabilité et le
+   geopackage de récepteurs, et le cycle d'exemple **publie les deux pour les
+   55** : la liste peut donc être élargie sans risque ici. L'exercice 1 propose
+   déjà les 55 si vous préférez importer cet élément.
 
 #. Réglez **Background Color** sur ``#ffffff``, définissez la valeur initiale sur
    ``Moroni``, enregistrez, et faites glisser l'élément à côté du sélecteur de
    fond de carte.
 
 
-Étape 3 — Ajouter les quatre entrées de seuil
+Étape 3 : Ajouter les quatre entrées de seuil
 =============================================
 
 Construisez les quatre avant les couches qui les consomment. Chacune est une
@@ -196,8 +206,8 @@ Pour **chacune** des quatre :
 #. Enregistrez l'élément et faites-le glisser en place le long du haut du tableau
    de bord, à droite du sélecteur de commune.
 
-Les noms portent la profondeur qu'ils contrôlent — ``(P(≥10 cm))`` et ainsi de
-suite — parce que l'argument de plugin auquel ils se lient s'appelle seulement
+Les noms portent la profondeur qu'ils contrôlent, ``(P(≥10 cm))`` et ainsi de
+suite, parce que l'argument de plugin auquel ils se lient s'appelle seulement
 ``seuil_faible``. Sans la profondeur dans le nom de la variable, rien sur le
 tableau de bord n'indique à quoi sert chaque seuil.
 
@@ -209,7 +219,7 @@ tableau de bord n'indique à quoi sert chaque seuil.
    libellé et sa valeur.
 
 
-Étape 4 — Ajouter la carte et les quatre rasters de probabilité
+Étape 4 : Ajouter la carte et les quatre rasters de probabilité
 ===============================================================
 
 Si vous avez l'exercice 1, réutilisez sa carte :
@@ -227,11 +237,14 @@ Si vous avez l'exercice 1, réutilisez sa carte :
 
 #. Sur l'onglet **Source** de chaque raster, remettez ``mask_below`` à ``0``.
    L'exercice 1 le liait à une entrée ``Masque de Probabilité`` qui n'existe pas
-   ici — ce sont les seuils qui assurent ce filtrage désormais — et une variable
+   ici (ce sont les seuils qui assurent ce filtrage désormais), et une variable
    non résolue laisse le champ vide.
 
 Si vous n'avez pas l'exercice 1, construisez la carte et les quatre rasters de
-zéro comme il y est décrit, puis poursuivez.
+zéro comme il y est décrit, puis poursuivez. Dans les deux cas, les quatre URL
+pointent vers le cycle d'exemple,
+``https://tito.uffis.org/sample/comoros/20240427.000000/``, c'est-à-dire le
+même cycle que lisent les plugins ci-dessous.
 
 #. Si la carte recouvre les entrées, cliquez sur son menu à 3 points, survolez
    **Order** et sélectionnez **Send to Back**.
@@ -239,7 +252,7 @@ zéro comme il y est décrit, puis poursuivez.
 #. Enregistrez le tableau de bord.
 
 
-Étape 5 — Ajouter la couche de classification de l'aléa
+Étape 5 : Ajouter la couche de classification de l'aléa
 =======================================================
 
 #. Mettez le tableau de bord en mode édition, puis cliquez sur le menu à 3 points
@@ -249,7 +262,7 @@ zéro comme il y est décrit, puis poursuivez.
 #. À côté de **Layers**, cliquez sur **Add Layer**.
 
 #. Allez directement sur l'onglet **Source** et réglez **Source Type** sur
-   **Couche d'Aléa (Comores)**.
+   **Comores: Couche d'Aléa** (listée sous le groupe **UFFIS: Comores**).
 
 #. Les arguments du plugin apparaissent. Renseignez :
 
@@ -269,11 +282,20 @@ zéro comme il y est décrit, puis poursuivez.
         - ``${Seuil Sévère (P(≥100 cm))}``
       * - ``commune``
         - ``${Commune}``
+      * - ``cycle``
+        - ``sample`` (affiché **Événement d'exemple** dans la liste)
 
-   Cinq arguments, et non quatre. Tout produit des Comores est écrit par commune :
+   Six arguments, et non quatre. Tout produit des Comores est écrit par commune :
    le plugin ne peut donc pas savoir quels rasters classer tant que la commune ne
-   lui est pas parvenue — la même raison pour laquelle les exercices 1 et 2
-   portent chacun un sélecteur de commune.
+   lui est pas parvenue, la même raison pour laquelle les exercices 1 et 2
+   portent chacun un sélecteur de commune. ``cycle`` indique quel cycle TITO
+   lire, et ``sample`` désigne le cycle d'exemple publié pour le pays, les mêmes
+   données du 27 avril 2024 que dessinent les quatre couches raster. Laissé vide,
+   il lirait plutôt le dernier cycle en direct.
+
+   Laissez ``source_inondation`` vide. Sa valeur par défaut est **Pluviale
+   (débordement)**, la même variante ``pluvial_overbank`` que les quatre couches
+   raster.
 
 #. Cliquez sur **Fetch plugin defaults**. La couche est nommée **Classification
    de l'aléa**, stylée avec quatre règles sur l'attribut ``alea``, et dotée d'une
@@ -282,27 +304,29 @@ zéro comme il y est décrit, puis poursuivez.
 #. Enregistrez la couche en cliquant sur **Create**.
 
 .. figure:: images/ex3-hazard-layer-source.png
-   :alt: La configuration de la source de la couche d'aléa avec cinq arguments liés
+   :alt: La configuration de la source de la couche d'aléa avec ses portes, sa commune et son cycle
    :width: 100%
 
    **Capture :** l'onglet **Source** de la couche d'aléa, avec les quatre portes
-   et la commune liées à des variables.
+   et la commune liées à des variables, et ``cycle`` réglé sur l'exemple.
 
 
-Étape 6 — Ajouter la couche des entités touchées
+Étape 6 : Ajouter la couche des entités touchées
 ================================================
 
 #. À côté de **Layers**, cliquez de nouveau sur **Add Layer**.
 
 #. Allez directement sur l'onglet **Source** et réglez **Source Type** sur
-   **Couche d'Impact (Comores)**.
+   **Comores: Couche d'Impact**.
 
-#. Liez les cinq mêmes arguments aux cinq mêmes variables qu'à l'étape
-   précédente.
+#. Renseignez les mêmes arguments qu'à l'étape précédente : les quatre portes
+   et la commune liées aux cinq mêmes variables, et ``cycle`` réglé sur
+   ``sample``. Ce plugin n'a pas de ``source_inondation`` : il lit les
+   probabilités déjà portées par chaque bâtiment et chaque route.
 
 #. Cliquez sur **Fetch plugin defaults**. La couche arrive sous le nom
-   **Bâtiments et routes en danger**, avec huit règles — polygone et ligne par
-   niveau — et une légende **Aléa**.
+   **Bâtiments et routes en danger**, avec huit règles (polygone et ligne par
+   niveau) et une légende **Aléa**.
 
 #. Enregistrez la couche en cliquant sur **Create**.
 
@@ -312,7 +336,7 @@ séparées permet à l'utilisateur de désactiver l'ombrage du sol et de ne rega
 que ce qui est touché.
 
 
-Étape 7 — Terminer la carte
+Étape 7 : Terminer la carte
 ===========================
 
 #. Dans l'argument **Map Extent**, choisissez **Use a Custom Extent** et
@@ -330,22 +354,23 @@ que ce qui est touché.
 
 #. Enregistrez le tableau de bord.
 
-**Avertissement** — Comme dans les exercices 1 et 2, **l'étendue ne suit pas la
+**Avertissement :** Comme dans les exercices 1 et 2, **l'étendue ne suit pas la
 commune**. Passez à une commune d'une autre île et les couches se rechargent
 correctement, mais la vue reste sur Moroni jusqu'à ce que vous fassiez un
 panoramique.
 
 
-Étape 8 — Ajouter le tableau de synthèse d'impact
+Étape 8 : Ajouter le tableau de synthèse d'impact
 =================================================
 
 #. Mettez le tableau de bord en mode édition, ajoutez un autre élément, ouvrez son
    menu à 3 points et sélectionnez **Edit**.
 
-#. Réglez **Visualization Type** sur **Résumé d'Impact (Comores)** (dans le groupe
-   **Cartes d'Inondation (Français)**).
+#. Réglez **Visualization Type** sur **Comores: Résumé d'Impact** (dans le groupe
+   **UFFIS: Comores**).
 
-#. Liez les cinq mêmes arguments aux cinq mêmes variables qu'à l'étape 5.
+#. Renseignez les mêmes arguments qu'à l'étape 6 : les quatre portes et la
+   commune liées à leurs variables, et ``cycle`` réglé sur ``sample``.
 
 #. Sur l'onglet **Settings**, réglez **Background Color** sur ``#ffffff`` et
    ajoutez des bordures à gauche, à droite et en bas, pour qu'il rejoigne la bande
@@ -356,21 +381,53 @@ panoramique.
 
 #. Enregistrez le tableau de bord.
 
-La part indiquée dans la dernière colonne est rapportée à la population **de la
-commune**, et non à celle de l'île ou du pays — c'est l'autre raison pour laquelle
-la commune doit parvenir au plugin sous forme d'argument plutôt que d'y être
-figée.
+La part indiquée dans la dernière colonne est rapportée aux personnes qui vivent
+dans les bâtiments **de la commune**, telles que les compte son fichier de
+récepteurs, et non à la population de l'île ou du pays. C'est l'autre raison pour
+laquelle la commune doit parvenir au plugin sous forme d'argument plutôt que d'y
+être figée. Le titre du tableau se termine par le cycle,
+**(2024-04-27 00:00 UTC, ÉCHANTILLON)**, pour que personne ne prenne l'exemple
+pour une prévision en direct.
 
 .. figure:: images/ex3-impact-summary.png
    :alt: Le tableau de synthèse d'impact lié aux quatre seuils et à la commune
    :width: 100%
 
    **Capture :** les arguments du tableau de synthèse d'impact liés aux quatre
-   variables de seuil et à la commune.
+   variables de seuil et à la commune, avec ``cycle`` réglé sur l'exemple.
 
 
-Étape 9 — Tester le câblage
+Étape 9 : Tester le câblage
 ===========================
+
+Aux portes par défaut (0,8 pour les quatre), à Moroni, vous devriez voir 145
+polygones d'aléa, un message de progression annonçant 1 339 éléments en danger
+(bâtiments et routes), et ce tableau :
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 30 30
+
+   * - Niveau
+     - Bâtiments
+     - Personnes
+   * - Sévère
+     - 29
+     - 29
+   * - Élevé
+     - 19
+     - 57
+   * - Moyen
+     - 241
+     - 828
+   * - Faible
+     - 961
+     - 3 468
+   * - TOTAL en danger
+     - 1 250
+     - 4 383
+
+La ligne du total indique aussi 14,1 km de routes et 6,29 % de la population.
 
 Changez un seuil. L'ombrage de l'aléa, les entités touchées et le tableau doivent
 tous se recalculer ensemble, avec des messages de progression pendant que les
@@ -381,7 +438,7 @@ classe verte s'étend sur les terrains bas à mesure que des cellules inondées 
 une minorité de membres seulement commencent à se qualifier.
 
 Changez ensuite la **Commune**. Les trois éléments produits par les plugins se
-rechargent sur les rasters et les récepteurs d'une autre commune — et le
+rechargent sur les rasters et les récepteurs d'une autre commune, et le
 pourcentage du tableau est mesuré par rapport à une autre population.
 
 .. figure:: images/ex3-thresholds-before.png
@@ -477,37 +534,44 @@ Points de discussion
   P(≥100 cm) ≥ 0,8 tandis qu'« Élevé » signifie P(≥70 cm) ≥ 0,8. Ce sont des
   questions différentes au même seuil : les noms de niveaux ne sont donc pas
   comparables entre eux et « sévère » ne veut rien dire tout seul. Régler les
-  quatre portes à la même valeur — comme le fait la configuration par défaut — est
+  quatre portes à la même valeur, comme le fait la configuration par défaut, est
   la version la plus facile à expliquer : les niveaux ne diffèrent alors que par
   la profondeur.
 * **Une classe inatteignable est un problème d'interface.** Pas ici, mais
   l'histoire du Guatemala vaut d'être racontée : là-bas, la porte Sévère peut être
   placée là où rien ne peut se qualifier, et l'interface n'en donne aucun indice.
-  Demandez aux participants comment ils l'éviteraient — plafonner l'entrée ?
+  Demandez aux participants comment ils l'éviteraient : plafonner l'entrée ?
   afficher la plage de valeurs ? annoter la légende ?
-* **Ce que la porte filtre réellement.** Un seuil de 0,8 garde les cellules que
-  plus de 40 des 50 membres de la prévision ont atteintes à cette profondeur. Ces
-  50 membres se réduisent à 16 scénarios distincts de la bibliothèque : la
-  probabilité est donc grossière et la classification change par sauts visibles
-  plutôt que progressivement.
+* **Ce que la porte filtre réellement.** Un seuil de 0,8 garde les cellules qu'au
+  moins 40 des 50 membres de la prévision ont atteintes à cette profondeur.
+  Chaque probabilité est un compte sur 50, un multiple de 0,02 : elle est donc
+  grossière et la classification change par sauts visibles plutôt que
+  progressivement.
 * **Vectoriser une classification.** Une couche cartographique ne peut que pointer
   vers une URL, et rien ne sert de raster calculé : le plugin vectorise donc la
-  grille classée — les cellules adjacentes de même classe fusionnent en un seul
+  grille classée : les cellules adjacentes de même classe fusionnent en un seul
   polygone, environ 145 pour Moroni aux portes par défaut. Normal et NoData sont
-  écartés — soit l'essentiel de la grille — parce qu'un fond de carte montre mieux
+  écartés (soit l'essentiel de la grille) parce qu'un fond de carte montre mieux
   le terrain non touché qu'une couche colorée.
 * **La commune est un argument, pas une constante.** Le Guatemala et
   Antigua-et-Barbuda ont chacun un seul domaine, leurs plugins le codent donc en
   dur. Les Comores en ont 55 : la commune voyage donc avec les seuils dans chacun
   des trois plugins. C'est aussi ce qui décide du dénominateur de la dernière
   colonne du tableau.
+* **Le cycle est aussi un argument.** Ici, il est fixé à ``sample`` pour que
+  l'exercice ait toujours une inondation à montrer. Liez-le plutôt à ``${Date}``,
+  la liste de cycles de l'exercice 2, et les trois plugins suivent les données en
+  direct ; pour un cycle en direct, les quatre couches raster devraient alors
+  pointer vers ``https://tito.uffis.org/outputs/comoros/${Date}/...`` pour rester
+  synchronisées.
 
 
 Suite
 =====
 
-Les trois exercices couvrent ensemble les produits raster, la bibliothèque de
-scénarios et la classification. Les notebooks associés, dans
-``notebooks/Comoros/``, dérivent les mêmes chiffres en Python simple, et la
-section 6 du notebook de l'exercice 3 détaille comment ces plugins sont
-assemblés.
+Les trois exercices couvrent ensemble les produits raster, la profondeur
+probable sur les bâtiments et les routes, et la classification. Les notebooks
+associés, dans ``notebooks/Comoros/``, dérivent la même analyse en Python simple,
+et la section 6 du notebook de l'exercice 3 détaille comment ces plugins sont
+assemblés. Les notebooks utilisent encore les anciens fichiers de formation :
+leurs chiffres peuvent donc différer de ceux des tableaux de bord.

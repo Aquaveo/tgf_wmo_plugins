@@ -8,7 +8,7 @@ Ejercicios Prácticos de Guatemala: Para Empezar
 Instalación, contexto y los pasos que se repiten en todos los ejercicios. Lea esta
 página una vez y luego trabaje el ejercicio que necesite.
 
-**Nota sobre el idioma** — La interfaz de TethysDash está en inglés. Por eso los
+**Nota sobre el idioma:** La interfaz de TethysDash está en inglés. Por eso los
 nombres de botones, pestañas y campos se dejan en inglés y **en negrita**
 (**Add Layer**, **Save Changes**), tal como aparecen en la pantalla. El texto
 explicativo está en español.
@@ -31,16 +31,16 @@ Cada ejercicio construye un tablero de visualización y tiene su propio archivo:
    * - Guía
      - Tablero
      - Qué muestra
-   * - `Ejercicio 1 — Un mapa de profundidad y probabilidad de inundación <exercise_1_es.rst>`_
+   * - `Ejercicio 1: Un mapa de probabilidad de inundación <exercise_1_es.rst>`_
      - Guatemala Práctica 1 (Español)
-     - Un ráster de profundidad de inundación y cuatro rásteres de probabilidad de
-       excedencia en un solo mapa, con un mapa base intercambiable.
-   * - `Ejercicio 2 — Impacto de una sola tormenta <exercise_2_es.rst>`_
+     - Cuatro rásteres de probabilidad de excedencia del ciclo de muestra de TITO
+       en un solo mapa, con un mapa base intercambiable.
+   * - `Ejercicio 2: Impacto probable de un ciclo de pronóstico <exercise_2_es.rst>`_
      - Guatemala Práctica 2 (Español)
-     - La profundidad de una sola tormenta de un conjunto de 198 miembros, junto
-       con los edificios y las carreteras que esa tormenta inunda, una tabla
-       resumen y una tarjeta con las cifras principales.
-   * - `Ejercicio 3 — Clasificación de peligro con umbrales ajustables <exercise_3_es.rst>`_
+     - La profundidad probable de inundación sobre cada edificio y carretera para
+       el ciclo de TITO y la probabilidad elegidos, con una tabla resumen y una
+       tarjeta con las cifras principales.
+   * - `Ejercicio 3: Clasificación de peligro con umbrales ajustables <exercise_3_es.rst>`_
      - Guatemala Práctica 3 (Español)
      - Una clasificación de peligro controlada por cuatro umbrales de probabilidad
        que el usuario puede mover, con los edificios y carreteras afectados y una
@@ -62,6 +62,10 @@ tablero*; los cuadernos tratan de *por qué los números son los que son*. Se
 complementan bien: ejecute el cuaderno primero si quiere entender el análisis, y
 siga la guía si quiere armar la interfaz.
 
+Los cuadernos todavía trabajan con los archivos de capacitación anteriores y no
+con el ciclo de muestra de TITO que ahora leen los tableros, así que sus números
+difieren de los que muestran los tableros.
+
 Convenciones
 ------------
 
@@ -73,7 +77,7 @@ Convenciones
   poder ver, y con **Puntos de discusión** que vale la pena mencionar si usted es
   quien enseña.
 
-**Nota** — Las capturas de pantalla de estas guías son marcadores de posición.
+**Nota:** Las capturas de pantalla de estas guías son marcadores de posición.
 Cada bloque ``figure`` describe lo que debe mostrar la imagen; coloque un PNG en
 la ruta indicada dentro de ``docs/Guatemala/images/`` y se mostrará.
 
@@ -98,13 +102,19 @@ Lo que necesita
 
    Reinicie la aplicación de Tethys después de instalar. Para confirmar que
    funcionó, abra el desplegable **Visualization Type** de cualquier elemento del
-   tablero y busque el grupo **Mapas de Inundación (Español)**.
-#. **Salida HTTPS desde el servidor.** Cada módulo lee sus datos de un bucket
-   público de S3 en el momento de la solicitud. Nada viene incluido en el paquete.
+   tablero y busque el grupo **UFFIS: Guatemala**.
+#. **Salida HTTPS desde el servidor.** Cada módulo lee sus datos del servidor
+   público de TITO en el momento de la solicitud. Nada viene incluido en el
+   paquete.
 #. **Permisos de visualización**, si su instancia restringe los tipos de módulo.
-   Los ejercicios usan los tipos ``table``, ``card`` y ``map_layer``.
+   Los ejercicios usan los tipos ``table``, ``card``, ``map_layer`` y
+   ``variable_input``.
+#. **Nombres de los módulos en español.** Los módulos de Guatemala hablan español
+   sea cual sea el idioma del tablero: sus etiquetas, nombres de argumentos,
+   nombres de capas y nombres de atributos están en español. Las guías en inglés
+   usan los mismos módulos.
 
-**Advertencia** — Si el grupo **Mapas de Inundación (Español)** no aparece en el
+**Advertencia:** Si el grupo **UFFIS: Guatemala** no aparece en el
 desplegable, el paquete no está instalado en el entorno donde realmente se ejecuta
 la aplicación. Este es, por mucho, el problema de instalación más común. Instalarlo
 en el Python de su terminal no es suficiente cuando la aplicación corre bajo otro
@@ -113,41 +123,51 @@ intérprete o en otro contenedor.
 Los datos
 ---------
 
-Todo proviene de un solo bucket público. La raíz es la misma en todos los casos, y
-los ejercicios se refieren a ella como ``.../``:
+Los tres tableros leen un mismo **ciclo de muestra** de TITO: el pronóstico
+publicado el 2026-10-16 a las 22:00 UTC para el sitio de Santa Inés Petapa, que se
+conserva como ejemplo fijo para que los ejercicios muestren el mismo evento en
+cada sesión. Su raíz es:
 
 .. code-block:: text
 
-   https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com
+   https://tito.uffis.org/sample/guatemala/20261016.220000/
 
-Importan tres prefijos:
+Un ciclo de muestra tiene la misma estructura que las salidas en vivo de TITO, que
+se publican en ``https://tito.uffis.org/outputs/guatemala/<ciclo>/``. Por eso,
+cualquier cosa construida sobre la muestra funciona con un ciclo en vivo con solo
+cambiar el ciclo.
 
 .. list-table::
    :header-rows: 1
    :widths: 26 74
 
-   * - Prefijo
+   * - Lo usa
      - Contenido
-   * - ``PBI_Actividad_2/``
-     - Los rásteres que usan las capas del mapa: un GeoTIFF de profundidad, cuatro
-       GeoTIFF de probabilidad de excedencia y los archivos que acompañan al
-       almacén Zarr del conjunto. Todos son copias en EPSG:3857 sobre una única
-       cuadrícula compartida.
-   * - ``Guatemala_IBF/``
-     - Los elementos de impacto (edificios y carreteras) y los rásteres originales
-       en UTM de los que fueron muestreados. Los módulos leen de aquí el CSV
-       reducido.
-   * - ``floodmaps_test/``
-     - El almacén Zarr del conjunto de 198 miembros que usa el ejercicio 2.
+   * - Capas del mapa (ejercicios 1 y 3)
+     - Los cuatro GeoTIFF de probabilidad de excedencia, en
+       ``guatemala_90m/fim/stream_sat_stormlab/Guatemala_SantaInesPetapa/combined_overbank/``
+       dentro de la raíz, con el nombre
+       ``prob_depth_ge_<profundidad>_overbank.20261016.220000.tif`` para
+       ``<profundidad>`` = ``10cm``, ``30cm``, ``70cm`` y ``100cm``. Cada celda
+       contiene la probabilidad de que el agua alcance esa profundidad.
+   * - Módulos (ejercicios 2 y 3)
+     - Los edificios, carreteras y probabilidades del mismo ciclo. Los módulos los
+       encuentran por sí mismos; usted solo les indica qué ciclo leer.
 
-**Importante** — Los rásteres a los que apuntan los tableros son las copias en
-**EPSG:3857** dentro de ``PBI_Actividad_2/``, no los originales en UTM de
-``Guatemala_IBF/``. Esto no es un detalle cosmético. TethysDash no incluye proj4,
-por lo que OpenLayers solo puede resolver EPSG:4326 y EPSG:3857 para los datos de
-una capa. Si apunta una capa a un ráster en UTM, parecerá cargar y luego
-desaparecerá, o arrastrará todo el mapa a UTM. Si una capa aparece y desaparece,
-revise primero su proyección.
+Las probabilidades son fracciones de 50 miembros del conjunto, así que cada valor
+es múltiplo de 0.02, y cada uno de los cuatro rásteres llega a 1.0 en algún punto.
+Los rásteres tienen 424 x 319 celdas de unos 5 m.
 
+Las versiones anteriores de estos ejercicios leían archivos de capacitación de un
+bucket de S3 (``PBI_Actividad_2/``, ``Guatemala_IBF/`` y ``floodmaps_test/``). Los
+tableros de los ejercicios ya no los usan; los cuadernos complementarios sí.
+
+**Importante:** Los rásteres de la muestra están de origen en **EPSG:3857**, y eso
+importa. TethysDash no incluye proj4, por lo que OpenLayers solo puede resolver
+EPSG:4326 y EPSG:3857 para los datos de una capa. Si apunta una capa a un ráster en
+otra proyección (por ejemplo, uno en UTM), parecerá cargar y luego desaparecerá, o
+arrastrará todo el mapa a coordenadas equivocadas. Si una capa aparece y
+desaparece, revise primero su proyección.
 
 Pasos comunes a los tres ejercicios
 ===================================
@@ -210,7 +230,7 @@ ofrece entonces lo siguiente:
    **Captura:** la barra de herramientas del encabezado en modo de edición, con
    los botones anteriores a la vista.
 
-**Consejo** — Guarde con frecuencia. **Cancel** revierte al último guardado, así
+**Consejo:** Guarde con frecuencia. **Cancel** revierte al último guardado, así
 que una sesión larga de edición sin guardar está a un solo error de perderse.
 
 Agregar y configurar un elemento del tablero
@@ -235,7 +255,7 @@ Agregar y configurar un elemento del tablero
    :width: 100%
 
    **Captura:** el visor de datos con el desplegable **Visualization Type**
-   abierto, mostrando el grupo **Mapas de Inundación (Español)**.
+   abierto, mostrando el grupo **UFFIS: Guatemala**.
 
 .. figure:: images/00-griditem-menu.png
    :alt: El menú de 3 puntos de un elemento del tablero, abierto
@@ -286,17 +306,22 @@ terminados están en este repositorio dentro de ``dashboards/``:
 
    dashboards/Guatemala/Guatemala_Hands_On_1.json
    dashboards/Guatemala/Guatemala_Hands_On_2.json
+   dashboards/Guatemala/Guatemala_Hands_On_2_English.json
    dashboards/Guatemala/Guatemala_Hands_On_3.json
 
-Las versiones en inglés están junto a ellos, con ``_English`` en lugar de
-``_Espanol``. Los tableros en español usan los módulos ``_es`` en todo momento, de
-modo que cada tablero es coherente en un solo idioma: no los mezcle.
+``Guatemala_Hands_On_1.json``, ``_2.json`` y ``_3.json`` son las soluciones en
+español, las que construyen estas guías.
+
+``Guatemala_Hands_On_2_English.json`` es un tablero en inglés más completo de
+pronóstico en vivo. Su primera pestaña contiene los elementos del ejercicio 2
+(desplegable de ciclos, variable ``Probability``, capa de profundidad probable,
+tarjeta y tabla) junto con elementos de peligro, lluvia y caudal, y una segunda
+pestaña muestra alertas.
 
 Estos archivos son exportaciones de tableros completos. Los elementos individuales
 también se pueden mover entre tableros con **Export** en el menú de 3 puntos de un
 elemento y **Import Dashboard Item** en el encabezado, que es la forma más rápida
-de reutilizar las cinco capas ráster del ejercicio 1 en el ejercicio 3.
-
+de reutilizar las cuatro capas ráster del ejercicio 1 en el ejercicio 3.
 
 Solución de problemas
 =====================
@@ -307,7 +332,7 @@ Solución de problemas
 
    * - Síntoma
      - Causa y solución
-   * - El grupo **Mapas de Inundación (Español)** no aparece en
+   * - El grupo **UFFIS: Guatemala** no aparece en
        **Visualization Type**.
      - ``tgf_wmo_plugins`` no está instalado en el entorno donde corre la
        aplicación, o la aplicación no se reinició. Instálelo en el servidor y
@@ -318,9 +343,9 @@ Solución de problemas
        Revise la ortografía, los espacios y la puntuación, y vuelva a seleccionar
        la variable.
    * - Una capa aparece y luego desaparece.
-     - Casi siempre es un problema de proyección. Confirme que la capa apunta a la
-       copia en EPSG:3857 de ``PBI_Actividad_2``, no a un original en UTM de
-       ``Guatemala_IBF``.
+     - Casi siempre es un problema de proyección. Confirme que el ráster está en
+       EPSG:3857 o EPSG:4326. Los rásteres de la muestra están en EPSG:3857; un
+       ráster en UTM no.
    * - Todo el mapa salta a algún lugar de África.
      - La misma causa. Un GeoTIFF en una proyección que no se puede resolver hace
        que el ajuste automático adopte coordenadas que caen cerca de 0°, 0°.
@@ -331,9 +356,16 @@ Solución de problemas
    * - Un ráster se ve de un solo color plano.
      - Los límites de la rampa no corresponden a los datos, o ``mask_below`` no
        está definido y por eso se está coloreando el suelo seco. Revise ambos.
-   * - El color morado nunca aparece en el ejercicio 3.
-     - Es lo esperado si el umbral Severo está por encima de 0.2. El ráster de
-       76 cm solo contiene 0 o 0.2. Baje el umbral a 0.2 o menos.
+   * - Una capa o tabla de un módulo está vacía, o muestra un evento distinto
+       del de las capas ráster.
+     - El ciclo del módulo no es la muestra. En el ejercicio 3 ponga ``ciclo`` en
+       **Evento de muestra** (``sample``); en el ejercicio 2 vincúlelo a
+       ``${Date}`` y elija el ciclo de muestra. Si se deja sin definir, el módulo
+       lee el último ciclo en vivo, en el que puede que no haya habido
+       inundación.
+   * - El desplegable **Date** del ejercicio 2 se abre en un ciclo en vivo.
+     - El argumento ``inicio`` de la lista de ciclos no está definido. Póngalo en
+       **Ciclo de muestra más reciente** (``sample``).
    * - El tablero no se puede editar.
      - Solo el propietario puede editar, y solo en modo de edición. Busque el botón
        **Edit Dashboard** en el encabezado.

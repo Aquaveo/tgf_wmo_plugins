@@ -1,7 +1,7 @@
 .. Antigua and Barbuda hands-on exercise 1 solution.
 
 ==============================================================
-Exercise 1 — A flood depth and probability map
+Exercise 1: A flood depth and probability map
 ==============================================================
 
 Building **Antigua and Barbuda Hands On 1** step by step.
@@ -17,15 +17,18 @@ What you are building
 
 One map filling the window, carrying the flood depth of one storm from the
 Saint John's flood-map library, the four exceedance-probability rasters of the
-Tropical Storm Jerry forecast, the parish boundaries drawn over them, and a
-small dropdown in the top-left corner that switches the base map underneath.
+Tropical Storm Jerry sample forecast for the Saint John's site, the parish
+boundaries drawn over them, and a small dropdown in the top-left corner that
+switches the base map underneath.
 
 .. figure:: images/ex1-finished.png
    :alt: The finished exercise 1 dashboard
    :width: 100%
 
    **Screenshot:** the finished dashboard over satellite imagery, layer control
-   open so all six layers are listed, the depth and 30 cm layers drawn.
+   open so all six layers are listed, the depth and 30 cm layers drawn. The
+   capture predates the switch to the sample cycle, so its 30 cm layer is the
+   earlier national raster; yours covers the Saint John's site only.
 
 This exercise is about layers: where a raster URL goes, how a colour ramp is
 chosen, the difference between letting the app scale a layer and pinning the
@@ -33,7 +36,7 @@ scale yourself, how a vector outline is styled so it frames the data without
 covering it, and which layers to show when the dashboard first opens.
 
 
-Step 1 — Create the dashboard
+Step 1: Create the dashboard
 =============================
 
 #. Create a new dashboard (see
@@ -52,7 +55,7 @@ Step 1 — Create the dashboard
    corner to enter edit mode.
 
 
-Step 2 — Add the map
+Step 2: Add the map
 ====================
 
 #. You will see an existing item on the dashboard. Click on the item's 3-dot
@@ -61,7 +64,7 @@ Step 2 — Add the map
 #. Set the **Visualization Type** to **Map** (in the **Default** group).
 
 #. Five arguments appear: **Base Map**, **Layer Control**, **Layers**,
-   **Map Extent** and **Map Drawing**. Leave them for now — you will fill them
+   **Map Extent** and **Map Drawing**. Leave them for now; you will fill them
    over the next steps.
 
 #. In the **Base Map** argument, choose ``World Imagery`` for now. You will
@@ -75,7 +78,7 @@ Step 2 — Add the map
    base map selected.
 
 
-Step 3 — Add the depth layer
+Step 3: Add the depth layer
 ============================
 
 There is no single "flood depth" GeoTIFF for Antigua and Barbuda: the forecast
@@ -116,7 +119,7 @@ of the Saint John's library, a Zarr store of 200 storms.
         - ``0.05``
 
    The store holds all 200 storms in one array, and ``index`` picks which slice
-   to draw — a fixed one here; exercise 2 puts this same field on a slider.
+   to draw, a fixed one here; exercise 2 puts this same field on a slider.
    Storm 150 is the one the companion notebook works through. ``mask_below``
    hides cells at or below the value given; ``0.05`` is the store's own wet
    threshold, so dry ground shows the base map instead of the ramp's low
@@ -144,13 +147,13 @@ of the Saint John's library, a Zarr store of 200 storms.
    where ``index`` is ``${Storm}``; here type ``150``.
 
 
-Step 4 — Add the four probability layers
+Step 4: Add the four probability layers
 ========================================
 
 These four are identical except for the URL, the name and their initial
 visibility, so build one and repeat. Add them in this order, so the deepest
-threshold ends up lowest in the stack and the shallowest — which covers the
-largest area — ends up on top:
+threshold ends up lowest in the stack and the shallowest (which covers the
+largest area) ends up on top:
 
 .. list-table::
    :header-rows: 1
@@ -159,15 +162,17 @@ largest area — ends up on top:
    * - Layer **Name**
      - ``url``
    * - ``Flood Probability at 100 cm``
-     - ``https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/antigua_barbuda_IBF/depth_prob/antiguabarbuda_prob_depth_ge_100cm_overbank.tif``
+     - ``https://tito.uffis.org/sample/antigua/20251010.010000/antigua_30m/fim/stream_sat_stormlab/Antigua_SaintJohnS/pluvial_overbank/prob_depth_ge_100cm_overbank.20251010.010000.tif``
    * - ``Flood Probability at 70 cm``
-     - ``https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/antigua_barbuda_IBF/depth_prob/antiguabarbuda_prob_depth_ge_70cm_overbank.tif``
+     - ``https://tito.uffis.org/sample/antigua/20251010.010000/antigua_30m/fim/stream_sat_stormlab/Antigua_SaintJohnS/pluvial_overbank/prob_depth_ge_70cm_overbank.20251010.010000.tif``
    * - ``Flood Probability at 30 cm``
-     - ``https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/antigua_barbuda_IBF/depth_prob/antiguabarbuda_prob_depth_ge_30cm_overbank.tif``
+     - ``https://tito.uffis.org/sample/antigua/20251010.010000/antigua_30m/fim/stream_sat_stormlab/Antigua_SaintJohnS/pluvial_overbank/prob_depth_ge_30cm_overbank.20251010.010000.tif``
    * - ``Flood Probability at 10 cm``
-     - ``https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/antigua_barbuda_IBF/depth_prob/antiguabarbuda_prob_depth_ge_10cm_overbank.tif``
+     - ``https://tito.uffis.org/sample/antigua/20251010.010000/antigua_30m/fim/stream_sat_stormlab/Antigua_SaintJohnS/pluvial_overbank/prob_depth_ge_10cm_overbank.20251010.010000.tif``
 
-(More information about the data is in
+These are the sample cycle's rasters for the Saint John's site, so they cover
+St. John's and parts of the neighbouring parishes, not the whole of either
+island. (More information about the data is in
 `The data <getting_started.rst#the-data>`_.)
 
 For **each** of the four:
@@ -209,18 +214,18 @@ For **each** of the four:
 
    ``mask_below`` hides cells at or below the value given. Zero means "no
    member floods this cell to this depth", and without the mask the whole
-   domain — sea included — would be painted the ramp's low colour instead of
+   domain (sea included) would be painted the ramp's low colour instead of
    showing the base map.
 
 #. On the **Style** tab, leave the mode on **Continuous** and pick the
    **turbo** ramp. Set **Min** = ``0`` and **Max** = ``1``.
 
-   Pinning Min and Max to 0–1 is the whole point of these four layers, and the
+   Pinning Min and Max to 0 to 1 is the whole point of these four layers, and the
    opposite of what you did for depth, which uses the same ramp but lets it
    stretch to the storm. Probability has a fixed, meaningful
    range, and all four layers must use the same one or they cannot be
    compared. Left to auto-scale, each layer would stretch its ramp over its own
-   range and 0.2 would look like a different severity on each — the shallow
+   range and 0.2 would look like a different severity on each: the shallow
    layer's mid-tone and the deep layer's mid-tone would mean different numbers.
 
 #. On the **Legend** tab, select **Default Legend**. For a ramp-styled raster
@@ -241,7 +246,7 @@ For **each** of the four:
    ``0`` go in the same two fields.
 
 .. figure:: images/ex1-layer-style-turbo.png
-   :alt: The Style tab with the turbo ramp pinned to 0–1
+   :alt: The Style tab with the turbo ramp pinned to 0 to 1
    :width: 100%
 
    **Screenshot:** the **Style** tab, **Continuous** mode, **turbo** selected,
@@ -255,7 +260,7 @@ For **each** of the four:
    probabilities deepest first. The parish outline comes next.
 
 
-Step 5 — Add the parish boundaries
+Step 5: Add the parish boundaries
 ==================================
 
 Antigua and Barbuda issues its flood warnings by parish, so the parish outlines
@@ -287,7 +292,7 @@ are the frame everything else is read against. They come from a shapefile.
 
    Point at the ``.shp``; the ``.dbf``, ``.shx`` and ``.prj`` files beside it
    are fetched automatically. The shapefile is the GADM level-1 boundary set
-   with a population column added — six parishes on Antigua plus Barbuda and
+   with a population column added: six parishes on Antigua plus Barbuda and
    Redonda.
 
 #. On the **Style** tab, set the **polygon** style to:
@@ -308,7 +313,7 @@ are the frame everything else is read against. They come from a shapefile.
    A fully transparent fill is what makes this an outline. Leave the fill at
    its default and the parishes cover the probability rasters beneath them.
 
-#. Leave the **Legend** tab alone — an outline needs no legend entry.
+#. Leave the **Legend** tab alone; an outline needs no legend entry.
 
 #. Save the layer by clicking **Create** at the bottom of the layer editor.
 
@@ -322,7 +327,7 @@ are the frame everything else is read against. They come from a shapefile.
    the dashboard editor.
 
 
-Step 6 — Add the base map selector
+Step 6: Add the base map selector
 ==================================
 
 The base map is a variable input so the viewer can switch it without editing
@@ -353,7 +358,7 @@ anything. Build the input first, then point the map at it.
       * - ``variable_options_source``
         - ``Base Map Layers``
 
-   ``Base Map Layers`` is a built-in options source — it fills the dropdown with
+   ``Base Map Layers`` is a built-in options source: it fills the dropdown with
    the base maps the instance offers, so you do not enumerate them yourself.
 
 #. On the **Settings** tab, set **Background Color** to ``#ffffff``. Without it
@@ -382,7 +387,7 @@ anything. Build the input first, then point the map at it.
    **Screenshot:** the **Variable Input** arguments for the base map selector.
 
 
-Step 7 — Update the map's base map, extent and viewport
+Step 7: Update the map's base map, extent and viewport
 =======================================================
 
 #. Set the dashboard in edit mode by clicking on the **Edit Dashboard** button
@@ -405,8 +410,10 @@ Step 7 — Update the map's base map, extent and viewport
       -6878431.34,1928974.98,11.6
 
    That is ``centre-x,centre-y,zoom`` in EPSG:3857 metres, and it frames both
-   islands. The map is always drawn in EPSG:3857, whatever projection the
-   layers arrive in; the extent is written in the map's coordinates.
+   islands so the parish outlines give context; the probability layers fill
+   only the Saint John's site in the west of Antigua. The map is always drawn
+   in EPSG:3857, whatever projection the layers arrive in; the extent is
+   written in the map's coordinates.
 
 #. On the **Settings** tab, turn on **Fill Viewport** so the map occupies the
    whole window.
@@ -456,7 +463,8 @@ Checkpoint
 You should now have:
 
 * A map filling the window, showing both Antigua and Barbuda with the parish
-  outlines drawn in black.
+  outlines drawn in black, and the probability layers confined to the Saint
+  John's site window in the west of Antigua.
 * A layer control listing seven layers (including the base map); only the
   depth, the 30 cm probability and the parishes are checked when the dashboard
   opens, and toggling the others draws them.
@@ -470,8 +478,8 @@ Talking points
 ==============
 
 * **Auto-scaled versus pinned ramps.** Depth auto-scales because its range is a
-  property of this particular storm. Probability is pinned to 0–1 because the
-  range is fixed by definition and the four layers must be comparable — the
+  property of this particular storm. Probability is pinned to 0 to 1 because the
+  range is fixed by definition and the four layers must be comparable: the
   same colour has to mean the same odds at every depth. This is the single most
   transferable idea in the exercise, and it is why the probability legend can
   be shared.
@@ -483,7 +491,11 @@ Talking points
 * **What the four layers are.** Each holds P(maximum depth ≥ threshold) across
   the 50 members. They nest: any cell with a chance of 100 cm has at least that
   chance of 30 cm. Switch from 10 cm to 100 cm and watch the footprint shrink
-  and the colours cool. Values move in steps of 0.02 — one member in fifty.
+  (from 16,270 cells with any chance at 10 cm to 410 at 100 cm) and the
+  colours cool. Values move in steps of 0.02, one member in fifty, but
+  because the rain has only five distinct realizations the layers hold just a
+  few values (0.02, 0.18, 0.2, 0.4, 0.42, 0.58, 0.6, 0.8 and 1.0), so the
+  colours come in bands rather than a smooth gradient.
 * **Why only one starts visible.** Nested surfaces stacked at full opacity hide
   each other, and the shallowest, largest one wins. Showing one and offering
   the rest is a design decision worth making explicit: a dashboard chooses
@@ -501,5 +513,5 @@ Talking points
 Next
 ====
 
-`Exercise 2 — Flood depth for a single storm <exercise_2.rst>`_ takes the
+`Exercise 2: Flood depth for a single storm <exercise_2.rst>`_ takes the
 depth layer you just built and puts the choice of storm on a slider.

@@ -38,7 +38,7 @@
           "source": {
            "type": "GeoTIFF",
            "props": {
-            "url": "https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/Comoros_training/Comoros_cycle_20240427_0000UTC/Comoros_cycle_20240427_0000UTC/fim/${Commune}/stream_sat_stormlab/pluvial_overbank/prob_depth_ge_100cm_overbank.20240427.000000.tif",
+            "url": "https://tito.uffis.org/sample/comoros/20240427.000000/comoros_30m/fim/stream_sat_stormlab/${Commune}/pluvial_overbank/prob_depth_ge_100cm_overbank.20240427.000000.tif",
             "mask_below": "0",
             "normalize": false
            },
@@ -153,7 +153,7 @@
           "source": {
            "type": "GeoTIFF",
            "props": {
-            "url": "https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/Comoros_training/Comoros_cycle_20240427_0000UTC/Comoros_cycle_20240427_0000UTC/fim/${Commune}/stream_sat_stormlab/pluvial_overbank/prob_depth_ge_70cm_overbank.20240427.000000.tif",
+            "url": "https://tito.uffis.org/sample/comoros/20240427.000000/comoros_30m/fim/stream_sat_stormlab/${Commune}/pluvial_overbank/prob_depth_ge_70cm_overbank.20240427.000000.tif",
             "mask_below": "0",
             "normalize": false
            },
@@ -267,7 +267,7 @@
           "source": {
            "type": "GeoTIFF",
            "props": {
-            "url": "https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/Comoros_training/Comoros_cycle_20240427_0000UTC/Comoros_cycle_20240427_0000UTC/fim/${Commune}/stream_sat_stormlab/pluvial_overbank/prob_depth_ge_30cm_overbank.20240427.000000.tif",
+            "url": "https://tito.uffis.org/sample/comoros/20240427.000000/comoros_30m/fim/stream_sat_stormlab/${Commune}/pluvial_overbank/prob_depth_ge_30cm_overbank.20240427.000000.tif",
             "mask_below": "0",
             "normalize": false
            },
@@ -381,7 +381,7 @@
           "source": {
            "type": "GeoTIFF",
            "props": {
-            "url": "https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/Comoros_training/Comoros_cycle_20240427_0000UTC/Comoros_cycle_20240427_0000UTC/fim/${Commune}/stream_sat_stormlab/pluvial_overbank/prob_depth_ge_10cm_overbank.20240427.000000.tif",
+            "url": "https://tito.uffis.org/sample/comoros/20240427.000000/comoros_30m/fim/stream_sat_stormlab/${Commune}/pluvial_overbank/prob_depth_ge_10cm_overbank.20240427.000000.tif",
             "mask_below": "0",
             "normalize": false
            },
@@ -512,7 +512,8 @@
             "seuil_moyen": "${Seuil Moyen (P(≥30 cm))}",
             "seuil_eleve": "${Seuil Élevé (P(≥70 cm))}",
             "seuil_severe": "${Seuil Sévère (P(≥100 cm))}",
-            "commune": "${Commune}"
+            "commune": "${Commune}",
+            "cycle": "sample"
            }
           },
           "layerId": "e2ce4999-0f25-48db-8020-9e0b95abe4fe"
@@ -621,7 +622,8 @@
             "seuil_moyen": "${Seuil Moyen (P(≥30 cm))}",
             "seuil_eleve": "${Seuil Élevé (P(≥70 cm))}",
             "seuil_severe": "${Seuil Sévère (P(≥100 cm))}",
-            "commune": "${Commune}"
+            "commune": "${Commune}",
+            "cycle": "sample"
            }
           },
           "layerId": "98dcb407-2af1-42b0-9ab9-0608af688e0b"
@@ -786,95 +788,95 @@
        "choices": [
         {
          "label": "Ngouengoe",
-         "value": "KM251_Ngouengoe"
+         "value": "Comoros_Ngouengoe"
         },
         {
          "label": "Nioumagama",
-         "value": "KM252_Nioumagama"
+         "value": "Comoros_Nioumagama"
         },
         {
          "label": "Cembenoi Lac Salé",
-         "value": "KM261_CembenoiLacSale"
+         "value": "Comoros_CembenoiLacSale"
         },
         {
          "label": "Cembenoi Sada Djoulamlima",
-         "value": "KM262_CembenoiSadaDjoulamlima"
+         "value": "Comoros_CembenoiSadaDjoulamlima"
         },
         {
          "label": "Mitsamiouli",
-         "value": "KM263_Mitsamiouli"
+         "value": "Comoros_Mitsamiouli"
         },
         {
          "label": "Nyuma Komo",
-         "value": "KM264_NyumaKomo"
+         "value": "Comoros_NyumaKomo"
         },
         {
          "label": "Nyumamro Kiblani",
-         "value": "KM265_NyumamroKiblani"
+         "value": "Comoros_NyumamroKiblani"
         },
         {
          "label": "Nyumamro Souheili",
-         "value": "KM266_NyumamroSouheili"
+         "value": "Comoros_NyumamroSouheili"
         },
         {
          "label": "Bambao Ya Hari",
-         "value": "KM271_BambaoYaHari"
+         "value": "Comoros_BambaoYaHari"
         },
         {
          "label": "Bambao Ya Mboini",
-         "value": "KM272_BambaoYaMboini"
+         "value": "Comoros_BambaoYaMboini"
         },
         {
          "label": "Bambao Yadjou",
-         "value": "KM273_BambaoYadjou"
+         "value": "Comoros_BambaoYadjou"
         },
         {
          "label": "Moroni",
-         "value": "KM274_Moroni"
+         "value": "Comoros_Moroni"
         },
         {
          "label": "Dimani",
-         "value": "KM281_Dimani"
+         "value": "Comoros_Dimani"
         },
         {
          "label": "Oichili Yadjou",
-         "value": "KM282_OichiliYadjou"
+         "value": "Comoros_OichiliYadjou"
         },
         {
          "label": "Oichili Yamboini",
-         "value": "KM283_OichiliYamboini"
+         "value": "Comoros_OichiliYamboini"
         },
         {
          "label": "Cratère du Karthala",
-         "value": "KM291_CratereDuKarthala"
+         "value": "Comoros_CratereDuKarthala"
         },
         {
          "label": "Djando",
-         "value": "KM311_Djando"
+         "value": "Comoros_Djando"
         },
         {
          "label": "Fomboni",
-         "value": "KM321_Fomboni"
+         "value": "Comoros_Fomboni"
         },
         {
          "label": "Moili Mdjini",
-         "value": "KM322_MoiliMdjini"
+         "value": "Comoros_MoiliMdjini"
         },
         {
          "label": "Moimbassa",
-         "value": "KM323_Moimbassa"
+         "value": "Comoros_Moimbassa"
         },
         {
          "label": "Mlédjélé",
-         "value": "KM331_Mledjele"
+         "value": "Comoros_Mledjele"
         },
         {
          "label": "Moimbao",
-         "value": "KM332_Moimbao"
+         "value": "Comoros_Moimbao"
         }
        ]
       },
-      "initial_value": "KM274_Moroni"
+      "initial_value": "Comoros_Moroni"
      },
      "metadata_string": {
       "backgroundColor": "#ffffff"
@@ -892,7 +894,8 @@
       "seuil_moyen": "${Seuil Moyen (P(≥30 cm))}",
       "seuil_eleve": "${Seuil Élevé (P(≥70 cm))}",
       "seuil_severe": "${Seuil Sévère (P(≥100 cm))}",
-      "commune": "${Commune}"
+      "commune": "${Commune}",
+      "cycle": "sample"
      },
      "metadata_string": {
       "border": {

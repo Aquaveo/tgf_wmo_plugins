@@ -1,7 +1,7 @@
 .. Antigua and Barbuda hands-on exercise 2 solution.
 
 ==============================================================
-Exercise 2 — Flood depth for a single storm
+Exercise 2: Flood depth for a single storm
 ==============================================================
 
 Building **Antigua and Barbuda Hands On 2** step by step.
@@ -24,7 +24,7 @@ and the depth re-reads.
    :alt: The finished exercise 2 dashboard
    :width: 100%
 
-   **Screenshot:** the finished dashboard — Saint John's over imagery, the
+   **Screenshot:** the finished dashboard: Saint John's over imagery, the
    depth of storm 150 in blues, the **Storm** input top-left and the base map
    selector top-right.
 
@@ -33,21 +33,23 @@ so that changing the input re-reads the data instead of switching between
 duplicated layers. The Zarr layer itself is the one from exercise 1, with its
 fixed ``index`` replaced by the variable.
 
-**Tip** — ``notebooks/Antigua_Barbuda/02_storm_impact.ipynb`` opens the same
+**Tip**: ``notebooks/Antigua_Barbuda/02_storm_impact.ipynb`` opens the same
 library as plain Python: what the store's metadata says about itself, how one
 storm is sampled onto every building and road in the parish, and how the
 forecast turns the library into the probability rasters of exercises 1 and 3.
 Worth running first if you want to understand the data before assembling the
-interface.
+interface. The notebook still uses the earlier training buildings and
+probability rasters rather than the sample cycle, so its exposure and
+probability numbers differ from exercises 1 and 3.
 
-**Note** — The Guatemala version of this exercise also adds a plugin-backed
+**Note**: The Guatemala version of this exercise also adds a plugin-backed
 impact layer, a summary table and a card for the chosen storm. Those plugins
 are wired to the Guatemala ensemble and no Antigua and Barbuda variant exists
 yet, so this dashboard stops at the depth layer. Section 10 of the notebook
 lists what such a variant would need.
 
 
-Step 1 — Create the dashboard
+Step 1: Create the dashboard
 =============================
 
 #. Create a new dashboard (see
@@ -66,7 +68,7 @@ Step 1 — Create the dashboard
    corner to enter edit mode.
 
 
-Step 2 — Add the storm input
+Step 2: Add the storm input
 ============================
 
 #. You will see an existing item on the dashboard. Click on the item's 3-dot
@@ -93,8 +95,8 @@ Step 2 — Add the storm input
    ``number`` gives a numeric box with a refresh button; the defaults are fine.
    The library holds 200 storms at positions 0 to 199, sorted by their rainfall
    total over the parish, so a larger number is a wetter storm. Position 0
-   never wets a cell — its rainfall total is 0.01 mm and its data chunk was
-   never even written — and storm 1 floods nothing above 5 cm either; the map
+   never wets a cell (its rainfall total is 0.01 mm and its data chunk was
+   never even written), and storm 1 floods nothing above 5 cm either; the map
    only starts to show water a little further up.
 
 #. On the **Settings** tab, set **Background Color** to ``#ffffff`` and add a
@@ -121,7 +123,7 @@ Step 2 — Add the storm input
    ``number``, initial value 150.
 
 
-Step 3 — Add the base map selector
+Step 3: Add the base map selector
 ==================================
 
 The base map is a variable input so the viewer can switch it without editing
@@ -152,7 +154,7 @@ anything. Build the input first, then point the map at it.
       * - ``variable_options_source``
         - ``Base Map Layers``
 
-   ``Base Map Layers`` is a built-in options source — it fills the dropdown with
+   ``Base Map Layers`` is a built-in options source: it fills the dropdown with
    the base maps the instance offers, so you do not enumerate them yourself.
 
 #. On the **Settings** tab, set **Background Color** to ``#ffffff``. Without it
@@ -179,7 +181,7 @@ anything. Build the input first, then point the map at it.
    **Screenshot:** the **Variable Input** arguments for the base map selector.
 
 
-Step 4 — Add the map with the Zarr depth layer
+Step 4: Add the map with the Zarr depth layer
 ==============================================
 
 #. Set the dashboard in edit mode by clicking on the **Edit Dashboard** button
@@ -229,7 +231,7 @@ Step 4 — Add the map with the Zarr depth layer
    exercise 1 it was the constant ``150``. The store holds all 200 storms in
    one array of 200 × 465 × 428 cells, about 160 MB in total, and ``index``
    selects the slice. Binding it to ``${Storm}`` means changing the input
-   re-reads a different slice — no duplicated layers, no separate files, and
+   re-reads a different slice: no duplicated layers, no separate files, and
    only one storm's worth of data crosses the wire.
 
    ``mask_below`` is ``0.05`` because that is the store's own wet threshold:
@@ -241,9 +243,9 @@ Step 4 — Add the map with the Zarr depth layer
 
    Leaving both bounds empty means "resolve them from the data at render time",
    so the ramp re-stretches across each storm's range as the storm changes.
-   Depth is a property of the particular storm, so auto-scaling is right here —
+   Depth is a property of the particular storm, so auto-scaling is right here,
    the opposite of the probability layers in exercise 1, which had to be pinned
-   to 0–1 so they could be compared with each other. Exercise 1 drew depth in
+   to 0 to 1 so they could be compared with each other. Exercise 1 drew depth in
    turbo so it matched the probabilities beside it; with nothing else on this
    map, a single-hue blue ramp reads as water without a legend.
 
@@ -260,7 +262,7 @@ Step 4 — Add the map with the Zarr depth layer
    ``variable`` depth, ``index`` ``${Storm}`` and ``mask_below`` 0.05.
 
 
-Step 5 — Finish the map
+Step 5: Finish the map
 =====================================================
 
 #. In the **Map Extent** argument, choose **Use a Custom Extent** and enter:
@@ -270,8 +272,8 @@ Step 5 — Finish the map
       -6884999.19,1933749.93,13
 
    That is ``centre-x,centre-y,zoom`` in EPSG:3857 metres, centred on Saint
-   John's. Exercise 1 framed both islands at zoom 11.6; here only one parish
-   has data, so the map opens on it.
+   John's. Exercise 1 framed both islands at zoom 11.6; here the only layer
+   with data is the Saint John's library, so the map opens on it.
 
 #. On the **Settings** tab, turn on **Fill Viewport** so the map occupies the
    whole window.
@@ -290,12 +292,12 @@ Step 5 — Finish the map
    the dashboard editor.
 
 
-Step 6 — Test the wiring
+Step 6: Test the wiring
 ========================
 
 Change the **Storm** number and press its refresh button. The depth layer
 re-reads its slice and the colour bar re-scales to the new storm's range. Try
-1, 50, 100, 150 and 199 in turn to see the flooded footprint grow — and to
+1, 50, 100, 150 and 199 in turn to see the flooded footprint grow, and to
 notice that it does not grow monotonically.
 
 
@@ -351,7 +353,7 @@ Talking points
   one input drive a 160 MB dataset from a browser.
 * **Position versus storm.** The input value is a position in a library sorted
   by rainfall total. The store's ``index.csv`` maps each position to the
-  scenario it came from and its magnitude in millimetres — real RainyDay storm
+  scenario it came from and its magnitude in millimetres: real RainyDay storm
   totals, area-weighted over the parish. The Guatemala ensemble's magnitudes
   were placeholders; these are not, so plotting impact against them is
   legitimate.
@@ -376,6 +378,6 @@ Talking points
 Next
 ====
 
-`Exercise 3 — Hazard classification with adjustable thresholds <exercise_3.rst>`_
+`Exercise 3: Hazard classification with adjustable thresholds <exercise_3.rst>`_
 turns the probability thresholds over to the viewer, and its last step shows
 how to drop this depth layer into that dashboard.

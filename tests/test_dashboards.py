@@ -53,7 +53,9 @@ def defined_variables(dashboard):
             if item["source"] == "Variable Input":
                 names.add(item["args_string"]["variable_name"])
             elif PLUGINS.get(item["source"]) and PLUGINS[item["source"]].type == "variable_input":
-                names.add(PLUGINS[item["source"]].publishes)
+                cls = PLUGINS[item["source"]]
+                published = getattr(cls, "variable_name", None)
+                names.add(published(item["args_string"]) if published else cls.publishes)
     return names
 
 

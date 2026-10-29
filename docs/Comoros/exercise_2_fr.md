@@ -1,14 +1,14 @@
 <!--
 Solution de l'exercice pratique 2 des Comores, français. La version anglaise
-se trouve à côté de ce fichier, sous le nom exercise_2.rst. Ce qui diffère du
-guide du Guatemala est expliqué là où cela se présente : la bibliothèque de
-profondeurs est par commune et non nationale, un second sélecteur la pilote
-donc ; et les plugins sont la famille francophone `_comoros`, si bien que
-leurs libellés et leurs sorties se lisent en français.
+se trouve à côté de ce fichier, sous le nom exercise_2.rst. Construit sur les
+plugins de cycles TITO : une liste de cycles publie ${Date}, et chaque plugin
+lit la commune, le cycle et une probabilité. La liste s'ouvre sur le cycle
+d'exemple du 27 avril 2024. Les plugins sont la famille francophone
+`_comoros`, si bien que leurs libellés et leurs sorties se lisent en français.
 Le tableau de bord construit est dashboards/Comoros/Comoros_Hands_On_2.json.
 -->
 
-# Exercice 2 — Impact d'une seule tempête
+# Exercice 2 : Profondeur probable sur les bâtiments et les routes
 
 Construction de **Comores Exercice 2**, pas à pas.
 
@@ -17,47 +17,59 @@ laissés en anglais et en gras.
 
 ## Ce que vous allez construire
 
-Une carte à gauche montrant la profondeur d'inondation d'une tempête ainsi que
-les bâtiments et les routes qu'elle inonde, et à droite un tableau de synthèse et
-une carte de synthèse (« card ») avec les chiffres clés. Trois contrôles en haut
-choisissent le fond de carte, la commune et la tempête, et tout se recalcule.
+Une carte à gauche montrant la classification de l'aléa d'un cycle de prévision
+ainsi que les bâtiments et les routes qu'il risque d'inonder, colorés selon la
+profondeur, et à droite un tableau de synthèse et une carte de synthèse
+(« card ») avec les chiffres clés. Quatre contrôles en haut choisissent le fond
+de carte, la commune, le cycle de prévision et la probabilité, et tout se
+recalcule.
 
 ![Le tableau de bord terminé de l'exercice 2](images/ex2-finished.png)
 
-**Capture :** le tableau de bord terminé, avec les trois sélecteurs, la carte,
+**Capture :** le tableau de bord terminé, avec les quatre contrôles, la carte,
 le tableau de synthèse et la card.
 
-Idées nouvelles ici : lire une tranche d'un magasin Zarr, une couche vectorielle
-dont les entités sont produites par un plugin plutôt que récupérées depuis une
-URL, et deux entrées variables qui pilotent quatre choses distinctes à la fois.
+Idées nouvelles ici : une entrée variable construite par un plugin (la liste des
+cycles de prévision), une entrée variable dont les choix sont empruntés à un
+argument de plugin (les communes), des couches vectorielles dont les entités sont
+produites par un plugin plutôt que récupérées depuis une URL, et trois variables
+qui pilotent quatre éléments distincts à la fois.
 
-L'exercice 1 dessinait des **probabilités** sur toute une prévision. Celui-ci
-dessine la **profondeur** dans un scénario précis de la bibliothèque communale —
-une grandeur physique, qui n'a donc besoin d'aucun seuil pour être interprétée. La
-section 9 du notebook associé montre comment les deux se relient.
+L'exercice 1 dessinait des **probabilités**, un raster par profondeur, cellule
+par cellule. Celui-ci transforme ces mêmes probabilités en une **profondeur** par
+bâtiment et par route. La *profondeur probable* d'une entité est le plus profond
+des quatre seuils (10, 30, 70 et 100 cm) qu'elle atteint avec au moins la
+probabilité choisie. À `0.5`, cela signifie « l'eau la plus profonde qu'au
+moins la moitié des 50 membres de la prévision mettent sur ce bâtiment ».
 
-**Astuce** — `notebooks/Comoros/02_storm_impact.ipynb` dérive en Python simple
-les chiffres que montre ce tableau de bord : comment la profondeur est
-échantillonnée sur chaque bâtiment et chaque route, et comment le tableau de
-synthèse est assemblé. Il reconstruit aussi le raster de probabilité de
-l'exercice 1 à partir des 50 membres de la prévision et le compare à celui qui a
-été publié. À exécuter d'abord si vous voulez comprendre l'analyse avant
-d'assembler l'interface.
+Le tableau de bord s'ouvre sur le **cycle d'exemple** de TITO, la prévision du
+27 avril 2024 à 00:00 UTC : il y a donc toujours une inondation à regarder. La
+même liste déroulante propose aussi les cycles en direct : passez à l'un d'eux
+et tous les éléments suivent.
 
-**Remarque** — Les plugins sont la famille francophone `_comoros` : leur groupe
-s'affiche donc sous **Cartes d'Inondation (Français)** dans la liste déroulante,
-et le tableau comme la card reviennent en français, dans un tableau de bord dont
-le titre original est en anglais. C'est délibéré — les produits comoriens sont
-francophones — mais c'est la première chose dont on vous parlera, alors dites-le
-avant qu'on ne le demande.
+**Astuce :** `notebooks/Comoros/02_storm_impact.ipynb` traite en Python simple
+la profondeur d'inondation sur les bâtiments et les routes : comment la
+profondeur est échantillonnée sur chaque entité, et comment le tableau de
+synthèse est assemblé. Il lit encore les anciens fichiers de formation (la
+bibliothèque de tempêtes de l'ancienne version de cet exercice) plutôt que le
+cycle d'exemple : ses chiffres diffèrent donc de ceux du tableau de bord. À
+exécuter si vous voulez comprendre l'analyse avant d'assembler l'interface.
 
-## Étape 1 — Créer le tableau de bord
+**Remarque :** Les plugins sont la famille francophone `_comoros`, listés sous
+le groupe **UFFIS: Comores** avec des libellés qui commencent par `Comores:` :
+le tableau comme la card reviennent donc en français. C'est délibéré (les
+produits comoriens sont francophones), mais c'est la première chose dont on vous
+parlera, alors dites-le avant qu'on vous le demande.
+
+## Étape 1 : Créer le tableau de bord
 
 1. Créez un nouveau tableau de bord (voir
    [Créer un tableau de bord](getting_started.rst#creating-a-dashboard)) avec :
 
    - **Name** : `Comores Exercice 2`
-   - **Description** : `Solution pour l'exercice pratique OMM Comores n°2`
+   - **Description** : `Prévision TITO en direct par commune : profondeur
+     probable d'inondation sur les bâtiments et routes pour le cycle et la
+     probabilité choisis`
 
 1. Retrouvez votre tableau de bord sur la page d'accueil et double-cliquez dessus
    pour l'ouvrir. Il est vide, la prévisualisation affiche donc une zone blanche.
@@ -68,10 +80,11 @@ avant qu'on ne le demande.
 1. Quittez **Dashboard Settings** et cliquez sur **Edit Dashboard** dans le coin
    supérieur droit pour passer en mode édition.
 
-## Étape 2 — Ajouter les trois entrées variables
+## Étape 2 : Ajouter les quatre contrôles
 
-Construisez les trois avant tout ce qui les lit. Chaque élément ultérieur dépend
-d'au moins l'une d'elles.
+Construisez les quatre avant tout ce qui les lit. Chaque élément suivant dépend
+d'au moins deux d'entre eux. Ils occupent une rangée en haut à droite, chacun
+d'environ 10 colonnes de large sur 6 lignes de haut.
 
 **Le sélecteur de fond de carte**
 
@@ -89,9 +102,9 @@ d'au moins l'une d'elles.
 
 1. Sur l'onglet **Settings**, réglez **Background Color** sur `#ffffff`.
 
-1. Choisissez **World Imagery** comme valeur initiale, enregistrez l'élément et
-   faites-le glisser en haut du tableau de bord, juste à droite de l'emplacement
-   où se trouvera la carte.
+1. Choisissez **World Imagery** comme valeur initiale, enregistrez l'élément, et
+   faites-le glisser en haut du tableau de bord, juste à droite de l'endroit où
+   se trouvera la carte.
 
 **Le sélecteur de commune**
 
@@ -104,73 +117,83 @@ d'au moins l'une d'elles.
    | --- | --- |
    | `variable_name` | `Commune` |
    | `show_label` | `True` |
-   | `variable_options_source` | `dropdown` |
+   | `variable_options_source` | `UFFIS: Comores: Comores: Résumé d'Impact par Tempête - Commune` |
 
-1. Dans l'éditeur de **choices**, chaque entrée comporte une **label** que lit
-   l'utilisateur et une **value** qui part dans l'URL — le nom de la commune et
-   son segment de chemin, comme dans l'exercice 1 :
+   Cette source d'options est générée à partir d'un argument de plugin existant,
+   sous la forme `<groupe>: <libellé du plugin> - <Argument>`. La choisir
+   signifie « proposer les mêmes choix que l'argument `commune` du tableau de
+   synthèse » : le contrôle liste donc les **55** communes et ne peut pas se
+   désynchroniser des plugins.
 
-   | Étiquette | Valeur |
-   | --- | --- |
-   | `Moroni` | `KM274_Moroni` |
-   | `Fomboni` | `KM321_Fomboni` |
-   | … | … |
-
-   **Important** — Cette liste déroulante porte **22 communes, et non les 55 de
-   l'exercice 1.** L'exercice 1 lit les rasters de probabilité, que le cycle
-   publie pour chaque commune. Celui-ci lit les bibliothèques Zarr de cartes
-   d'inondation, et seules 22 d'entre elles avaient fini d'être téléversées — tout
-   à partir de `KM251`. Proposer une commune dont la bibliothèque est absente
-   produit une erreur d'ouverture du magasin nommant l'URL : la liste est donc
-   réduite à ce qui existe. Revérifiez le bucket avant un atelier ; si les autres
-   sont arrivées, élargissez-la.
+   Ses valeurs sont des pcodes comme `KM274_Moroni`, là où l'exercice 1
+   stockait les dossiers de site TITO comme `Comoros_Moroni`. Les deux
+   conviennent ici : les plugins acceptent les deux formes, et rien dans ce
+   tableau de bord n'insère la commune dans une URL.
 
 1. Réglez **Background Color** sur `#ffffff`, définissez la valeur initiale sur
    `Moroni`, enregistrez, et faites glisser l'élément à côté du sélecteur de
    fond de carte.
 
-**Le sélecteur de tempête**
+**La liste des cycles**
 
-1. Ajoutez un troisième élément, ouvrez son menu à 3 points, sélectionnez **Edit**
-   et réglez **Visualization Type** sur **Variable Input**.
+Ce contrôle n'est pas du tout une **Variable Input**. C'est un plugin qui
+construit lui-même la liste déroulante, à partir des cycles que TITO publie à ce
+moment-là.
+
+1. Ajoutez un troisième élément, ouvrez son menu à 3 points, sélectionnez
+   **Edit**, et réglez **Visualization Type** sur **Comores: Cycles
+   Disponibles** (dans le groupe **UFFIS: Comores**).
 
 1. Renseignez :
 
    | Argument | Valeur |
    | --- | --- |
-   | `variable_name` | `Tempête` |
+   | `debut` | `sample` (affiché **Cycle d'exemple le plus récent**) |
+   | `texte_etiquette` | *laisser vide* |
+   | `afficher_etiquette` | *laisser tel quel* |
+
+   La liste propose chaque cycle horaire que TITO publie encore, du plus récent
+   au plus ancien (environ une journée), puis les cycles d'exemple. Un cycle en
+   direct s'affiche comme `2026-10-29 12:00 UTC` ; l'exemple s'affiche
+   `2024-04-27 00:00 UTC, ÉCHANTILLON`. `debut` choisit le point de départ :
+   `sample` ouvre sur l'exemple, `latest` sur le cycle en direct le plus
+   récent. Pour un atelier, l'exemple est le choix sûr, car un jour calme n'a
+   aucune inondation à montrer.
+
+   `texte_etiquette` est le libellé, et aussi le nom de la variable que publie
+   l'élément. Laissée vide, la variable s'appelle `Date`, et c'est à elle que
+   se lient les plugins ci-dessous.
+
+1. Enregistrez l'élément et faites-le glisser à droite du sélecteur de commune.
+
+![La configuration du plugin de liste des cycles](images/ex2-storm-input.png)
+
+**Capture :** les arguments de **Comores: Cycles Disponibles**, avec
+`debut` réglé sur le cycle d'exemple.
+
+**L'entrée de probabilité**
+
+1. Ajoutez un quatrième élément, ouvrez son menu à 3 points, sélectionnez
+   **Edit**, et réglez **Visualization Type** sur **Variable Input**.
+
+1. Renseignez :
+
+   | Argument | Valeur |
+   | --- | --- |
+   | `variable_name` | `Probabilité` |
    | `show_label` | `True` |
-   | `variable_options_source` | `Cartes d'Inondation (Français): Résumé de Tempête (Comores) - Index` |
+   | `variable_options_source` | `number` |
 
-   Cette source d'options est générée à partir d'un argument de plugin existant,
-   sous la forme `<groupe>: <libellé du plugin> - <Argument>`. La choisir revient
-   à dire « proposer les mêmes choix que l'argument `index` de la card de
-   tempête » : le contrôle est donc peuplé par le plugin et ne peut pas se
-   désynchroniser de lui.
+1. Définissez la valeur initiale sur `0.5`. L'élément livré limite aussi
+   l'entrée à `0.05`-`1` par pas de `0.05`.
 
-   Les choix sont les 200 positions de la bibliothèque d'une commune, étiquetées
-   par position. Elles ne sont **pas** étiquetées en millimètres, et c'est
-   délibéré : une magnitude comorienne est la pluie moyenne pondérée par la
-   surface sur une seule commune, si bien que la même position vaut 346 mm dans
-   une commune et 462 mm dans une autre. Ce qui est identique partout, c'est
-   l'ordre — chaque bibliothèque contient 200 scénarios triés par magnitude, donc
-   une position plus élevée est une tempête plus humide où que vous soyez. La card
-   de l'étape 6 indique les millimètres réels une fois la commune choisie.
+1. Enregistrez l'élément et faites-le glisser à l'extrême droite de la rangée du
+   haut.
 
-1. Sur l'onglet **Settings**, réglez **Background Color** sur `#ffffff`.
+## Étape 3 : Ajouter la carte avec la couche d'aléa
 
-1. Définissez la valeur initiale, enregistrez l'élément et faites-le glisser à
-   l'extrême droite de la rangée du haut.
-
-![La configuration de l'entrée variable du sélecteur de tempête](images/ex2-storm-input.png)
-
-**Capture :** les arguments **Variable Input** du sélecteur de tempête, avec la
-source d'options dérivée du plugin sélectionnée.
-
-## Étape 3 — Ajouter la carte avec la couche de profondeur Zarr
-
-1. Ajoutez un autre élément, ouvrez son menu à 3 points, sélectionnez **Edit** et
-   réglez **Visualization Type** sur **Map** (dans le groupe **Default**).
+1. Ajoutez un autre élément, ouvrez son menu à 3 points, sélectionnez **Edit**,
+   et réglez **Visualization Type** sur **Map** (dans le groupe **Default**).
 
 1. Dans l'argument **Base Map**, choisissez `Base Map` dans la section
    **Variable Inputs**, en bas de la liste déroulante. La valeur devient
@@ -180,95 +203,74 @@ source d'options dérivée du plugin sélectionnée.
 
 1. À côté de **Layers**, cliquez sur **Add Layer**.
 
-1. Sur l'onglet **Layer**, réglez :
-
-   | Champ | Valeur |
-   | --- | --- |
-   | `name` | `Profondeur d'inondation (m), bibliothèque communale` |
-
-1. Sur l'onglet **Source**, réglez **Source Type** sur **Zarr** et renseignez :
-
-   | Champ | Valeur |
-   | --- | --- |
-   | `url` | `https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/Comoros_IBF/Comoros/fim_store_${Commune}_v1.zarr` |
-   | `variable` | `depth` |
-   | `index` | `${Tempête}` |
-   | `mask_below` | `0.05` |
-
-   Deux variables dans une même source, avec des rôles différents. `${Commune}`
-   est insérée dans l'URL : la changer ouvre donc un **magasin différent**.
-   `${Tempête}` occupe tout le champ `index` : la changer lit donc une
-   **tranche différente** du magasin déjà ouvert. Le magasin contient les 200
-   scénarios dans un seul tableau et `index` en sélectionne un — pas de couches
-   dupliquées, pas de fichiers séparés, et seule la quantité de données d'un
-   scénario transite sur le réseau.
-
-   `mask_below` vaut `0.05` parce que c'est l'`extent_threshold_m` propre au
-   magasin : le modèle ne considère pas une cellule comme inondée en dessous de
-   5 cm. Réutiliser le nombre avec lequel les données ont été construites vaut
-   mieux que d'en inventer un.
-
-1. Sur l'onglet **Style**, laissez le mode sur **Continuous** et choisissez la
-   rampe **Blues** (sous **Single hue**). Laissez **Min** et **Max** vides.
-
-   Laisser les deux bornes vides signifie « les résoudre à partir des données au
-   moment du rendu » : la rampe se ré-étire donc pour chaque scénario quand la
-   tempête change. La profondeur est une propriété du scénario particulier, la
-   mise à l'échelle automatique est donc juste ici — l'inverse des couches de
-   probabilité de l'exercice 1, qui devaient être fixées à 0–1 pour pouvoir être
-   comparées entre elles. Comme il n'y a rien d'autre sur cette carte, un bleu
-   monochrome se lit comme de l'eau sans légende.
-
-1. Sur l'onglet **Legend**, sélectionnez **Default Legend**.
-
-1. Enregistrez la couche en cliquant sur **Create** au bas de l'éditeur de
-   couches.
-
-![L'onglet Source configuré pour le magasin Zarr](images/ex2-zarr-source.png)
-
-**Capture :** l'onglet **Source** avec **Source Type** Zarr, l'URL du magasin
-portant `${Commune}`, `variable` depth, `index` `${Tempête}` et `mask_below`
-0.05.
-
-## Étape 4 — Ajouter la couche d'impact produite par le plugin
-
-Les entités de cette couche sont calculées à chaque requête par un plugin. Il n'y
-a pas d'URL GeoJSON — le plugin échantillonne la profondeur sur chaque bâtiment et
-chaque route de la commune et renvoie le résultat.
-
-1. À côté de **Layers**, cliquez de nouveau sur **Add Layer**.
-
 1. Allez directement sur l'onglet **Source** et réglez **Source Type** sur
-   **Couche d'Impact par Tempête (Comores)**. Les plugins de couches
-   cartographiques dynamiques apparaissent dans la même liste **Source Type** que
-   GeoTIFF et Zarr, classés sous leur groupe de plugins.
+   **Comores: Couche d'Aléa**. Les plugins de couche cartographique dynamique
+   apparaissent dans la même liste **Source Type** que GeoTIFF, rangés sous leur
+   groupe de plugins.
 
 1. Les arguments du plugin apparaissent. Renseignez :
 
    | Argument | Valeur |
    | --- | --- |
    | `commune` | `${Commune}` |
-   | `index` | `${Tempête}` |
+   | `cycle` | `${Date}` |
+
+   Laissez vides les quatre portes (`seuil_faible` et les autres) ainsi que
+   `source_inondation`. Les portes prennent alors les valeurs par défaut du
+   plugin, 0,3, 0,2, 0,1 et 0,15 de Faible à Sévère, et les rasters la variante
+   `pluvial_overbank` de l'exercice 1. L'exercice 3 met les quatre portes sur
+   le tableau de bord ; ici, la couche sert de contexte aux bâtiments dessinés
+   par-dessus.
+
+1. Cliquez sur **Fetch plugin defaults**. La couche est nommée **Classification
+   de l'aléa**, stylée avec quatre règles sur l'attribut `alea`, et dotée d'une
+   légende **Aléa** à quatre entrées.
+
+1. Enregistrez la couche en cliquant sur **Create** au bas de l'éditeur de
+   couches.
+
+![L'onglet Source configuré pour le plugin de couche d'aléa](images/ex2-zarr-source.png)
+
+**Capture :** l'onglet **Source** avec **Comores: Couche d'Aléa**
+sélectionnée, `commune` lié à `${Commune}` et `cycle` à `${Date}`.
+
+## Étape 4 : Ajouter la couche de profondeur probable
+
+Les entités de cette couche sont calculées à chaque requête par un plugin. Il
+n'y a pas d'URL GeoJSON : le plugin lit les bâtiments et les routes du cycle pour
+la commune, chacun portant ses quatre probabilités, calcule la profondeur
+probable de chacun, et renvoie ceux qui atteignent au moins 10 cm.
+
+1. À côté de **Layers**, cliquez de nouveau sur **Add Layer**.
+
+1. Allez directement sur l'onglet **Source** et réglez **Source Type** sur
+   **Comores: Couche d'Impact par Tempête**.
+
+1. Les arguments du plugin apparaissent. Renseignez :
+
+   | Argument | Valeur |
+   | --- | --- |
+   | `commune` | `${Commune}` |
+   | `cycle` | `${Date}` |
+   | `probabilite_minimale` | `${Probabilité}` |
 
 1. Cliquez sur **Fetch plugin defaults**.
 
    C'est l'étape qui épargne le plus de travail. Le `run()` du plugin renvoie
-   une ossature toute faite — le nom de la couche, la liaison à la source, un
-   style à base de règles fondé sur l'attribut `bande` (tranche de profondeur)
-   et une légende assortie. Après récupération, vous devriez voir huit règles de
-   style et une légende **Profondeur** à quatre entrées, dont aucune n'a eu besoin
-   d'être écrite. Rédiger des règles de style vectoriel à la main est source
-   d'erreurs : une règle mal formée ne correspond jamais à rien, silencieusement,
-   et laisse toutes les entités en gris.
-
-1. Renommez la couche en `Bâtiments et routes inondés` sur l'onglet **Layer**
-   si vous voulez qu'elle corresponde à la solution livrée.
+   une structure toute prête : le nom de la couche, la liaison de la source, un
+   style à base de règles fondé sur l'attribut `bande` (bande de profondeur), et
+   une légende assortie. Après récupération, vous devriez voir la couche nommée
+   **Profondeur probable sur les bâtiments et routes**, huit règles de style et
+   une légende **Profondeur** à quatre entrées, sans avoir rien écrit vous-même.
+   Écrire à la main des règles de style vectoriel est source d'erreurs : une
+   règle mal formée ne correspond silencieusement à rien et laisse toutes les
+   entités en gris.
 
 1. Consultez les onglets **Style** et **Legend** pour voir ce qui est arrivé. Les
-   couleurs vont du vert au jaune, au rouge puis au violet sur quatre tranches de
-   profondeur, avec des règles distinctes pour les polygones (bâtiments) et les
-   lignes (routes), afin que les routes reçoivent un trait assez large pour être
-   vues.
+   couleurs vont du vert au jaune, au rouge puis au violet sur les quatre bandes
+   (`0.1 - 0.3 m`, `0.3 - 0.7 m`, `0.7 - 1 m` et `1 m ou plus`), avec
+   des règles distinctes pour les polygones (bâtiments) et les lignes (routes),
+   pour que les routes aient un trait assez large pour être vues.
 
 1. Enregistrez la couche en cliquant sur **Create** au bas de l'éditeur de
    couches.
@@ -282,70 +284,80 @@ chaque route de la commune et renvoie le résultat.
 
    C'est `centre-x,centre-y,zoom` en mètres EPSG:3857, centré sur Moroni.
 
-   **Avertissement** — Comme dans l'exercice 1, **l'étendue ne suit pas la
+   **Avertissement :** Comme dans l'exercice 1, **l'étendue ne suit pas la
    commune**. Passez à une commune d'une autre île et la vue reste sur Moroni
    jusqu'à ce que vous fassiez un panoramique. Les couches se rechargent
-   correctement ; seule la caméra est figée.
+   correctement ; seule la caméra est fixe.
 
 1. Enregistrez l'élément, puis redimensionnez la carte pour qu'elle occupe à peu
-   près les 60 % gauches de la fenêtre, en laissant la bande de droite au tableau
-   et à la card.
+   près les 60 % gauches de la fenêtre, en laissant la bande de droite aux
+   contrôles, au tableau et à la card.
 
 1. Enregistrez le tableau de bord en cliquant sur **Save Changes** dans le coin
    supérieur droit.
 
 ![L'onglet Source avec un plugin de couche cartographique dynamique sélectionné](images/ex2-dynamic-layer-source.png)
 
-**Capture :** l'onglet **Source** avec la couche d'impact par tempête
-sélectionnée, `commune` et `index` liés, et le bouton **Fetch plugin
-defaults**.
+**Capture :** l'onglet **Source** avec la couche de profondeur probable
+sélectionnée, `commune`, `cycle` et `probabilite_minimale` liés, et le
+bouton **Fetch plugin defaults**.
 
 ![L'onglet Style montrant le style à base de règles récupéré](images/ex2-dynamic-layer-style.png)
 
 **Capture :** l'onglet **Style** après récupération, montrant les huit règles
 sur l'attribut `bande`.
 
-## Étape 5 — Ajouter le tableau de synthèse
+## Étape 5 : Ajouter le tableau de synthèse
 
 1. Mettez le tableau de bord en mode édition, ajoutez un autre élément, ouvrez son
    menu à 3 points et sélectionnez **Edit**.
 
-1. Réglez **Visualization Type** sur **Résumé d'Impact par Tempête (Comores)**
-   (dans le groupe **Cartes d'Inondation (Français)**).
+1. Réglez **Visualization Type** sur **Comores: Résumé d'Impact par Tempête**
+   (dans le groupe **UFFIS: Comores**).
 
 1. Renseignez :
 
    | Argument | Valeur |
    | --- | --- |
    | `commune` | `${Commune}` |
-   | `index` | `${Tempête}` |
+   | `cycle` | `${Date}` |
+   | `probabilite_minimale` | `${Probabilité}` |
 
-   Le tableau répartit les entités inondées du scénario en tranches de
-   profondeur, la plus profonde en premier, avec le nombre de bâtiments, la
-   population, la surface, la longueur de route et la part de la population **de
-   la commune** touchée — et non celle de l'île ou du pays, ce qui explique
-   pourquoi la commune doit parvenir au plugin sous forme d'argument plutôt que
-   d'y être figée.
+   Le tableau répartit les entités inondées dans les quatre mêmes bandes de
+   profondeur, de la plus profonde à la moins profonde, puis une ligne
+   **TOTAL affecté**, avec le nombre de bâtiments, la population, la surface, la
+   longueur de routes et la part de la population touchée. Cette part est
+   rapportée aux personnes qui vivent dans les bâtiments **de la commune**, telles
+   que les compte son fichier de récepteurs, et non à la population de l'île ou du
+   pays : c'est pourquoi la commune doit parvenir au plugin sous forme d'argument
+   plutôt que d'y être figée.
 
-1. Enregistrez l'élément et faites-le glisser en haut à droite du tableau de bord.
+   Le titre indique la probabilité et le cycle, par exemple **Profondeur
+   probable, probabilité ≥ 50% (2024-04-27 00:00 UTC, ÉCHANTILLON)**, pour qu'une
+   capture du tableau ne puisse jamais passer pour une prévision en direct.
 
-## Étape 6 — Ajouter la card de tempête
+1. Enregistrez l'élément et faites-le glisser sous les contrôles, à droite.
+
+## Étape 6 : Ajouter la card de tempête
 
 1. Ajoutez un autre élément, ouvrez son menu à 3 points et sélectionnez **Edit**.
 
-1. Réglez **Visualization Type** sur **Résumé de Tempête (Comores)** (dans le même
-   groupe), et liez les deux mêmes arguments :
+1. Réglez **Visualization Type** sur **Comores: Résumé de Tempête** (dans le même
+   groupe), et liez les trois mêmes arguments :
 
    | Argument | Valeur |
    | --- | --- |
    | `commune` | `${Commune}` |
-   | `index` | `${Tempête}` |
+   | `cycle` | `${Date}` |
+   | `probabilite_minimale` | `${Probabilité}` |
 
-   La card donne les chiffres clés — le cumul de pluie du scénario, la surface
-   inondée, la hauteur d'eau maximale et la profondeur moyenne là où c'est
-   mouillé — pour qui ne lira pas un tableau. C'est ici que la magnitude en
-   millimètres apparaît enfin, parce que ce n'est qu'à ce moment que la commune et
-   le scénario sont tous deux connus.
+   La card donne les chiffres clés à qui ne lira pas un tableau : la pluie prévue
+   sur la commune (médiane et membre le plus pluvieux des 50), la superficie
+   inondée sur au moins 0,1 m avec la probabilité choisie, et les personnes et
+   bâtiments **attendus** avec au moins 0,3 m. Un nombre attendu additionne la
+   probabilité de chaque entité : il ne dépend donc pas de l'entrée de
+   probabilité. Une commune que le cycle n'a pas déclenchée affiche à la place une
+   seule ligne **Calme : non déclenchée**.
 
 1. Enregistrez l'élément et faites-le glisser sous le tableau de synthèse.
 
@@ -354,100 +366,110 @@ sur l'attribut `bande`.
 
 ![Le tableau de synthèse et la card de tempête](images/ex2-table-card.png)
 
-**Capture :** le tableau de synthèse et la card pour un scénario.
+**Capture :** le tableau de synthèse et la card pour Moroni sur le cycle
+d'exemple.
 
-## Étape 7 — Tester le câblage
+## Étape 7 : Tester le câblage
 
-Changez l'entrée **Tempête**. Quatre choses doivent se mettre à jour : la couche
-Zarr relit sa tranche, la couche d'impact se réexécute, et le tableau comme la
-card se rechargent. Des messages de progression s'affichent pendant que la couche
-d'impact recalcule.
+Sur le cycle d'exemple, avec **Moroni** et **Probabilité** à `0.5`, vous
+devriez voir :
 
-Changez ensuite la **Commune**. Les quatre mêmes éléments se mettent à jour, mais
-cette fois la couche Zarr ouvre un magasin entièrement différent et les plugins
-lisent un autre jeu de bâtiments et de routes. Seule la caméra ne bouge pas.
-
-À essayer aux deux extrémités de la bibliothèque :
-
-| Tempête | Ce que vous devriez voir |
+| Élément | Ce qu'il affiche |
 | --- | --- |
-| `0` | Presque rien — c'est l'eau stagnante permanente de la commune, pas une tempête. La card indique un cumul de pluie proche de zéro. |
-| `150` | Une emprise importante. Pour Moroni, la card affiche environ 423 mm et 12 km². |
-| `199` | Le scénario le plus humide de la bibliothèque, et la seule extrémité où la tranche `2 m ou plus` a une chance d'apparaître. |
+| Card | Pluie `92 / 285 mm` (médiane / membre le plus pluvieux) ; superficie inondée ≥ 0,1 m (P ≥ 50 %) `1.10 km²` ; `1,647` personnes et `500` bâtiments attendus avec ≥ 0,3 m. |
+| Tableau | **TOTAL affecté** : 1 569 bâtiments, 5 805 personnes, 16,8 km de routes, 8,33 % de la population. |
+| Couche de profondeur probable | 1 677 bâtiments et routes, annoncés par le message de progression pendant le chargement. |
+
+Essayez ensuite chaque contrôle :
+
+- **Probabilité.** La couche de profondeur probable, le tableau et la superficie
+  inondée de la card se mettent à jour ; la couche d'aléa non, car elle ne prend
+  pas la probabilité. Abaissez-la et les entités deviennent plus profondes et
+  plus nombreuses ; augmentez-la et il ne reste que ce sur quoi la plupart des
+  membres s'accordent.
+- **Commune.** Les quatre éléments produits par les plugins se rechargent sur les
+  bâtiments, les routes et les rasters d'une autre commune. Seule la caméra reste
+  en place.
+- **Date.** Les quatre éléments produits par les plugins relisent un autre cycle.
+  Sur un cycle en direct, beaucoup de communes sont calmes ; la card le dit alors
+  et les couches reviennent vides, ce qui est une réponse et non une panne.
 
 ## Positions des éléments
 
 La solution livrée, pour référence. Il n'est pas nécessaire de les reproduire au
-pixel près — faites glisser jusqu'à une position proche et ajustez.
+pixel près : faites glisser jusqu'à une position proche et ajustez.
 
 | Élément | `x` | `y` | `w` | `h` |
 | --- | --- | --- | --- | --- |
 | Carte | 0 | 0 | 60 | 44 |
-| Fond de Carte (entrée variable) | 60 | 0 | 13 | 6 |
-| Commune (entrée variable) | 74 | 0 | 13 | 6 |
-| Tempête (entrée variable) | 89 | 0 | 11 | 6 |
+| Fond de Carte (entrée variable) | 60 | 0 | 10 | 6 |
+| Commune (entrée variable) | 70 | 0 | 10 | 6 |
+| Cycles Disponibles (liste des cycles) | 80 | 0 | 10 | 6 |
+| Probabilité (entrée variable) | 90 | 0 | 10 | 6 |
 | Résumé d'Impact par Tempête (tableau) | 60 | 9 | 40 | 20 |
 | Résumé de Tempête (card) | 62 | 29 | 37 | 12 |
 
-Contrairement à l'exercice 1, la carte **ne** remplit **pas** la fenêtre ici — elle
-la partage avec le tableau et la card, laissez donc **Fill Viewport** désactivé.
+Contrairement à l'exercice 1, la carte n'occupe **pas** toute la fenêtre ici :
+elle la partage avec les contrôles, le tableau et la card, laissez donc
+**Fill Viewport** désactivé.
 
 ## Point de contrôle
 
 Vous devriez maintenant avoir :
 
-- Trois sélecteurs en haut : fond de carte, commune et tempête.
+- Quatre contrôles en haut à droite : fond de carte, commune, cycle et
+  probabilité.
+- La liste des cycles ouverte sur `2024-04-27 00:00 UTC, ÉCHANTILLON`, avec les
+  cycles en direct listés au-dessus.
 - Une carte à gauche avec deux couches plus le fond de carte dans le contrôle des
   couches.
-- La profondeur dessinée en bleu, se remettant à l'échelle quand la tempête
-  change.
-- Les bâtiments et les routes colorés par tranche de profondeur par-dessus, avec
-  une légende **Profondeur**, et des routes visibles sous forme de lignes colorées
-  plutôt que de traits fins.
-- Un tableau de synthèse et une card à droite, tous deux en français, tous deux se
-  mettant à jour avec l'un ou l'autre sélecteur.
-- Le changement de commune remplaçant tout le jeu de données — magasin, entités et
-  dénominateurs — pendant que la vue reste là où elle était.
+- La classification de l'aléa en dessous, et les bâtiments et routes colorés
+  selon leur profondeur probable par-dessus, avec une légende **Profondeur**, les
+  routes visibles comme des lignes colorées et non comme des traits fins.
+- Un tableau de synthèse et une card à droite, tous deux en français, tous deux
+  mis à jour par chaque contrôle sauf le fond de carte.
+- Le changement de commune remplaçant tout le jeu de données (entités, rasters
+  et dénominateurs) pendant que la vue reste où elle était.
 
 ## Points de discussion
 
-- **Deux variables, quatre consommateurs.** `${Tempête}` apparaît dans l'index
-  d'une source Zarr, dans un argument de couche plugin et dans deux arguments de
-  visualisation ; `${Commune}` apparaît à tous les mêmes endroits, plus dans
-  l'URL du magasin. Aucun des six éléments ne connaît les autres ; ils déclarent
-  tous simplement une dépendance envers un nom.
-- **Insertion contre substitution.** `${Tempête}` occupe un champ entier : elle
-  se résout donc en une valeur, type compris. `${Commune}` se trouve à
-  l'intérieur d'une URL plus longue : elle est donc insérée dans le texte
-  environnant. Même syntaxe, comportement différent, et c'est ce qui permet à une
-  seule couche d'atteindre 22 magasins différents.
-- **Les couches dynamiques se réexécutent ; les couches statiques se
-  rechargent.** La couche Zarr relit une tranche d'un tableau déjà ouvert. La
-  couche d'impact réexécute du Python qui échantillonne un raster sur quelque
-  25 000 géométries. Même déclencheur, coût très différent — d'où le fait que le
-  plugin signale sa progression pendant qu'il travaille.
-- **Pourquoi l'échantillonnage n'est pas une rastérisation.** Le plugin du
-  Guatemala grave les identifiants des entités dans une grille et relit les
-  profondeurs par identifiant, ce qui fonctionne avec ses cellules de 5 m. Ici les
-  cellules font 30,57 m et la plupart des bâtiments sont plus petits qu'une
-  cellule : beaucoup en partagent donc une — graver les identifiants garde le
-  dernier et perd silencieusement les autres, soit environ 61 % des entités. Le
-  plugin des Comores construit à la place une liste de paires (entité, cellule),
-  qui autorise plusieurs entités par cellule. Même question, grille différente,
-  méthode différente : il vaut la peine de vérifier la couverture chaque fois
-  qu'une méthode d'échantillonnage rencontre une nouvelle grille.
-- **Profondeur contre probabilité.** L'exercice 1 demandait « quelles sont les
-  chances d'avoir 30 cm ici » sur toute une prévision. Celui-ci demande « quelle
-  profondeur dans ce scénario précis ». Les deux utilisent les mêmes bâtiments.
-  Lequel placeriez-vous devant un officier de protection civile, et que diriez-vous
-  de l'autre ?
-- **Pourquoi le plugin livre un style.** L'alternative — écrire huit règles à la
-  main dans l'interface — échoue silencieusement dès qu'une règle est mal formée.
-  Livrer le style depuis `run()` fait que la couche est correcte du premier coup
-  et le reste si les tranches changent.
+- **Trois variables, quatre consommateurs.** `${Commune}` et `${Date}`
+  atteignent les quatre éléments produits par les plugins ; `${Probabilité}` en
+  atteint trois. Aucun des sept éléments ne connaît les autres ; tous se
+  contentent de déclarer une dépendance à un nom.
+- **Un plugin peut être un contrôle.** La liste des cycles est construite au
+  chargement du tableau de bord, à partir de ce que TITO publie à ce moment-là :
+  personne n'entretient de liste de dates. Les cycles en direct sont conservés
+  environ une journée ; le cycle d'exemple reste, et c'est pourquoi un tableau
+  de bord de formation s'ouvre dessus.
+- **Des choix empruntés.** La liste des communes prend ses choix dans un argument
+  de plugin : le tableau de bord et le plugin ne peuvent donc pas être en
+  désaccord sur les communes qui existent. L'exercice 1 devait fournir sa propre
+  liste, parce que ses valeurs devaient correspondre à des noms de dossiers dans
+  une URL.
+- **La profondeur probable est un choix de confiance.** « Profondeur probable à
+  0,5 » est le seuil le plus profond qu'au moins la moitié des membres atteignent
+  sur cette entité. À 0,2, la carte montre ce que prévoit un pessimiste ; à 0,8,
+  ce sur quoi presque tous les membres s'accordent. Laquelle mettriez-vous devant
+  un responsable de la protection civile, et que diriez-vous de l'autre ?
+- **Nombres probables contre nombres attendus.** Le tableau compte les entités
+  dont la profondeur probable atteint une bande à la probabilité choisie. Les
+  personnes et bâtiments attendus de la card additionnent plutôt des
+  probabilités : ils ne bougent donc pas avec l'entrée. Les deux sont honnêtes ;
+  ils répondent à des questions différentes, et la différence mérite d'être
+  montrée à l'écran.
+- **Les couches dynamiques se ré-exécutent.** Chaque changement ré-exécute du
+  Python qui lit le fichier de récepteurs du cycle et classe chaque bâtiment et
+  chaque route de la commune. Même déclencheur qu'une couche statique, coût très
+  différent : c'est pourquoi les plugins signalent leur progression pendant
+  qu'ils travaillent.
+- **Pourquoi le plugin livre un style.** L'alternative, écrire à la main huit
+  règles dans l'interface, échoue silencieusement lorsqu'une règle est mal
+  formée. Livrer le style depuis `run()` garantit que la couche est correcte du
+  premier coup et le reste si les bandes changent.
 
 ## Suite
 
-L'exercice 3 confie les seuils de probabilité eux-mêmes à l'utilisateur, à l'aide
-des couches d'aléa et d'impact qui classent les quatre rasters de dépassement de
-l'exercice 1.
+L'exercice 3 confie à l'utilisateur les seuils de probabilité de la couche
+d'aléa, en utilisant les couches d'aléa et d'impact qui classent selon les quatre
+rasters de dépassement de l'exercice 1.

@@ -1,12 +1,12 @@
 .. Antigua and Barbuda hands-on exercise 3 solution.
 
 ==============================================================
-Exercise 3 — Hazard classification with adjustable thresholds
+Exercise 3: Hazard classification with adjustable thresholds
 ==============================================================
 
 Building **Antigua and Barbuda Hands On 3** step by step.
 
-**Start here** — This exercise reuses the map from
+**Start here**: This exercise reuses the map from
 `Exercise 1 <exercise_1.rst>`_, so building that one first will save you time.
 
 .. contents:: On this page
@@ -23,20 +23,25 @@ from exercise 1 (without its depth layer) plus two computed layers: a hazard cla
 buildings and roads that fall inside it. Four number inputs across the top set
 the probability threshold for each hazard level, and an impact table sits under
 them. Change a threshold and the classification, the affected features and the
-table all recompute.
+table all recompute. Everything computed here reads the TITO sample cycle for
+Tropical Storm Jerry (2025-10-10 01:00 UTC) at the Saint John's site.
 
 .. figure:: images/ex3-finished.png
    :alt: The finished exercise 3 dashboard
    :width: 100%
 
-   **Screenshot:** the finished dashboard — full-window map of both islands,
-   four threshold inputs along the top right, impact table under them.
+   **Screenshot:** the finished dashboard: full-window map of both islands,
+   four threshold inputs along the top right, impact table under them. The
+   capture predates the switch to the sample cycle, so it shows hazard classes
+   across both islands; yours are confined to the Saint John's site.
 
-**Tip** — ``notebooks/Antigua_Barbuda/03_hazard_classification.ipynb`` derives
+**Tip**: ``notebooks/Antigua_Barbuda/03_hazard_classification.ipynb`` derives
 this classification as plain Python, including a gate sweep that shows what
 each threshold controls, a per-parish exposure table, and a check of the
 geopackage's own ``hazard_flag`` against the rule. Worth running first if you
-want to understand the analysis before assembling the interface.
+want to understand the analysis before assembling the interface. The notebook
+still reads the earlier training files rather than the sample cycle, so its
+numbers differ from the dashboard's.
 
 
 Understanding the four thresholds
@@ -75,22 +80,23 @@ gates are not monotonic and do not need to be: a deeper threshold is rarer, so
 a lower gate on it says "take a one-in-ten chance of 70 cm as seriously as a
 one-in-three chance of ankle depth".
 
-**Note** — Two things to know before you present this, both covered at length
-in the notebook:
+**Note**: Two things to know before you present this:
 
-**Probabilities move in steps of 0.02** — one member in fifty — and take few
-distinct values, because five rainfall realizations drive most of the spread.
-Sliding a gate therefore moves the classification in plateaus: nothing changes
-for several steps, then a whole footprint changes level at once.
+**Probabilities move in steps of 0.02** (one member in fifty) but take few
+distinct values, because the rain has only five distinct realizations. Across
+the four Saint John's rasters the only values are 0.02 (70 cm only), 0.18,
+0.2, 0.4, 0.42 (10 and 30 cm only), 0.58, 0.6, 0.8 and 1.0. Sliding a gate
+therefore moves the classification in plateaus: nothing changes for several
+steps, then a whole footprint changes level at once.
 
 **Every level is reachable.** Each of the four rasters reaches 1.0 somewhere,
-so no gate setting empties a class outright — unlike the Guatemala data, where
+so no gate setting empties a class outright, unlike the Guatemala data, where
 the deepest layer never exceeded 0.2. What a high Severe gate does here is
-shrink the purple to the few buildings every member floods, which is a
-different and more useful conversation.
+shrink the purple to the few places every member floods (only 28 cells reach
+0.8 or more at 100 cm), which is a different and more useful conversation.
 
 
-Step 1 — Create the dashboard
+Step 1: Create the dashboard
 =============================
 
 #. Create a new dashboard (see
@@ -109,7 +115,7 @@ Step 1 — Create the dashboard
    corner to enter edit mode.
 
 
-Step 2 — Add the base map selector
+Step 2: Add the base map selector
 ==================================
 
 The base map is a variable input so the viewer can switch it without editing
@@ -136,7 +142,7 @@ anything. Build the input first, then point the map at it.
       * - ``variable_options_source``
         - ``Base Map Layers``
 
-   ``Base Map Layers`` is a built-in options source — it fills the dropdown with
+   ``Base Map Layers`` is a built-in options source: it fills the dropdown with
    the base maps the instance offers, so you do not enumerate them yourself.
 
 #. On the **Settings** tab, set **Background Color** to ``#ffffff`` and add a
@@ -163,7 +169,7 @@ anything. Build the input first, then point the map at it.
    **Screenshot:** the **Variable Input** arguments for the base map selector.
 
 
-Step 3 — Add the four threshold inputs
+Step 3: Add the four threshold inputs
 ======================================
 
 Build all four before the layers that consume them. Each is a **Variable Input**
@@ -242,7 +248,7 @@ For **each** of the four:
    label and value.
 
 
-Step 4 — Add the map, the four rasters and the parishes
+Step 4: Add the map, the four rasters and the parishes
 =======================================================
 
 For **each** of the four layers listed here follow the instructions below:
@@ -254,15 +260,16 @@ For **each** of the four layers listed here follow the instructions below:
    * - Layer **Name**
      - ``url``
    * - ``Flood Probability at 100 cm``
-     - ``https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/antigua_barbuda_IBF/depth_prob/antiguabarbuda_prob_depth_ge_100cm_overbank.tif``
+     - ``https://tito.uffis.org/sample/antigua/20251010.010000/antigua_30m/fim/stream_sat_stormlab/Antigua_SaintJohnS/pluvial_overbank/prob_depth_ge_100cm_overbank.20251010.010000.tif``
    * - ``Flood Probability at 70 cm``
-     - ``https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/antigua_barbuda_IBF/depth_prob/antiguabarbuda_prob_depth_ge_70cm_overbank.tif``
+     - ``https://tito.uffis.org/sample/antigua/20251010.010000/antigua_30m/fim/stream_sat_stormlab/Antigua_SaintJohnS/pluvial_overbank/prob_depth_ge_70cm_overbank.20251010.010000.tif``
    * - ``Flood Probability at 30 cm``
-     - ``https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/antigua_barbuda_IBF/depth_prob/antiguabarbuda_prob_depth_ge_30cm_overbank.tif``
+     - ``https://tito.uffis.org/sample/antigua/20251010.010000/antigua_30m/fim/stream_sat_stormlab/Antigua_SaintJohnS/pluvial_overbank/prob_depth_ge_30cm_overbank.20251010.010000.tif``
    * - ``Flood Probability at 10 cm``
-     - ``https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/antigua_barbuda_IBF/depth_prob/antiguabarbuda_prob_depth_ge_10cm_overbank.tif``
+     - ``https://tito.uffis.org/sample/antigua/20251010.010000/antigua_30m/fim/stream_sat_stormlab/Antigua_SaintJohnS/pluvial_overbank/prob_depth_ge_10cm_overbank.20251010.010000.tif``
 
-(More information about the data is in
+These are the sample cycle's rasters for the Saint John's site, the same four
+as in exercise 1. (More information about the data is in
 `The data <getting_started.rst#the-data>`_.)
 
 #. Next to **Layers**, click **Add Layer** again.
@@ -302,18 +309,18 @@ For **each** of the four layers listed here follow the instructions below:
 
    ``mask_below`` hides cells at or below the value given. Zero means "no
    member floods this cell to this depth", and without the mask the whole
-   domain — sea included — would be painted the ramp's low colour instead of
+   domain (sea included) would be painted the ramp's low colour instead of
    showing the base map.
 
 #. On the **Style** tab, leave the mode on **Continuous** and pick the
    **turbo** ramp. Set **Min** = ``0`` and **Max** = ``1``.
 
-   Pinning Min and Max to 0–1 is the whole point of these four layers, and the
+   Pinning Min and Max to 0 to 1 is the whole point of these four layers, and the
    opposite of what you did for depth, which uses the same ramp but lets it
    stretch to the storm. Probability has a fixed, meaningful
    range, and all four layers must use the same one or they cannot be
    compared. Left to auto-scale, each layer would stretch its ramp over its own
-   range and 0.2 would look like a different severity on each — the shallow
+   range and 0.2 would look like a different severity on each: the shallow
    layer's mid-tone and the deep layer's mid-tone would mean different numbers.
 
 #. On the **Legend** tab, select **Default Legend**. For a ramp-styled raster
@@ -334,7 +341,7 @@ For **each** of the four layers listed here follow the instructions below:
    ``0`` go in the same two fields.
 
 .. figure:: images/ex1-layer-style-turbo.png
-   :alt: The Style tab with the turbo ramp pinned to 0–1
+   :alt: The Style tab with the turbo ramp pinned to 0 to 1
    :width: 100%
 
    **Screenshot:** the **Style** tab, **Continuous** mode, **turbo** selected,
@@ -344,7 +351,7 @@ For **each** of the four layers listed here follow the instructions below:
    the dashboard editor.
 
 
-Step 5 — Add the hazard classification layer
+Step 5: Add the hazard classification layer
 ============================================
 
 #. Set the dashboard in edit mode by clicking on the **Edit Dashboard** button
@@ -376,15 +383,28 @@ Step 5 — Add the hazard classification layer
         - ``${High Threshold (P(≥70 cm))}``
       * - ``severe_threshold``
         - ``${Severe Threshold (P(≥100 cm))}``
+      * - ``cycle``
+        - **Sample event** (stored as ``sample``)
+      * - ``parish``
+        - **Saint John's** (stored as ``Antigua_SaintJohnS``)
 
    See `Referencing a variable input
    <getting_started.rst#referencing-a-variable-input>`_ for the two forms
    this reference can take.
 
+   ``cycle`` picks the TITO forecast cycle to classify. **Sample event** is
+   the country's published sample cycle, the Jerry forecast of 2025-10-10
+   01:00 UTC; left empty, the plugin reads the latest live cycle instead.
+   ``parish`` picks the site, because TITO publishes Antigua one parish site
+   at a time; the choices are Saint John's, Saint George, Saint Mary,
+   Saint Paul, Saint Peter, Saint Philip and Barbuda. Saint John's matches the
+   four rasters above. Leave ``flood_source`` empty: it defaults to pluvial
+   overbank, the variant those rasters are.
+
 #. Click **Fetch plugin defaults**.
 
    This is the step that saves the most work. The plugin's ``run()`` returns a
-   ready-made scaffold — the layer name, the source binding, a rule-based style
+   ready-made scaffold: the layer name, the source binding, a rule-based style
    keyed on the ``peligro`` (hazard class) attribute, and a matching legend.
    After fetching you should see the layer named **Hazard classification**,
    four style rules, and a four-item **Hazard** legend, none of which you had
@@ -399,9 +419,11 @@ Step 5 — Add the hazard classification layer
 
    **Screenshot:** the **Source** tab for the hazard layer, four arguments bound
    to the four threshold variables, and the **Fetch plugin defaults** button.
+   The capture predates the ``cycle`` and ``parish`` arguments; set them as in
+   the table above.
 
 
-Step 6 — Add the affected-features layer
+Step 6: Add the affected-features layer
 ========================================
 
 #. Next to **Layers**, click **Add Layer** again.
@@ -410,7 +432,8 @@ Step 6 — Add the affected-features layer
    **Flood Impact Layer (Antigua and Barbuda)**.
 
 #. Bind the same four arguments to the same four variables as in the previous
-   step.
+   step, and set ``cycle`` to **Sample event** and ``parish`` to
+   **Saint John's** as there.
 
 #. Click **Fetch plugin defaults**. The layer arrives as **Buildings and roads
    at risk** with eight rules (polygon and linestring per level) and a
@@ -421,16 +444,19 @@ Step 6 — Add the affected-features layer
 The two layers answer different questions from the same thresholds: the hazard
 layer classifies *ground*, this one classifies *assets*. Keeping them separate
 lets a viewer turn off the ground shading and look only at what is affected.
-The features come from the IBF geopackage, which already carries the four
-probabilities sampled onto each of the 71,136 buildings and 9,315 road
-segments, so this layer never touches the rasters.
+The features come from the sample cycle's receptor geopackage for the site,
+``antigua_30m/ibf/Antigua_SaintJohnS/ibf_receptors.20251010.010000.gpkg``,
+which already carries the four probabilities sampled onto each building and
+road segment, so this layer never touches the rasters. At the default gates
+2,825 buildings and roads are at risk.
 
 
-Step 7 — Finish the map
+Step 7: Finish the map
 =======================
 
 #. In the **Map Extent** argument, keep exercise 1's extent, which frames both
-   islands:
+   islands (the computed layers fill only the Saint John's site in the west of
+   Antigua):
 
    .. code-block:: text
 
@@ -451,7 +477,7 @@ Step 7 — Finish the map
    the dashboard editor.
 
 
-Step 8 — Add the impact summary table
+Step 8: Add the impact summary table
 =====================================
 
 #. Set the dashboard in edit mode by clicking on the **Edit Dashboard** button
@@ -465,13 +491,16 @@ Step 8 — Add the impact summary table
    **Flood Impact Summary (Antigua and Barbuda)** (in the
    **Flood Maps (English)** group).
 
-#. Bind the same four arguments to the same four variables as in step 5.
+#. Bind the same four arguments to the same four variables as in step 5, and
+   set ``cycle`` to **Sample event** and ``parish`` to **Saint John's**.
 
    The table breaks the features at risk into hazard levels, deepest first,
    with counts of buildings, population, floor area, road length and the share
-   of the country's population affected. The population figures are the
-   geopackage's per-building estimates — the parish total spread over the
-   residential buildings by built-up area — not a census.
+   of the population affected. The population figures are the geopackage's
+   per-building estimates, not a census, and because the sample file carries no
+   census total, the share is of the people in the site's own receptor file.
+   The title carries the cycle, "(2025-10-10 01:00 UTC, SAMPLE)", and at the
+   default gates the TOTAL row reads 2,331 buildings and 2,868 people.
 
 #. On the **Settings** tab, set **Background Color** to ``#ffffff`` and add
    borders on the left, right and bottom, so it joins the strip of threshold
@@ -491,17 +520,18 @@ Step 8 — Add the impact summary table
    :width: 100%
 
    **Screenshot:** the impact summary table arguments bound to the four
-   threshold variables.
+   threshold variables. The capture predates the ``cycle`` and ``parish``
+   arguments and the sample-cycle title.
 
 
-Step 9 — Test the wiring
+Step 9: Test the wiring
 ========================
 
 Update a threshold. The hazard shading, the affected features and the table
 should all recompute together, with progress messages while the layers rebuild.
 As a demonstration, raise the Severe threshold from 0.15 to 0.5. The purple
 shrinks to the ground and buildings that at least half the members flood to a
-metre, and the Severe row of the table drops with it — but does not empty.
+metre, and the Severe row of the table drops with it, but does not empty.
 Then set all four gates to the same value and watch the levels line up by
 depth alone.
 
@@ -518,7 +548,7 @@ depth alone.
    **Screenshot:** the same view with the Severe threshold at 0.5.
 
 
-Step 10 — Optional: add the depth layer from exercise 2
+Step 10: Optional: add the depth layer from exercise 2
 =======================================================
 
 **Antigua and Barbuda Hands On 3 with Depth** is this dashboard with
@@ -541,7 +571,7 @@ gates classify. To build it:
 
 #. Change the **Map Extent** to exercise 2's Saint John's view,
    ``-6884999.19,1933749.93,13``, because the depth library covers only that
-   parish.
+   parish and the sample-cycle layers only the Saint John's site.
 
 #. Save the layer, the map and the dashboard.
 
@@ -610,7 +640,11 @@ You should now have:
   hazard classification and the features at risk checked.
 * Four labelled threshold inputs across the top right.
 * Moving any threshold updates the hazard layer, the impact layer and the table.
-* Raising the Severe threshold shrinks the purple but never removes it — every
+* At the default gates, 1,468 hazard polygons and 2,825 buildings and roads at
+  risk, all within the Saint John's site, and an impact table titled with
+  "(2025-10-10 01:00 UTC, SAMPLE)" whose TOTAL row reads 2,331 buildings and
+  2,868 people.
+* Raising the Severe threshold shrinks the purple but never removes it: every
   level is reachable in this data.
 * Progress messages while the layers recompute.
 
@@ -623,24 +657,27 @@ Talking points
   different cutoffs, so the level names are not comparable to each other and
   "severe" carries no meaning on its own. Setting all four gates equal is a good
   demonstration: the levels then differ only by depth, which is far easier to
-  explain — and it is what the IBF workflow that produced the geopackage did.
-  The notebook recovers the single gate it used from the data.
+  explain. It is also what the IBF workflow that produced the earlier training
+  geopackage did; the notebook recovers the single gate it used from that
+  data.
 * **Plateaus are the data, not the interface.** With probabilities in steps of
-  0.02 and few distinct values, a gate can move three steps and change nothing,
-  then move one more and reclassify a whole neighbourhood. Ask attendees how
-  they would tell a decision-maker that a threshold of 0.20 and one of 0.24
-  give the same map.
+  0.02 and few distinct values, a gate can move several steps and change
+  nothing, then move one more and reclassify a whole neighbourhood. With no
+  value between 0.2 and 0.4 in this data, ask attendees how they would tell a
+  decision-maker that a threshold of 0.22 and one of 0.38 give the same map.
 * **Parish is the unit.** Antigua and Barbuda issues warnings by parish, and
-  the table's population share is against both islands together. The notebook
-  breaks the same exposure down per parish; ask which denominator a parish
-  disaster coordinator wants, and which the national office wants.
+  TITO publishes it one parish site at a time, so the table's population share
+  is against the people in the Saint John's site, not both islands together.
+  The notebook breaks the training data's exposure down per parish; ask which
+  denominator a parish disaster coordinator wants, and which the national
+  office wants.
 * **Vectorising a classification.** A map layer can only point at a URL, and
   nothing here serves a computed raster, so the plugin vectorises the classified
-  grid into about 3,400 polygons at the default gates. Adjacent cells of equal
+  grid into 1,468 polygons at the default gates. Adjacent cells of equal
   class merge, so this is exact rather than an approximation. Normal and NoData
   are dropped because a basemap shows unaffected ground better than a coloured
   layer does.
 * **Two products, one grid.** Exercise 2 answered "how deep in storm 150", this
-  one "what are the odds of 30 cm". Both use the same buildings on the same
-  30 m lattice; the *with Depth* dashboard puts them side by side. Which would
+  one "what are the odds of 30 cm". Both are 465 × 428 grids at 30 m over
+  Saint John's; the *with Depth* dashboard puts them side by side. Which would
   you put in front of the duty officer, and what would you say about the other?

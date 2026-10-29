@@ -76,6 +76,21 @@
           "metadata_string": {}
         },
         {
+          "i": "4",
+          "x": 46,
+          "y": 0,
+          "w": 9,
+          "h": 6,
+          "source": "Variable Input",
+          "args_string": {
+            "variable_name": "Parish",
+            "show_label": true,
+            "variable_options_source": "UFFIS: Antigua and Barbuda: Antigua and Barbuda: Storm Impact Summary - Parish",
+            "initial_value": "Antigua_SaintJohnS"
+          },
+          "metadata_string": {}
+        },
+        {
           "i": "5",
           "x": 0,
           "y": 6,
@@ -104,7 +119,7 @@
                         "period": "forecast"
                       }
                     },
-                    "layerId": "313cef38-c32e-478a-80b8-08511060580d",
+                    "layerId": "5f1ca11c-5f39-414b-a6c1-d5e9b1987b04",
                     "opacity": 0.7
                   },
                   "style": {
@@ -227,10 +242,11 @@
                     "pluginSource": {
                       "source": "uffis_hazard_layer_antigua_barbuda",
                       "args": {
+                        "parish": "${Parish}",
                         "cycle": "${Date}"
                       }
                     },
-                    "layerId": "3c0bfc00-7ba7-4a09-b41b-71552cd3d4ee"
+                    "layerId": "8cab3227-6f70-451e-9eed-bf63f3adb4c5"
                   },
                   "style": {
                     "default": {
@@ -332,10 +348,11 @@
                     "pluginSource": {
                       "source": "uffis_impact_layer_antigua_barbuda",
                       "args": {
+                        "parish": "${Parish}",
                         "cycle": "${Date}"
                       }
                     },
-                    "layerId": "0c97baf7-ffbe-4cf5-ade4-b6e908e6ad6f"
+                    "layerId": "1ce5be32-2cfc-4ee6-893a-9f6e61539039"
                   },
                   "style": {
                     "default": {
@@ -478,11 +495,12 @@
                     "pluginSource": {
                       "source": "uffis_storm_impact_layer_antigua_barbuda",
                       "args": {
+                        "parish": "${Parish}",
                         "cycle": "${Date}",
                         "min_probability": "${Probability}"
                       }
                     },
-                    "layerId": "1aa43d41-a873-460d-8cff-19bbba0576d9"
+                    "layerId": "97051dfd-f16d-4f84-bb79-606bb044f3da"
                   },
                   "style": {
                     "default": {
@@ -623,6 +641,7 @@
           "h": 12,
           "source": "uffis_storm_card_antigua_barbuda",
           "args_string": {
+            "parish": "${Parish}",
             "cycle": "${Date}",
             "min_probability": "${Probability}"
           },
@@ -636,6 +655,7 @@
           "h": 22,
           "source": "uffis_storm_impact_summary_antigua_barbuda",
           "args_string": {
+            "parish": "${Parish}",
             "cycle": "${Date}",
             "min_probability": "${Probability}"
           },
@@ -649,6 +669,7 @@
           "h": 20,
           "source": "uffis_impact_summary_antigua_barbuda",
           "args_string": {
+            "parish": "${Parish}",
             "cycle": "${Date}"
           },
           "metadata_string": {}
@@ -712,11 +733,12 @@
                     "pluginSource": {
                       "source": "uffis_risk_layer_antigua_barbuda",
                       "args": {
+                        "parish": "${Parish}",
                         "cycle": "${Date}",
                         "min_risk_level": "${Risk level}"
                       }
                     },
-                    "layerId": "315ee98f-bad8-4850-bf19-f29b536fa1d2"
+                    "layerId": "9d0f985c-c214-4b7c-b0d8-f49205ecc5f8"
                   },
                   "style": {
                     "default": {
@@ -857,6 +879,7 @@
           "h": 24,
           "source": "uffis_risk_matrix_antigua_barbuda",
           "args_string": {
+            "parish": "${Parish}",
             "cycle": "${Date}"
           },
           "metadata_string": {}
@@ -869,7 +892,23 @@
           "h": 22,
           "source": "uffis_event_summary_antigua_barbuda",
           "args_string": {
+            "parish": "${Parish}",
             "cycle": "${Date}"
+          },
+          "metadata_string": {}
+        },
+        {
+          "i": "6",
+          "x": 40,
+          "y": 0,
+          "w": 15,
+          "h": 6,
+          "source": "Variable Input",
+          "args_string": {
+            "variable_name": "Parish",
+            "show_label": true,
+            "variable_options_source": "UFFIS: Antigua and Barbuda: Antigua and Barbuda: Storm Impact Summary - Parish",
+            "initial_value": "Antigua_SaintJohnS"
           },
           "metadata_string": {}
         }

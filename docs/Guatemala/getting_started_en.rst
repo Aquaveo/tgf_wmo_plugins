@@ -26,20 +26,20 @@ Each exercise builds one dashboard and lives in its own file:
    * - Guide
      - Dashboard
      - What it shows
-   * - `Exercise 1 — A flood depth and probability map <exercise_1_en.rst>`_
+   * - `Exercise 1: A flood probability map <exercise_1_en.rst>`_
      - Guatemala Hands On 1 (English)
-     - A flood depth raster and four exceedance-probability rasters on one map,
-       with a switchable base map.
-   * - `Exercise 2 — Impact for a single storm <exercise_2_en.rst>`_
+     - Four exceedance-probability rasters from the TITO sample cycle on one
+       map, with a switchable base map.
+   * - `Exercise 2: Likely impact for a forecast cycle <exercise_2_en.rst>`_
      - Guatemala Hands On 2 (English)
-     - Depth for a single storm out of a 198-member ensemble, plus the buildings
-       and roads that storm floods, a summary table and a headline card.
-   * - `Exercise 3 — Hazard classification with adjustable thresholds <exercise_3_en.rst>`_
+     - The likely flood depth on every building and road for a chosen TITO
+       cycle and probability, with a summary table and a headline card.
+   * - `Exercise 3: Hazard classification with adjustable thresholds <exercise_3_en.rst>`_
      - Guatemala Hands On 3 (English)
      - A hazard classification driven by four probability thresholds the viewer
        can move, with the affected buildings and roads and an impact table.
 
-The exercises are cumulative in difficulty, not in content — each is a separate
+The exercises are cumulative in difficulty, not in content: each is a separate
 dashboard, and each can be built on its own. Exercise 1 teaches raster layers,
 2 adds a plugin-backed vector layer and a data-driven selector, 3 adds
 interactivity through variable inputs.
@@ -53,6 +53,10 @@ derive the numbers behind exercises 2 and 3 as plain Python. These guides cover
 are*. They pair well: run the notebook first if you want to understand the
 analysis, follow the guide if you want to assemble the interface.
 
+The notebooks still work from the earlier training files rather than the TITO
+sample cycle the dashboards now read, so their numbers differ from what the
+dashboards show.
+
 Conventions
 -----------
 
@@ -63,7 +67,7 @@ Conventions
 * Every exercise ends with a **Checkpoint** listing what you should be able to
   see, and **Talking points** worth raising if you are teaching from it.
 
-**Note** — Screenshots in these guides are placeholders. Each ``figure`` block
+**Note:** Screenshots in these guides are placeholders. Each ``figure`` block
 names what the image should show; drop a PNG at the given path under
 ``docs/Guatemala/images/`` and it will render.
 
@@ -87,13 +91,18 @@ What you need
 
    Restart the Tethys app after installing. To confirm it worked, open any
    dashboard item's **Visualization Type** dropdown and look for the
-   **Flood Maps (English)** group.
-#. **Outbound HTTPS from the server.** Every plugin reads its data from a public
-   S3 bucket at request time. Nothing is bundled with the package.
+   **UFFIS: Guatemala** group.
+#. **Outbound HTTPS from the server.** Every plugin reads its data from the
+   public TITO server at request time. Nothing is bundled with the package.
+#. **Spanish plugin names.** Guatemala's plugins speak Spanish whatever the
+   dashboard's language: their labels, argument names, layer names and
+   attribute names are all in Spanish. The English guides use the same
+   plugins and give an English gloss where it helps.
 #. **Visualization permissions**, if your instance restricts plugin types. The
-   exercises use the ``table``, ``card`` and ``map_layer`` types.
+   exercises use the ``table``, ``card``, ``map_layer`` and
+   ``variable_input`` types.
 
-**Warning** — If the **Flood Maps (English)** group is missing from the
+**Warning:** If the **UFFIS: Guatemala** group is missing from the
 dropdown, the package is not installed in the environment the app is actually
 running in. That is by far the most common setup problem. Installing into your
 shell's Python is not enough when the app runs under a different interpreter or
@@ -102,38 +111,49 @@ container.
 The data
 --------
 
-Everything comes from one public bucket. The root is the same throughout, and
-the exercises refer to it as ``.../``:
+All three dashboards read one TITO **sample cycle**: the forecast published at
+2026-10-16 22:00 UTC for the Santa Inés Petapa site, kept as a fixed example so
+the exercises show the same event in every session. Its root is:
 
 .. code-block:: text
 
-   https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com
+   https://tito.uffis.org/sample/guatemala/20261016.220000/
 
-Three prefixes matter:
+A sample cycle has the same layout as the live TITO outputs, which are published
+under ``https://tito.uffis.org/outputs/guatemala/<cycle>/``. Anything built on
+the sample therefore works on a live cycle once you change the cycle.
 
 .. list-table::
    :header-rows: 1
    :widths: 26 74
 
-   * - Prefix
+   * - Used by
      - Contents
-   * - ``PBI_Actividad_2/``
-     - The rasters used by the map layers: one depth GeoTIFF, four
-       exceedance-probability GeoTIFFs, and the ensemble Zarr store's companion
-       files. All are EPSG:3857 copies on a single shared grid.
-   * - ``Guatemala_IBF/``
-     - The impact features (buildings and roads) and the original UTM rasters
-       they were sampled from. The plugins read the slim CSV from here.
-   * - ``floodmaps_test/``
-     - The 198-member ensemble Zarr store used by exercise 2.
+   * - Map layers (exercises 1 and 3)
+     - The four exceedance-probability GeoTIFFs, in
+       ``guatemala_90m/fim/stream_sat_stormlab/Guatemala_SantaInesPetapa/combined_overbank/``
+       under the root, named
+       ``prob_depth_ge_<depth>_overbank.20261016.220000.tif`` for ``<depth>`` =
+       ``10cm``, ``30cm``, ``70cm`` and ``100cm``. Each cell holds the
+       probability that flood water reaches that depth.
+   * - Plugins (exercises 2 and 3)
+     - The same cycle's buildings, roads and probabilities. The plugins find
+       these themselves; you only tell them which cycle to read.
 
-**Important** — The rasters the dashboards point at are the **EPSG:3857** copies
-under ``PBI_Actividad_2/``, not the UTM originals under ``Guatemala_IBF/``. This
-is not cosmetic. TethysDash ships no proj4, so OpenLayers can only resolve
-EPSG:4326 and EPSG:3857 for layer data. Point a layer at a UTM raster and it
-will appear to load and then vanish, or drag the whole map into UTM. If a layer
-flashes on and disappears, check its projection first.
+The probabilities are fractions of 50 ensemble members, so every value is a
+multiple of 0.02, and each of the four rasters reaches 1.0 somewhere. The
+rasters are 424 x 319 cells of about 5 m.
 
+Earlier versions of these exercises read training files from an S3 bucket
+(``PBI_Actividad_2/``, ``Guatemala_IBF/`` and ``floodmaps_test/``). The exercise
+dashboards no longer use them; the companion notebooks still do.
+
+**Important:** The sample rasters are natively **EPSG:3857**, and that matters.
+TethysDash ships no proj4, so OpenLayers can only resolve EPSG:4326 and EPSG:3857
+for layer data. Point a layer at a raster in another projection (a UTM raster,
+for example) and it will appear to load and then vanish, or drag the whole map
+into the wrong coordinates. If a layer flashes on and disappears, check its
+projection first.
 
 Groundwork common to all three exercises
 ========================================
@@ -195,7 +215,7 @@ A dashboard can only be changed by its owner, and only in edit mode. Click the
    **Screenshot:** the header toolbar in edit mode, with the buttons above
    visible.
 
-**Tip** — Save often. **Cancel** reverts to the last save, so a long unsaved
+**Tip:** Save often. **Cancel** reverts to the last save, so a long unsaved
 editing session is a single mistake away from being lost.
 
 Adding and configuring a dashboard item
@@ -207,8 +227,8 @@ Adding and configuring a dashboard item
 #. On the **Visualization** tab, pick a **Visualization Type**. Arguments for
    that visualization appear underneath.
 #. Fill the arguments in. The preview updates as you go.
-#. Switch to the **Settings** tab for item-level options — borders, background,
-   **Fill Viewport**. Settings only become available once a visualization is
+#. Switch to the **Settings** tab for item-level options (borders, background,
+   **Fill Viewport**). Settings only become available once a visualization is
    configured and previewing.
 #. Click **Save** in the bottom-right corner of the item editor to apply,
    then **Save Changes** in the top-right corner of the dashboard editor to
@@ -219,7 +239,7 @@ Adding and configuring a dashboard item
    :width: 100%
 
    **Screenshot:** the data viewer with the **Visualization Type** dropdown open,
-   showing the **Flood Maps (English)** group.
+   showing the **UFFIS: Guatemala** group.
 
 .. figure:: images/00-griditem-menu.png
    :alt: A dashboard item's 3-dot menu open
@@ -234,7 +254,7 @@ Sizing and placing items
 Drag an item by its body, resize it from the handle in its lower-right corner.
 The grid is 100 columns wide. All three solutions turn on
 **Unrestricted Grid Item Movement** (in **Dashboard Settings**), which lets items
-sit anywhere and overlap — needed here so the controls and panels can float over
+sit anywhere and overlap. That is needed here so the controls and panels can float over
 a full-bleed map.
 
 Each exercise ends with an **Item positions** table giving the exact ``x``, ``y``,
@@ -248,7 +268,7 @@ All three exercises wire visualizations to variable inputs. There are two ways t
 write the reference, depending on the argument:
 
 * **Dropdown-type arguments** list the available variables in a
-  **Variable Inputs** section at the bottom of the dropdown — pick from there.
+  **Variable Inputs** section at the bottom of the dropdown; pick from there.
 * **Free-text arguments** take the template syntax ``${Variable Name}``, typed by
   hand.
 
@@ -265,19 +285,26 @@ this repository under ``dashboards/``:
 
 .. code-block:: text
 
-   dashboards/Guatemala/Guatemala_Hands_On_1_English.json
+   dashboards/Guatemala/Guatemala_Hands_On_1.json
+   dashboards/Guatemala/Guatemala_Hands_On_2.json
    dashboards/Guatemala/Guatemala_Hands_On_2_English.json
-   dashboards/Guatemala/Guatemala_Hands_On_3_English.json
+   dashboards/Guatemala/Guatemala_Hands_On_3.json
 
-Spanish versions sit alongside them with ``_Espanol`` in place of ``_English``.
-The Spanish dashboards use the ``_es`` plugins throughout, so a dashboard is
-internally consistent in one language — do not mix them.
+``Guatemala_Hands_On_1.json``, ``_2.json`` and ``_3.json`` are the Spanish
+solutions, so their variable inputs carry Spanish names (``Mapa Base``,
+``Probabilidad``, ``Umbral Bajo (P(≥10 cm))``). Swap in the English names used in
+these guides after importing, or keep the Spanish ones throughout; what matters
+is that every ``${...}`` reference matches its input exactly.
+
+``Guatemala_Hands_On_2_English.json`` is a fuller English live-forecast
+dashboard. Its first tab holds the exercise 2 items (cycle dropdown,
+``Probability`` input, likely-depth layer, card and table) alongside hazard,
+rainfall and river discharge items, and a second tab shows warnings.
 
 These files are whole-dashboard exports. Individual items can also be moved
 between dashboards through **Export** on an item's 3-dot menu and
 **Import Dashboard Item** in the header, which is the quickest way to reuse
-exercise 1's five raster layers in exercise 3.
-
+exercise 1's four raster layers in exercise 3.
 
 Troubleshooting
 ===============
@@ -288,7 +315,7 @@ Troubleshooting
 
    * - Symptom
      - Cause and fix
-   * - The **Flood Maps (English)** group is missing from
+   * - The **UFFIS: Guatemala** group is missing from
        **Visualization Type**.
      - ``tgf_wmo_plugins`` is not installed in the environment the app runs in,
        or the app was not restarted. Install it server-side and restart.
@@ -297,8 +324,8 @@ Troubleshooting
        variable input was added after the item that references it. Check
        spelling, spaces and punctuation, then re-select the variable.
    * - A layer flashes on and then disappears.
-     - Almost always a projection problem. Confirm the layer points at the
-       ``PBI_Actividad_2`` EPSG:3857 copy, not a ``Guatemala_IBF`` UTM original.
+     - Almost always a projection problem. Confirm the raster is in EPSG:3857
+       or EPSG:4326. The sample rasters are EPSG:3857; a UTM raster is not.
    * - The whole map jumps to somewhere in Africa.
      - Same cause. A GeoTIFF in an unresolvable projection makes the auto-fit
        adopt coordinates that land near 0°, 0°.
@@ -309,9 +336,15 @@ Troubleshooting
    * - A raster is a single flat colour.
      - The ramp bounds do not suit the data, or ``mask_below`` is unset so dry
        ground is being coloured. Check both.
-   * - Purple never appears in exercise 3.
-     - Expected if the Severe threshold is above 0.2. The 76 cm raster only ever
-       holds 0 or 0.2. Lower the threshold to 0.2 or below.
+   * - A plugin layer or table is empty, or shows a different event from the
+       raster layers.
+     - The plugin's cycle is not the sample. In exercise 3 set ``ciclo`` to
+       **Evento de muestra** (``sample``); in exercise 2 bind it to ``${Date}``
+       and pick the sample cycle. Left unset, a plugin reads the latest live
+       cycle, which may not have flooded at all.
+   * - The **Date** dropdown in exercise 2 opens on a live cycle.
+     - The cycle list's ``inicio`` argument is not set. Set it to
+       **Ciclo de muestra más reciente** (``sample``).
    * - The dashboard cannot be edited.
      - Only the owner can edit, and only in edit mode. Check the header for the
        **Edit Dashboard** button.

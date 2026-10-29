@@ -63,6 +63,10 @@ uffis_storm_impact_layer_comoros = "tgf_wmo_plugins.storm_impact_layer:StormImpa
 uffis_storm_impact_summary_comoros = "tgf_wmo_plugins.storm_impact_summary:StormImpactSummaryComoros"
 # live TITO inputs and products
 uffis_flood_map_layer_guatemala = "tgf_wmo_plugins.flood_map_layer:FloodMapLayerGuatemala"
+uffis_depth_filter_guatemala = "tgf_wmo_plugins.flood_map_layer:DepthFilterGuatemala"
+uffis_depth_filter_haiti = "tgf_wmo_plugins.flood_map_layer:DepthFilterHaiti"
+uffis_depth_filter_antigua_barbuda = "tgf_wmo_plugins.flood_map_layer:DepthFilterAntiguaBarbuda"
+uffis_depth_filter_comoros = "tgf_wmo_plugins.flood_map_layer:DepthFilterComoros"
 uffis_flood_map_layer_haiti = "tgf_wmo_plugins.flood_map_layer:FloodMapLayerHaiti"
 uffis_flood_map_layer_antigua_barbuda = "tgf_wmo_plugins.flood_map_layer:FloodMapLayerAntiguaBarbuda"
 uffis_flood_map_layer_comoros = "tgf_wmo_plugins.flood_map_layer:FloodMapLayerComoros"

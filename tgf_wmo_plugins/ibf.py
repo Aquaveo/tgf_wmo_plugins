@@ -14,9 +14,9 @@ from html import escape
 
 import numpy as np
 import pyogrio
-from tethysapp.tethysdash.plugin_helpers import LayerConfigurationBuilder, TethysDashPlugin
+from tethysapp.tethysdash.plugin_helpers import LayerConfigurationBuilder
 
-from tgf_wmo_plugins.base import CountryPlugin, LiveData, country_group, country_label
+from tgf_wmo_plugins.base import CountryChoiceInput, CountryPlugin, LiveData
 from tgf_wmo_plugins.countries import ANTIGUA_BARBUDA, COMOROS, COUNTRIES, GUATEMALA, HAITI
 from tgf_wmo_plugins.impact_layer import _load, feature_collection, feature_style
 from tgf_wmo_plugins.strings import LIVE_ARGS, STRINGS
@@ -99,8 +99,9 @@ class BaseRiskMatrix(LiveOnly, CountryPlugin):
         districts = district_risk(self.country.key, self.scope(), cycle)
         if districts is not None and len(districts):
             worst = int(districts.max())
+            chip = _chip(s["risk_levels"][worst], RISK_COLORS[worst])
             overall = (f'<p style="margin:8px 0 0">{escape(s["overall_warning"])} '
-                       f'({escape(cycle_label(cycle, s["sample_tag"]))}): {_chip(s["risk_levels"][worst], RISK_COLORS[worst])}</p>')
+                       f'({escape(cycle_label(cycle, s["sample_tag"]))}): {chip}</p>')
         else:
             overall = (f'<p style="margin:8px 0 0;color:#555">{escape(s["overall_warning"])} '
                        f'({escape(cycle_label(cycle, s["sample_tag"]))}): {escape(s["status_quiet"])}</p>')
@@ -108,37 +109,17 @@ class BaseRiskMatrix(LiveOnly, CountryPlugin):
                         f'{table}<div style="margin-top:6px">{chips}</div>{overall}'}
 
 
-class BaseRiskFilter(TethysDashPlugin):
-    """The warning-level choice the risk layer is filtered by, as a dropdown."""
+class BaseRiskFilter(CountryChoiceInput):
+    """The warning-level choice the risk layer is filtered by."""
 
     family = "risk_filter"
-    country = None
-    type = "variable_input"
+    strings_key = "risk_filter"
 
-    def __init_subclass__(cls, **kwargs):
-        super().__init_subclass__(**kwargs)
-        country = cls.__dict__.get("country")
-        if country is None:
-            return
-        s = STRINGS[country.lang]
-        cls.name = f"uffis_{cls.family}_{country.key}"
-        cls.label = country_label(country, s["risk_filter_label"])
-        cls.group = country_group(country)
-        cls.tags = list(s["risk_filter_tags"])
-        cls.description = s["risk_filter_desc"]
-        cls.publishes = s["risk_filter_variable"]
+    def choices(self, s):
+        return [(str(level), label) for level, label in s["risk_filter_choices"].items()]
 
-    def run(self):
-        s = STRINGS[self.country.lang]
-        return {
-            "variable_name": self.publishes,
-            "initial_value": str(DEFAULT_MIN_RISK),
-            "variable_options_source": "dropdown",
-            "metadata": {"choices": [
-                {"label": label, "value": str(level)}
-                for level, label in s["risk_filter_choices"].items()
-            ]},
-        }
+    def initial(self):
+        return str(DEFAULT_MIN_RISK)
 
 
 class BaseRiskLayer(LiveOnly, CountryPlugin):

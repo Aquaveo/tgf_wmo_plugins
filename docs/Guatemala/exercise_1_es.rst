@@ -2,7 +2,7 @@
 .. está junto a este archivo como exercise_1_en.rst.
 
 =================================================================
-Ejercicio 1 — Un mapa de profundidad y probabilidad de inundación
+Ejercicio 1: Un mapa de probabilidad de inundación
 =================================================================
 
 Construcción de **Guatemala Práctica 1 (Español)**, paso a paso.
@@ -19,24 +19,26 @@ y campos se dejan en inglés y en negrita.
 Qué va a construir
 ==================
 
-Un mapa que ocupa toda la ventana, con cinco capas ráster —la profundidad de
-inundación más cuatro probabilidades de excedencia— y un desplegable pequeño en la
-esquina superior izquierda que cambia el mapa base que está debajo.
+Un mapa que ocupa toda la ventana, con cuatro capas ráster (la probabilidad de que
+el agua alcance 10, 30, 70 y 100 cm) y un desplegable pequeño en la esquina
+superior izquierda que cambia el mapa base que está debajo. Los rásteres vienen
+del ciclo de muestra de TITO del 2026-10-16 a las 22:00 UTC para Santa Inés
+Petapa; vea `Los datos <getting_started_es.rst#los-datos>`_.
 
 .. figure:: images/ex1-finished.png
    :alt: El tablero terminado del ejercicio 1
    :width: 100%
 
    **Captura:** el tablero terminado, con el control de capas abierto para que se
-   vean las cinco capas.
+   vean las cuatro capas de probabilidad.
 
 Este ejercicio trata de las capas ráster: dónde va la URL, cómo se elige una rampa
-de color y la diferencia entre dejar que la aplicación escale una capa o fijar la
-escala usted mismo.
+de color y por qué una rampa de probabilidad se fija en una escala constante en
+lugar de dejar que la aplicación la escale.
 
 
-Paso 1 — Crear el tablero
-=========================
+Paso 1: Crear el tablero
+========================
 
 #. Cree un tablero nuevo (vea
    `Crear un tablero <getting_started_es.rst#crear-un-tablero>`_) con:
@@ -54,8 +56,8 @@ Paso 1 — Crear el tablero
    esquina superior derecha, para entrar en modo de edición.
 
 
-Paso 2 — Agregar el mapa
-========================
+Paso 2: Agregar el mapa
+=======================
 
 #. Verá un elemento que ya existe en el tablero. Haga clic en el menú de 3 puntos
    del elemento y seleccione **Edit**.
@@ -77,78 +79,13 @@ Paso 2 — Agregar el mapa
    seleccionado por defecto.
 
 
-Paso 3 — Agregar la capa de profundidad
-=======================================
+Paso 3: Agregar las cuatro capas de probabilidad
+================================================
 
-#. Junto a **Layers**, haga clic en **Add Layer**. El editor de capas se abre con
-   las pestañas **Layer**, **Source**, **Style**, **Legend**,
-   **Attributes/Table Popup** y **Custom Modal Popup**.
-
-#. En la pestaña **Layer**, defina las siguientes propiedades:
-
-   .. list-table::
-      :header-rows: 1
-      :widths: 24 76
-
-      * - Campo
-        - Valor
-      * - ``name``
-        - ``Profundidad (m)``
-      * - ``opacity``
-        - ``.5``
-
-#. En la pestaña **Source**, ponga **Source Type** en **GeoTIFF** y complete:
-
-   .. list-table::
-      :header-rows: 1
-      :widths: 24 76
-
-      * - Campo
-        - Valor
-      * - ``url``
-        - ``https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/PBI_Actividad_2/depth_m.tif``
-      * - ``mask_below``
-        - ``0.01``
-
-   ``mask_below`` oculta las celdas iguales o inferiores al valor indicado. En este
-   ráster el suelo seco es 0, y sin una máscara todo el dominio se pintaría con el
-   color bajo de la rampa en lugar de mostrar el mapa base.
-
-#. En la pestaña **Style**, deje el modo en **Continuous** y elija la rampa
-   **YlGnBu**. Deje **Min** y **Max** vacíos.
-
-   Dejar ambos límites vacíos es una decisión deliberada, no descuido. Un límite
-   vacío significa "resuélvelo a partir de las estadísticas del archivo al
-   momento de dibujar", así que la rampa se extiende sobre el rango que tenga este
-   ráster en particular: de 0 a unos 4.76 m en este caso. Si define ambos, se
-   aplican los valores tal cual.
-
-#. En la pestaña **Legend**, seleccione **Default Legend**. Para un ráster con
-   rampa, la aplicación genera automáticamente una barra de color.
-
-#. Guarde la capa haciendo clic en **Create**, al pie del editor de capas.
-
-.. figure:: images/ex1-layer-source-geotiff.png
-   :alt: La pestaña Source configurada para el GeoTIFF de profundidad
-   :width: 100%
-
-   **Captura:** la pestaña **Source** con **Source Type** en GeoTIFF, la URL de
-   profundidad y ``mask_below`` en 0.01.
-
-.. figure:: images/ex1-layer-style-ramp.png
-   :alt: La pestaña Style con la rampa YlGnBu seleccionada
-   :width: 100%
-
-   **Captura:** la pestaña **Style**, modo **Continuous**, **YlGnBu**
-   seleccionada, **Min** y **Max** vacíos.
-
-
-Paso 4 — Agregar las cuatro capas de probabilidad
-=================================================
-
-Estas cuatro son idénticas salvo por la URL y el nombre, así que construya una y
-repita. Agréguelas en este orden, para que el umbral más profundo quede más abajo
-en la pila y el más superficial —que cubre la mayor superficie— quede arriba:
+Estas cuatro capas son idénticas salvo por la URL y el nombre, así que construya
+una y repita. Agréguelas en este orden, para que el umbral más profundo quede más
+abajo en la pila y el más superficial (que cubre la mayor superficie) quede
+arriba:
 
 .. list-table::
    :header-rows: 1
@@ -156,19 +93,23 @@ en la pila y el más superficial —que cubre la mayor superficie— quede arrib
 
    * - **Name** de la capa
      - ``url``
-   * - ``Probabilidad de Inundación a 76 cm``
-     - ``https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/PBI_Actividad_2/prob_76cm.tif``
+   * - ``Probabilidad de Inundación a 100 cm``
+     - ``https://tito.uffis.org/sample/guatemala/20261016.220000/guatemala_90m/fim/stream_sat_stormlab/Guatemala_SantaInesPetapa/combined_overbank/prob_depth_ge_100cm_overbank.20261016.220000.tif``
+   * - ``Probabilidad de Inundación a 70 cm``
+     - ``https://tito.uffis.org/sample/guatemala/20261016.220000/guatemala_90m/fim/stream_sat_stormlab/Guatemala_SantaInesPetapa/combined_overbank/prob_depth_ge_70cm_overbank.20261016.220000.tif``
    * - ``Probabilidad de Inundación a 30 cm``
-     - ``https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/PBI_Actividad_2/prob_30cm.tif``
+     - ``https://tito.uffis.org/sample/guatemala/20261016.220000/guatemala_90m/fim/stream_sat_stormlab/Guatemala_SantaInesPetapa/combined_overbank/prob_depth_ge_30cm_overbank.20261016.220000.tif``
    * - ``Probabilidad de Inundación a 10 cm``
-     - ``https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/PBI_Actividad_2/prob_10cm.tif``
-   * - ``Probabilidad de Inundación a 7.6 cm``
-     - ``https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/PBI_Actividad_2/prob_7p62.tif``
+     - ``https://tito.uffis.org/sample/guatemala/20261016.220000/guatemala_90m/fim/stream_sat_stormlab/Guatemala_SantaInesPetapa/combined_overbank/prob_depth_ge_10cm_overbank.20261016.220000.tif``
 
 (Hay más información sobre los datos en
 `Los datos <getting_started_es.rst#los-datos>`_.)
 
 Para **cada** una de las cuatro:
+
+#. Junto a **Layers**, haga clic en **Add Layer**. El editor de capas se abre con
+   las pestañas **Layer**, **Source**, **Style**, **Legend**,
+   **Attributes/Table Popup** y **Custom Modal Popup**.
 
 #. En la pestaña **Layer**, defina las siguientes propiedades:
 
@@ -194,17 +135,24 @@ Para **cada** una de las cuatro:
       * - ``mask_below``
         - ``0``
 
-   Cero significa "aquí no hay ninguna probabilidad de inundación".
+   ``mask_below`` oculta las celdas iguales o inferiores al valor indicado. Cero
+   significa "ningún miembro del conjunto inunda aquí", y sin la máscara todo el
+   dominio se pintaría con el color bajo de la rampa en lugar de mostrar el mapa
+   base.
 
 #. En la pestaña **Style**, deje el modo en **Continuous** y elija la rampa
    **turbo**. Ponga **Min** = ``0`` y **Max** = ``1``.
 
-   Fijar Min y Max en 0–1 es el punto central de estas cuatro capas. La
+   Fijar Min y Max en 0-1 es el punto central de estas cuatro capas. La
    probabilidad tiene un rango fijo y con significado propio, y las cuatro capas
-   deben usar el mismo o no se pueden comparar. Si se dejan en escala automática,
-   cada capa estiraría su rampa sobre su propio rango y un 0.2 se vería como una
-   severidad distinta en cada una: el tono medio de la capa superficial y el de la
-   capa profunda significarían números diferentes.
+   deben usar el mismo o no se pueden comparar.
+
+   Dejar **Min** y **Max** vacíos significaría "resuélvelos a partir de las
+   estadísticas del archivo al momento de dibujar", así que cada capa estiraría
+   su rampa sobre el rango que tenga ese ráster en particular. Eso sirve para una
+   magnitud cuyo rango depende del evento, como la profundidad, pero no para la
+   probabilidad: en un ciclo en el que una profundidad nunca pasara de, digamos,
+   0.3, su rampa pintaría 0.3 con el color que las otras capas usan para 1.0.
 
 #. Si está configurando la primera capa, en la pestaña **Legend** seleccione
    **Default Legend**. Para un ráster con rampa, la aplicación genera
@@ -212,8 +160,8 @@ Para **cada** una de las cuatro:
 
    Solo la primera capa de probabilidad necesita su leyenda activada; las cuatro
    comparten una misma escala, así que cuatro barras de color idénticas solo
-   ocuparían espacio. En la solución entregada, la capa de 76 cm es la que lleva la
-   leyenda y las otras tres no tienen ninguna.
+   ocuparían espacio. En la solución entregada, la capa de 100 cm es la que lleva
+   la leyenda y las otras tres no tienen ninguna.
 
 #. Guarde la capa haciendo clic en **Create**, al pie del editor de capas.
 
@@ -226,15 +174,29 @@ Para **cada** una de las cuatro:
 #. Guarde el tablero haciendo clic en **Save Changes**, en la esquina superior
    derecha del editor del tablero.
 
-.. figure:: images/ex1-layer-list.png
-   :alt: La lista Layers mostrando las cinco capas ráster
+.. figure:: images/ex1-layer-source-geotiff.png
+   :alt: La pestaña Source configurada para un GeoTIFF de probabilidad
    :width: 100%
 
-   **Captura:** la lista **Layers** con las cinco capas en orden.
+   **Captura:** la pestaña **Source** con **Source Type** en GeoTIFF, la URL de
+   probabilidad a 100 cm y ``mask_below`` en 0.
+
+.. figure:: images/ex1-layer-style-ramp.png
+   :alt: La pestaña Style con la rampa turbo fijada en 0-1
+   :width: 100%
+
+   **Captura:** la pestaña **Style**, modo **Continuous**, **turbo**
+   seleccionada, **Min** en 0 y **Max** en 1.
+
+.. figure:: images/ex1-layer-list.png
+   :alt: La lista Layers mostrando las cuatro capas ráster
+   :width: 100%
+
+   **Captura:** la lista **Layers** con las cuatro capas en orden.
 
 
-Paso 5 — Agregar el selector de mapa base
-=========================================
+Paso 4: Agregar el selector de mapa base
+========================================
 
 El mapa base es una variable de entrada, para que el usuario pueda cambiarlo sin
 editar nada. Construya primero la variable y después apunte el mapa a ella.
@@ -271,7 +233,7 @@ editar nada. Construya primero la variable y después apunte el mapa a ella.
    el desplegable flota sobre el mapa sin fondo y es difícil de leer.
 
 #. Elija un valor inicial para el desplegable desde la previsualización, en el lado
-   derecho del editor. La solución entregada usa ``World Light Gray Base``, pero
+   derecho del editor. La solución entregada usa ``World Imagery``, pero
    cualquier mapa base sirve.
 
 #. Guarde el elemento haciendo clic en **Save**, en la esquina inferior derecha del
@@ -293,8 +255,8 @@ editar nada. Construya primero la variable y después apunte el mapa a ella.
    **Captura:** los argumentos de **Variable Input** del selector de mapa base.
 
 
-Paso 6 — Actualizar el mapa base, la extensión y la ventana del mapa
-====================================================================
+Paso 5: Actualizar el mapa base, la extensión y la ventana del mapa
+===================================================================
 
 #. Ponga el tablero en modo de edición haciendo clic en el botón
    **Edit Dashboard**, en la esquina superior derecha.
@@ -338,44 +300,70 @@ Punto de control
 
 A estas alturas debería tener:
 
-* Un mapa que ocupa la ventana y muestra la Ciudad de Guatemala.
-* Un control de capas con seis capas (incluido el mapa base); al activar o
-  desactivar cada una cambia lo que se dibuja.
-* Un control de leyenda con una barra de color para la profundidad y otra para la
-  probabilidad.
+* Un mapa que ocupa la ventana y muestra el sitio de Santa Inés Petapa.
+* Un control de capas con cinco capas (las cuatro de probabilidad y el mapa base);
+  al activar o desactivar cada una cambia lo que se dibuja.
+* Un control de leyenda con una sola barra de color para la probabilidad.
 * Un desplegable de mapa base arriba a la izquierda que cambia las imágenes de
   fondo.
-* La profundidad visible junto con las capas de probabilidad que están debajo,
-  gracias a la opacidad de 0.5.
 
 
 Puntos de discusión
 ===================
 
-* **Escala automática frente a escala fija.** La profundidad usa escala automática
-  porque su rango es una propiedad de este evento en particular. La probabilidad se
-  fija en 0–1 porque el rango está definido por definición y las cuatro capas
-  deben ser comparables. Es la idea más transferible de todo el ejercicio.
+* **Escala fija frente a escala automática.** La probabilidad se fija en 0-1
+  porque su rango está dado por definición y las cuatro capas deben ser
+  comparables. Una rampa con escala automática sirve para una magnitud cuyo rango
+  depende del evento, como la profundidad. Es la idea más transferible de todo el
+  ejercicio.
 * **Para qué sirve** ``mask_below``. Los rásteres suelen codificar "aquí no hay
   nada" con un número real y, si no se enmascara, la rampa coloreará fielmente todo
-  el dominio. Cada capa necesita un umbral distinto: ``0.01`` para la profundidad y
-  ``0`` para la probabilidad.
+  el dominio. Para la probabilidad ese número es ``0``: ningún miembro del
+  conjunto inunda la celda.
+* **Qué son los números.** Cada valor es la fracción de los 50 miembros del
+  conjunto que ponen al menos esa profundidad de agua sobre la celda, así que cada
+  valor es múltiplo de 0.02. La probabilidad de una celda solo puede bajar a
+  medida que sube la profundidad, y por eso la capa de 10 cm cubre más terreno y
+  la de 100 cm, menos.
 * **El orden de las capas es el orden de dibujo.** La primera capa de la lista se
   dibuja más abajo, justo sobre el mapa base, y cada capa posterior pinta encima.
-  La profundidad se agrega primero y por eso queda al fondo; las cuatro capas de
-  probabilidad se apilan sobre ella, con el umbral más profundo más abajo. En la
-  práctica nada queda oculto, porque cada capa está enmascarada donde no tiene
-  datos: las probabilidades solo pintan donde hay alguna probabilidad distinta de
-  cero, y la profundidad solo donde hay agua.
-* **La restricción de proyección.** Los cinco rásteres son copias en EPSG:3857.
-  Vea la advertencia en `Los datos <getting_started_es.rst#los-datos>`_; esto
-  vuelve a aparecer en el ejercicio 3, donde equivocarse hace que las capas
+  El umbral más profundo se agrega primero y por eso queda al fondo; apague las
+  capas superiores para ver las más profundas que están debajo.
+* **La restricción de proyección.** Los cuatro rásteres están de origen en
+  EPSG:3857. Vea la advertencia en `Los datos <getting_started_es.rst#los-datos>`_;
+  esto vuelve a aparecer en el ejercicio 3, donde equivocarse hace que las capas
   aparezcan y luego desaparezcan.
+
+
+Posiciones de los elementos
+===========================
+
+La solución entregada coloca sus elementos así, en la cuadrícula de 100 columnas:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 15 15 15 15
+
+   * - Elemento
+     - ``x``
+     - ``y``
+     - ``w``
+     - ``h``
+   * - Mapa
+     - 0
+     - 0
+     - 99
+     - 41
+   * - Variable Mapa Base
+     - 0
+     - 0
+     - 15
+     - 5
 
 
 Siguiente
 =========
 
-`Ejercicio 2 — Impacto de una sola tormenta <exercise_2_es.rst>`_ agrega una capa
-vectorial generada por un módulo y un selector alimentado por datos a lo que acaba
-de construir.
+`Ejercicio 2: Impacto probable de un ciclo de pronóstico <exercise_2_es.rst>`_
+agrega una capa vectorial generada por un módulo y un selector alimentado por
+datos a lo que acaba de construir.

@@ -360,7 +360,9 @@
           "w": 10,
           "h": 6,
           "source": "uffis_cycle_times_comoros",
-          "args_string": {},
+          "args_string": {
+            "debut": "sample"
+          },
           "metadata_string": {}
         },
         {

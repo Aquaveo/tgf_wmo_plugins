@@ -26,21 +26,21 @@ Each exercise builds one dashboard and lives in its own file:
    * - Guide
      - Dashboard
      - What it shows
-   * - `Exercise 1 — A flood depth and probability map <exercise_1.rst>`_
+   * - `Exercise 1: A flood depth and probability map <exercise_1.rst>`_
      - Antigua and Barbuda Hands On 1
      - Flood depth for one storm of the Saint John's flood-map library and the
-       four exceedance-probability rasters of the Tropical Storm Jerry forecast
-       on one map, with the parish boundaries and a switchable base map.
-   * - `Exercise 2 — Flood depth for a single storm <exercise_2.rst>`_
+       four exceedance-probability rasters of the Tropical Storm Jerry sample
+       forecast for the Saint John's site on one map, with the parish boundaries and a switchable base map.
+   * - `Exercise 2: Flood depth for a single storm <exercise_2.rst>`_
      - Antigua and Barbuda Hands On 2
      - Maximum flood depth for one storm out of the 200-storm Saint John's
        flood-map library, chosen with a number input.
-   * - `Exercise 3 — Hazard classification with adjustable thresholds <exercise_3.rst>`_
+   * - `Exercise 3: Hazard classification with adjustable thresholds <exercise_3.rst>`_
      - Antigua and Barbuda Hands On 3
      - A hazard classification driven by four probability thresholds the viewer
        can move, with the affected buildings and roads and an impact table.
 
-The exercises are cumulative in difficulty, not in content — each is a separate
+The exercises are cumulative in difficulty, not in content: each is a separate
 dashboard, and each can be built on its own. Exercise 1 teaches raster and vector
 layers, 2 puts the depth layer's storm on a variable input, 3 adds plugin-backed
 layers and interactivity through four inputs at once.
@@ -58,7 +58,8 @@ behind exercises 2 and 3 as plain Python. These guides cover *building the
 dashboard*; the notebooks cover *why the numbers are what they are*. They pair
 well: run the notebook first if you want to understand the analysis, follow the
 guide if you want to assemble the interface. Both notebooks also run on Google
-Colab.
+Colab. The notebooks still read the earlier training files rather than the
+sample cycle, so their probabilities and counts differ from the dashboards'.
 
 Conventions
 -----------
@@ -70,7 +71,7 @@ Conventions
 * Every exercise ends with a **Checkpoint** listing what you should be able to
   see, and **Talking points** worth raising if you are teaching from it.
 
-**Note** — Screenshots were taken on TethysDash 0.19; a newer release may
+**Note**: Screenshots were taken on TethysDash 0.19; a newer release may
 place a button or tab differently. The text names every control, so follow
 the words when a picture disagrees.
 
@@ -96,12 +97,13 @@ What you need
    dashboard item's **Visualization Type** dropdown and look for
    **Flood Impact Summary (Antigua and Barbuda)** in the
    **Flood Maps (English)** group.
-#. **Outbound HTTPS from the server.** Every plugin reads its data from a public
-   S3 bucket at request time. Nothing is bundled with the package.
+#. **Outbound HTTPS from the server.** Every plugin reads its data at request
+   time, from ``tito.uffis.org`` and from a public S3 bucket (see
+   `The data`_). Nothing is bundled with the package.
 #. **Visualization permissions**, if your instance restricts plugin types. The
    exercises use the ``table`` and ``map_layer`` types.
 
-**Warning** — If the **Flood Maps (English)** group is missing from the
+**Warning**: If the **Flood Maps (English)** group is missing from the
 dropdown, the package is not installed in the environment the app is actually
 running in. That is by far the most common setup problem. Installing into your
 shell's Python is not enough when the app runs under a different interpreter or
@@ -110,29 +112,59 @@ container.
 The event
 ---------
 
-Every dataset in these exercises comes from one forecast cycle of the UFFIS
-chain for **Tropical Storm Jerry**, which in October 2025 dropped about 167 mm
-in four hours on V.C. Bird airport. The forecast
-had 50 rainfall members: five StormLab realizations run from each of ten
-satellite-rainfall analysis states. The chain does not run a hydraulic model
-when a storm approaches. Instead, each parish has a library of 200 synthetic
-storms with precomputed maximum-depth maps, each member's rainfall total selects
-the closest library storm, and the probability of exceeding a depth at a cell is
-simply the share of the 50 members whose matched storm floods that cell to that
-depth. Exercise 2 opens the library; exercises 1 and 3 use the probabilities it
-produced.
+Every dataset in these exercises concerns **Tropical Storm Jerry**, which in
+October 2025 dropped about 167 mm in four hours on V.C. Bird airport. The
+probabilities come from the TITO **sample cycle** for Antigua, the forecast
+issued at 2025-10-10 01:00 UTC. That forecast had 50 rainfall members: five
+StormLab realizations run from each of ten satellite-rainfall analysis states.
+The chain does not run a hydraulic model when a storm approaches. Instead, each
+parish has a library of 200 synthetic storms with precomputed maximum-depth
+maps, each member's rainfall total selects the closest library storm, and the
+probability of exceeding a depth at a cell is simply the share of the 50
+members whose matched storm floods that cell to that depth. Exercise 2 opens
+the Saint John's library; exercises 1 and 3 use the probabilities the sample
+cycle produced from it.
 
 The data
 --------
 
-Everything comes from one public bucket. The root is the same throughout, and
-the exercises refer to it as ``.../``:
+The data comes from two places.
+
+**The TITO sample cycle.** The probability rasters and the receptors the
+exercise 3 plugins read are one published forecast cycle, kept as a sample
+under:
+
+.. code-block:: text
+
+   https://tito.uffis.org/sample/antigua/20251010.010000/
+
+It is laid out exactly like the live TITO outputs
+(``https://tito.uffis.org/outputs/antigua/<cycle>/``), so a dashboard built on
+it can later be pointed at a live cycle. TITO publishes Antigua one parish site
+at a time, and each site has its own folder:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 60
+
+   * - Path under the cycle
+     - Contents
+   * - ``antigua_30m/fim/stream_sat_stormlab/Antigua_<Site>/pluvial_overbank/``
+     - The four exceedance-probability GeoTIFFs (10, 30, 70 and 100 cm) for
+       that site, named ``prob_depth_ge_<depth>_overbank.20251010.010000.tif``.
+       Exercises 1 and 3 read the Saint John's site, ``Antigua_SaintJohnS``.
+   * - ``antigua_30m/ibf/Antigua_<Site>/``
+     - ``ibf_receptors.20251010.010000.gpkg``: the site's buildings and road
+       segments with the four probabilities already sampled onto them. The
+       exercise 3 impact layer and table read from here.
+
+**The training bucket.** The flood-map libraries and the parish boundaries have
+no sample-cycle equivalent and still come from the public bucket used for the
+earlier training data:
 
 .. code-block:: text
 
    https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com
-
-Two prefixes matter:
 
 .. list-table::
    :header-rows: 1
@@ -140,38 +172,39 @@ Two prefixes matter:
 
    * - Prefix
      - Contents
-   * - ``antigua_barbuda_IBF/``
-     - The forecast outputs. ``depth_prob/`` holds the four
-       exceedance-probability GeoTIFFs (10, 30, 70 and 100 cm), ``gadm/`` the
-       parish boundaries as a shapefile, and the geopackage
-       ``AntiguaBarbuda_Jerry_cycle_10151010_IBF_outputs.gpkg`` carries the
-       71,136 buildings and 9,315 road segments with the four probabilities
-       already sampled onto them. The exercise 3 plugins read from here.
    * - ``AnB_IBF/``
      - The flood-map libraries, one Zarr store per parish
        (``AG01_Barbuda_v1.zarr`` through ``AG08_SaintPhilip_v1.zarr``, seven in
        all). Each holds 200 storms of maximum depth in metres. Exercises 1
        and 2 read the Saint John's store, ``AG04_SaintJohnS_v1.zarr``.
+   * - ``antigua_barbuda_IBF/``
+     - ``gadm/`` holds the parish boundaries as a shapefile, which every
+       exercise draws. The same prefix also holds the earlier training
+       forecast (a national probability mosaic in ``depth_prob/`` and the
+       ``AntiguaBarbuda_Jerry_cycle_10151010_IBF_outputs.gpkg`` geopackage);
+       the dashboards no longer use them, but the companion notebooks still
+       do.
 
-All of the rasters, and the libraries, sit on one lattice: **EPSG:4326** at one
-arc-second (about 30 m), the probability rasters covering both islands at
-2658 × 921 cells and each library windowed on its parish. TethysDash ships no
-proj4, so OpenLayers can resolve only EPSG:4326 and EPSG:3857 for layer data —
-and these rasters are already in the first, so nothing needs reprojecting. That
-is a real difference from the Guatemala exercises, whose rasters had to be
-copied out of UTM first.
+The Saint John's probability rasters cover the Saint John's site window only
+(longitude -61.9085 to -61.7896, latitude 17.0471 to 17.1762), which takes in
+St. John's and parts of the neighbouring parishes but not the rest of Antigua,
+and not Barbuda. They are **EPSG:4326** at one arc-second (about 30 m),
+465 × 428 cells, and each library is windowed on its parish on the same
+one-arc-second lattice. TethysDash ships no proj4, so OpenLayers can resolve
+only EPSG:4326 and EPSG:3857 for layer data, and these rasters are already in
+the first, so nothing needs reprojecting. That is a real difference from the
+Guatemala exercises, whose rasters had to be copied out of UTM first.
 
-Two things about the data are worth knowing before you present it, both worked
-through in the notebooks:
+Two things about the data are worth knowing before you present it:
 
 * **Depth saturates at 2.55 m.** The libraries stored depth as whole
   centimetres in a byte, so a cell at 2.55 means *at least* 2.55, and no band
   above about 2 m is distinct from the one below it.
-* **Probabilities move in steps of 0.02** and take few distinct values, because
-  five rainfall realizations drive most of the spread between 50 members. Every
-  probability layer does reach 1.0 somewhere, so — unlike Guatemala — the top
-  hazard level is reachable at any threshold.
-
+* **Probabilities take few distinct values.** They move in steps of 0.02 (one
+  member in fifty), but the rain has only five distinct realizations, so
+  across the four Saint John's rasters the only values are 0.02 (70 cm only),
+  0.18, 0.2, 0.4, 0.42 (10 and 30 cm only), 0.58, 0.6, 0.8 and 1.0. Every probability layer does reach 1.0 somewhere, so (unlike
+  Guatemala) the top hazard level is reachable at any threshold.
 
 Groundwork common to all three exercises
 ========================================
@@ -233,7 +266,7 @@ A dashboard can only be changed by its owner, and only in edit mode. Click the
    **Screenshot:** the header toolbar in edit mode, with the buttons above
    visible.
 
-**Tip** — Save often. **Cancel** reverts to the last save, so a long unsaved
+**Tip**: Save often. **Cancel** reverts to the last save, so a long unsaved
 editing session is a single mistake away from being lost.
 
 Adding and configuring a dashboard item
@@ -245,8 +278,8 @@ Adding and configuring a dashboard item
 #. On the **Visualization** tab, pick a **Visualization Type**. Arguments for
    that visualization appear underneath.
 #. Fill the arguments in. The preview updates as you go.
-#. Switch to the **Settings** tab for item-level options — borders, background,
-   **Fill Viewport**. Settings only become available once a visualization is
+#. Switch to the **Settings** tab for item-level options (borders, background,
+   **Fill Viewport**). Settings only become available once a visualization is
    configured and previewing.
 #. Click **Save** in the bottom-right corner of the item editor to apply,
    then **Save Changes** in the top-right corner of the dashboard editor to
@@ -272,7 +305,7 @@ Sizing and placing items
 Drag an item by its body, resize it from the handle in its lower-right corner.
 The grid is 100 columns wide. All three solutions turn on
 **Unrestricted Grid Item Movement** (in **Dashboard Settings**), which lets items
-sit anywhere and overlap — needed here so the controls and panels can float over
+sit anywhere and overlap, needed here so the controls and panels can float over
 a full-bleed map.
 
 Each exercise ends with an **Item positions** table giving the exact ``x``, ``y``,
@@ -286,7 +319,7 @@ All three exercises wire visualizations to variable inputs. There are two ways t
 write the reference, depending on the argument:
 
 * **Dropdown-type arguments** list the available variables in a
-  **Variable Inputs** section at the bottom of the dropdown — pick from there.
+  **Variable Inputs** section at the bottom of the dropdown; pick from there.
 * **Free-text arguments** take the template syntax ``${Variable Name}``, typed by
   hand.
 
@@ -339,18 +372,28 @@ Troubleshooting
    * - A probability layer shows almost nothing.
      - Expected at the deeper thresholds: 100 cm is exceeded by any member on
        only a small footprint. Compare it with the 10 cm layer, and remember
-       the ramp is pinned to 0–1 so a faint cell is a genuinely low
+       the ramp is pinned to 0 to 1 so a faint cell is a genuinely low
        probability.
    * - Every vector feature is grey.
      - The style rules are not matching. Use **Fetch plugin defaults** rather
        than hand-authoring rules; a malformed rule never matches and fails
        silently.
+   * - The probability layers cover only part of Antigua.
+     - Expected: they are the sample cycle's Saint John's site, which covers
+       St. John's and parts of the neighbouring parishes only. Zoom in on the
+       west of Antigua.
+   * - The probability layers, or the exercise 3 plugin layers and table, show
+       nothing at all.
+     - The GeoTIFF layers are fetched by your browser, the plugins by the
+       server; whichever is empty cannot reach ``tito.uffis.org``. Open
+       ``https://tito.uffis.org/sample/antigua/20251010.010000/`` from there
+       to check.
    * - The parish outlines do not appear.
      - The shapefile source needs the ``.shp`` URL; the ``.dbf``, ``.shx`` and
        ``.prj`` beside it are fetched automatically. Check the URL ends in
        ``ATG_gadm_adm1_pop.shp``.
    * - The hazard layer takes a long time to appear.
-     - It classifies a 2658 × 921 grid and vectorises about 3,400 polygons on
+     - It classifies a 465 × 428 grid and vectorises about 1,500 polygons on
        every threshold change, and the first load also downloads the four
        rasters. Later loads reuse the cached rasters and are quicker.
    * - The dashboard cannot be edited.

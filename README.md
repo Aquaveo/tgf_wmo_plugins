@@ -30,9 +30,9 @@ country's plugins list together.
 |---|---|---|---|---|---|
 | Guatemala | es | ✓ | ✓ live | none | ✓ |
 | Haiti | fr | ✓ (hazard layer live only) | ✓ live | none | ✓, `site` La Quinte or Gris |
-| Antigua and Barbuda | en | ✓ | ✓ live | none | ✓ |
+| Antigua and Barbuda | en | ✓ | ✓ live | none | ✓, `parish` (live only), one of seven parish sites |
 | Barbados | en | ✓ | ✓ training library, per parish | `parish` | no |
-| Comoros | fr | ✓ | ✓ live (no receptors published) | `commune` | ✓ |
+| Comoros | fr | ✓ | ✓ live | `commune` (a pcode or TITO site name) | ✓ |
 
 The map layers are `dynamic_map_layer`s: they re-fetch whenever a bound
 variable input changes, which is what makes the thresholds and the storm slider
@@ -45,16 +45,19 @@ The hazard family reads the hourly cycles TITO publishes at
 a `live` entry in `countries.py`. Three arguments control it, named in the
 country's language:
 
-- `cycle` / `ciclo`: `latest` (also what an unset argument means), `training`
-  for the static training data the exercises use, or a cycle stamp such as
-  `20261023.170000`. Bind it to a `uffis_cycle_times_<country>` variable input
-  to get a dropdown of every cycle still published, about a day's worth.
+- `cycle` / `ciclo`: `latest` (also what an unset argument means), `sample`
+  for the country's sample cycle under `https://tito.uffis.org/sample/<country>/`
+  (what the exercises use), `training` for the older static training data, or
+  a cycle stamp such as `20261023.170000`. Bind it to a
+  `uffis_cycle_times_<country>` variable input to get a dropdown of every cycle
+  still published, about a day's worth, plus the sample cycle.
 - `flood_source` / `fuente_inundacion` / `source_inondation` (hazard layer
   only): which probability rasters to classify -- pluvial, fluvial or combined,
   overbank or not. The default is the variant TITO samples the receptors from
   (`combined_overbank`, or `pluvial_overbank` where only pluvial is modelled),
   so the map and the impact figures agree unless another is chosen.
-- `site` (Haiti only): La Quinte or Gris.
+- `site` (Haiti): La Quinte or Gris; `parish` (Antigua and Barbuda): one of the
+  seven parish sites TITO publishes.
 
 TITO only maps floods, and only assesses impact, where the forecast triggers.
 A quiet site has no rasters or receptors in that cycle, and the plugins say so

@@ -2,14 +2,14 @@
 .. se trouve à côté de ce fichier, sous le nom exercise_1.rst. Deux points
 .. diffèrent du guide original du Guatemala et sont expliqués là où ils se
 .. présentent : il n'y a pas de couche de profondeur, car le cycle ne publie
-.. aucun raster de profondeur unique et un membre choisi arbitrairement ne se
-.. marierait pas avec les quatre probabilités d'ensemble ; et les rasters sont en
-.. EPSG:5629, que la carte ne sait pas résoudre tant que le code n'est pas
-.. enregistré -- voir l'avertissement ci-dessous.
+.. aucun raster de profondeur à associer aux quatre probabilités d'ensemble ; et
+.. les rasters sont en EPSG:5629, que la carte ne sait pas résoudre tant que le
+.. code n'est pas enregistré (voir l'avertissement ci-dessous). Les données sont
+.. le cycle d'exemple TITO du 27 avril 2024.
 .. Le tableau de bord construit est dashboards/Comoros/Comoros_Hands_On_1.json.
 
 =======================================================================
-Exercice 1 — Une carte de profondeur et de probabilité d'inondation
+Exercice 1 : Une carte de profondeur et de probabilité d'inondation
 =======================================================================
 
 Construction de **Comores Exercice 1**, pas à pas.
@@ -31,7 +31,7 @@ dépassement du cycle de prévision, et trois contrôles en haut : une liste
 déroulante qui change le fond de carte situé en dessous, une deuxième qui choisit
 laquelle des 55 communes du pays est dessinée, et un nombre qui fixe la
 probabilité minimale qu'une cellule doit atteindre pour être dessinée. Le tableau
-de bord s'ouvre sur **Moroni** (KM274), la capitale, sur la Grande Comore.
+de bord s'ouvre sur **Moroni**, la capitale, sur la Grande Comore.
 
 .. figure:: images/ex1-finished.png
    :alt: Le tableau de bord terminé de l'exercice 1
@@ -43,15 +43,16 @@ de bord s'ouvre sur **Moroni** (KM274), la capitale, sur la Grande Comore.
 Cet exercice porte sur les couches raster : où va l'URL, pourquoi une rampe de
 probabilité doit être fixée plutôt que mise à l'échelle automatiquement, et
 comment une entrée variable peut piloter le même réglage sur quatre couches à la
-fois — dont une qui réécrit une partie de l'URL de chaque couche.
+fois, dont une qui réécrit une partie de l'URL de chaque couche.
 
-Il n'y a délibérément **aucune couche de profondeur**. Le cycle ne publie pas de
-raster de profondeur unique — seulement un par membre de la prévision — et poser
-un membre arbitraire à côté de quatre probabilités calculées sur tout l'ensemble
-inviterait le lecteur à comparer des grandeurs qui ne sont pas comparables.
-L'exercice 2 ouvre correctement la bibliothèque de profondeurs.
+Il n'y a délibérément **aucune couche de profondeur**. Le cycle ne publie aucun
+raster de profondeur, seulement les quatre probabilités comptées sur ses 50
+membres, et poser la profondeur d'une seule tempête à côté de quatre probabilités
+calculées sur tout l'ensemble inviterait le lecteur à comparer des grandeurs qui
+ne sont pas comparables. L'exercice 2 transforme plutôt ces mêmes probabilités en
+une profondeur probable sur chaque bâtiment et chaque route.
 
-**Avertissement** — **Les rasters des Comores sont en EPSG:5629 (Moznet / UTM
+**Avertissement :** **Les rasters des Comores sont en EPSG:5629 (Moznet / UTM
 zone 38S), et la carte ne sait pas encore résoudre ce code.** OpenLayers gère
 EPSG:4326, EPSG:3857 et les zones UTM WGS84 par lui-même ; tout le reste doit être
 enregistré, et la table de ``reactapp/components/map/projections.js`` ne contient
@@ -62,7 +63,7 @@ L'ajout consiste en une entrée de table plus un point de contrôle, comme le
 décrivent les commentaires de ce fichier. Rien d'autre dans ce guide ne change
 une fois que c'est fait.
 
-**Remarque** — Les captures d'écran de ce guide sont des images provisoires.
+**Remarque :** Les captures d'écran de ce guide sont des images provisoires.
 Chaque bloc ``figure`` indique ce que l'image doit montrer ; déposez un PNG au
 chemin indiqué sous ``docs/Comoros/images/`` et il s'affichera.
 ``images/README.md`` les répertorie toutes.
@@ -71,49 +72,56 @@ chemin indiqué sous ``docs/Comoros/images/`` et il s'affichera.
 Les données
 ===========
 
-Tout provient d'un seul bucket public :
+Tout provient du **cycle d'exemple** TITO des Comores, la prévision du 27 avril
+2024 à 00:00 UTC :
 
 .. code-block:: text
 
-   https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com
+   https://tito.uffis.org/sample/comoros/20240427.000000/
+
+Un cycle d'exemple est un événement passé conservé pour les démonstrations et
+la formation. Il est organisé exactement comme les cycles en direct que TITO
+publie chaque heure sous ``https://tito.uffis.org/outputs/comoros/<cycle>/`` :
+tout ce que montre ce guide s'applique donc aux données en direct, seuls la
+racine et l'horodatage du cycle changent. Les cycles en direct ne sont conservés
+qu'environ une journée, c'est pourquoi les exercices s'appuient sur l'exemple.
 
 Les produits de prévision des Comores sont écrits **par commune ADM3**, et non
 sur une seule grille nationale : chaque chemin ci-dessous nomme donc une commune.
-Ce nom est un segment de chemin unique combinant le pcode et la commune —
-``KM274_Moroni`` — et l'échanger est tout ce qui sépare les rasters d'une commune
-de ceux d'une autre. L'étape 2 transforme ce segment en liste déroulante, pour que
-le tableau de bord atteigne les 55 communes sans modifier une URL.
+TITO appelle le dossier de chaque commune un *site* et le nomme ``Comoros_``
+suivi de la commune, par exemple ``Comoros_Moroni``. Échanger ce seul segment de
+chemin est tout ce qui sépare les rasters d'une commune de ceux d'une autre.
+L'étape 2 le transforme en liste déroulante, pour que le tableau de bord atteigne
+les 55 communes sans modifier une URL.
 
 .. list-table::
    :header-rows: 1
-   :widths: 26 74
+   :widths: 40 60
 
-   * - Préfixe
+   * - Chemin sous la racine du cycle
      - Contenu
-   * - ``Comoros_training/Comoros_cycle_20240427_0000UTC/``
-     - Le cycle de prévision du 27 avril 2024, et tout ce que dessine cet
-       exercice. ``fim/<commune>/stream_sat_stormlab/`` contient les quatre
-       rasters de probabilité de dépassement dessinés ici, et
-       ``fim/<commune>/member_depths/`` les 50 rasters de profondeur par membre à
-       partir desquels ils sont comptés. Les geopackages de récepteurs que lit
-       l'exercice 3 sont dans ``ibf/``.
-   * - ``Comoros_IBF/Comoros/``
-     - Les magasins de scénarios, un Zarr par commune
-       (``fim_store_KM274_Moroni_v1.zarr``), contenant chacun les 200 tempêtes
-       synthétiques de profondeur maximale. L'exercice 2 ouvre celui de Moroni.
+   * - ``comoros_30m/fim/stream_sat_stormlab/<site>/``
+     - Les cartes d'inondation de la commune. ``pluvial_overbank/`` contient les
+       quatre rasters de probabilité de dépassement dessinés ici, et
+       ``pluvial/`` les quatre mêmes sans la soustraction de l'eau permanente
+       (voir l'étape 4).
+   * - ``comoros_30m/ibf/<site>/``
+     - Le geopackage de récepteurs, ``ibf_receptors.20240427.000000.gpkg`` :
+       chaque bâtiment et chaque route de la commune avec ses quatre
+       probabilités. Les exercices 2 et 3 le lisent au travers de leurs modules.
 
 Deux propriétés de ces données déterminent la forme de l'exercice :
 
 * **Pluvial uniquement.** Les modèles insulaires ont été exécutés avec un forçage
   pluviométrique et sans débit entrant en limite amont : un niveau d'aléa signifie
   donc ici de la pluie qui ne s'est pas écoulée, jamais une rivière en crue.
-* **Une grille projetée.** EPSG:5629 à 30,57 m, la grille propre au modèle
+* **Une grille projetée.** EPSG:5629 à environ 30,57 m, la grille propre au modèle
   insulaire plutôt qu'une copie reprojetée. C'est l'objet de l'avertissement
   ci-dessus, et c'est une vraie différence avec le Guatemala, dont les rasters ont
   été copiés en EPSG:3857 précisément pour que la carte puisse les lire.
 
 
-Étape 1 — Créer le tableau de bord
+Étape 1 : Créer le tableau de bord
 ==================================
 
 #. Créez un nouveau tableau de bord (voir
@@ -132,7 +140,7 @@ Deux propriétés de ces données déterminent la forme de l'exercice :
    supérieur droit pour passer en mode édition.
 
 
-Étape 2 — Ajouter les trois entrées variables
+Étape 2 : Ajouter les trois entrées variables
 =============================================
 
 Les trois contrôles se construisent en premier, car les couches de l'étape 4 en
@@ -163,7 +171,7 @@ référencer. Voir
       * - ``variable_options_source``
         - ``Base Map Layers``
 
-   ``Base Map Layers`` est une source d'options intégrée — elle remplit la liste
+   ``Base Map Layers`` est une source d'options intégrée : elle remplit la liste
    déroulante avec les fonds de carte proposés par l'instance, vous n'avez donc
    pas à les énumérer vous-même.
 
@@ -172,9 +180,9 @@ référencer. Voir
    difficile à lire.
 
 #. Choisissez une valeur initiale dans la prévisualisation, à droite de
-   l'éditeur. La solution livrée utilise **World Imagery** — l'imagerie aérienne
+   l'éditeur. La solution livrée utilise **World Imagery** (l'imagerie aérienne
    permet de voir facilement quels bâtiments se trouvent sous les cellules
-   inondées — mais n'importe quel fond de carte convient.
+   inondées), mais n'importe quel fond de carte convient.
 
 #. Enregistrez l'élément, faites-le glisser dans le coin supérieur gauche et
    redimensionnez-le à environ 14 colonnes de large sur 5 lignes de haut.
@@ -209,9 +217,9 @@ nombre, c'est une liste que vous fournissez.
         - ``dropdown``
 
 #. Choisir ``dropdown`` fait apparaître un éditeur de **choices**. Chaque entrée
-   comporte une **label** — ce que lit l'utilisateur — et une **value** — ce qui
-   est substitué dans l'URL. Pour les Comores, ce sont le nom de la commune et son
-   segment de chemin :
+   comporte une **label** (ce que lit l'utilisateur) et une **value** (ce qui
+   est substitué dans l'URL). Pour les Comores, ce sont le nom de la commune et
+   son dossier de site :
 
    .. list-table::
       :header-rows: 1
@@ -220,20 +228,21 @@ nombre, c'est une liste que vous fournissez.
       * - Étiquette
         - Valeur
       * - ``Moroni``
-        - ``KM274_Moroni``
+        - ``Comoros_Moroni``
       * - ``Mutsamudu``
-        - ``KM134_Mutsamudu``
+        - ``Comoros_Mutsamudu``
       * - ``Fomboni``
-        - ``KM321_Fomboni``
+        - ``Comoros_Fomboni``
       * - …
         - …
 
    La distinction entre les deux est tout l'intérêt. L'utilisateur ne voit jamais
-   de pcode, et l'URL ne voit jamais de nom d'affichage. Les **55** communes
-   figurent dans le tableau de bord livré, ordonnées par pcode pour que les trois
-   îles se regroupent — Anjouan (``KM1xx``), Grande Comore (``KM2xx``), Mohéli
-   (``KM3xx``). Plutôt que de les saisir à la main, importez l'élément livré ou
-   copiez la liste depuis ``dashboards/Comoros/Comoros_Hands_On_1.json``.
+   de nom de dossier, et l'URL ne voit jamais de nom d'affichage avec ses accents
+   et ses espaces. Les **55** communes figurent dans le tableau de bord livré,
+   dans l'ordre des pcodes pour que les trois îles se regroupent : Anjouan, puis
+   la Grande Comore, puis Mohéli. Plutôt que de les saisir à la main, importez
+   l'élément livré ou copiez la liste depuis
+   ``dashboards/Comoros/Comoros_Hands_On_1.json``.
 
 #. Sur l'onglet **Settings**, réglez **Background Color** sur ``#ffffff``.
 
@@ -289,7 +298,7 @@ nombre, c'est une liste que vous fournissez.
    ``variable_options_source`` à ``number`` et une valeur initiale de 0.
 
 
-Étape 3 — Ajouter la carte
+Étape 3 : Ajouter la carte
 ==========================
 
 #. Mettez le tableau de bord en mode édition, ajoutez un autre élément, puis
@@ -307,7 +316,7 @@ nombre, c'est une liste que vous fournissez.
 #. Activez **Layer Control**, pour que les quatre couches puissent être basculées
    individuellement.
 
-Laissez **Map Extent** pour l'étape 5 — il est plus facile de la choisir une fois
+Laissez **Map Extent** pour l'étape 5 : il est plus facile de la choisir une fois
 qu'il y a quelque chose sur la carte.
 
 .. figure:: images/ex1-map-args.png
@@ -318,24 +327,23 @@ qu'il y a quelque chose sur la carte.
    **Base Map** lié à ``${Fond de Carte}`` et **Layer Control** activé.
 
 
-Étape 4 — Ajouter les quatre couches de probabilité
+Étape 4 : Ajouter les quatre couches de probabilité
 ===================================================
 
 Ces quatre couches sont identiques à l'URL et au nom près : construisez-en une et
 répétez. Ajoutez-les dans cet ordre, pour que le seuil le plus profond se
-retrouve au bas de la pile et le moins profond — qui couvre la plus grande
-surface — au-dessus.
+retrouve au bas de la pile et le moins profond, qui couvre la plus grande
+surface, au-dessus.
 
 Les quatre chemins partagent un préfixe ; seule la profondeur dans le nom de
-fichier change. Notez le ``${Commune}`` au milieu — c'est le segment de commune de
+fichier change. Notez le ``${Commune}`` au milieu : c'est le dossier de site de
 l'étape 2, et c'est ce qui permet à un seul jeu de quatre couches de servir les 55
 communes :
 
 .. code-block:: text
 
-   https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/
-     Comoros_training/Comoros_cycle_20240427_0000UTC/Comoros_cycle_20240427_0000UTC/
-     fim/${Commune}/stream_sat_stormlab/pluvial_overbank/
+   https://tito.uffis.org/sample/comoros/20240427.000000/
+     comoros_30m/fim/stream_sat_stormlab/${Commune}/pluvial_overbank/
 
 .. list-table::
    :header-rows: 1
@@ -353,11 +361,17 @@ communes :
      - ``prob_depth_ge_10cm_overbank.20240427.000000.tif``
 
 Ce sont les variantes **overbank**, dont l'eau stagnante permanente de Moroni a
-été retirée — le dossier ``pluvial/`` à côté contient les quatre mêmes rasters
-sans cette soustraction. Pour cette commune, les deux diffèrent sur exactement 47
+été retirée ; le dossier ``pluvial/`` à côté contient les quatre mêmes rasters
+sans cette soustraction. Pour cette commune, les deux diffèrent sur au plus 47
 cellules : le choix se voit donc à peine ici, mais c'est le bon. Un produit qui
 dessinerait l'eau permanente comme une inondation crierait au loup à chaque
 cycle.
+
+L'horodatage du cycle, ``20240427.000000``, apparaît deux fois dans chaque URL :
+une fois dans le chemin et une fois dans le nom de fichier. Sur des données en
+direct, la même couche lirait
+``https://tito.uffis.org/outputs/comoros/<cycle>/...`` avec l'horodatage de ce
+cycle aux deux endroits.
 
 Pour **chacune** des quatre :
 
@@ -409,13 +423,13 @@ Pour **chacune** des quatre :
 
    ``mask_below`` masque les cellules inférieures ou égales à la valeur donnée. À
    ``0``, toute cellule ayant la moindre chance est dessinée. Augmentez-la et la
-   carte ne garde que les cellules qui dépassent cette probabilité — tout l'objet
-   de l'étape 5.
+   carte ne garde que les cellules qui dépassent cette probabilité, ce qui est
+   tout l'objet de l'étape 5.
 
 #. Sur l'onglet **Style**, laissez le mode sur **Continuous** et choisissez la
    rampe **turbo**. Réglez **Min** = ``0`` et **Max** = ``1``.
 
-   Fixer Min et Max à 0–1 est toute la raison d'être de ces quatre couches. La
+   Fixer Min et Max à 0-1 est toute la raison d'être de ces quatre couches. La
    probabilité a une plage fixe et signifiante, et les quatre doivent utiliser la
    même, sinon elles ne sont pas comparables. Laissée en mise à l'échelle
    automatique, chaque couche étirerait sa rampe sur sa propre plage et 0,2
@@ -457,7 +471,7 @@ Pour **chacune** des quatre :
    premier.
 
 
-Étape 5 — Terminer la carte, puis la piloter
+Étape 5 : Terminer la carte, puis la piloter
 ============================================
 
 #. Dans l'argument **Map Extent**, choisissez **Use a Custom Extent** et
@@ -507,13 +521,13 @@ regardez les quatre couches s'éclaircir ensemble :
      - Seulement les cellules sur lesquelles plus de la moitié des membres
        s'accordent.
    * - ``0.9``
-     - La poignée de cellules que presque tous les membres inondent.
+     - Seulement les cellules que presque tous les membres inondent.
 
 **Essayez la commune.** Changez **Commune** et les quatre couches se rechargent
 depuis un dossier différent. Mutsamudu et Jimlimé sur Anjouan, Fomboni sur
 Mohéli, et Moroni ici sont quatre endroits bien différents.
 
-**Avertissement** — **L'étendue de la carte ne suit pas la commune.** C'est une
+**Avertissement :** **L'étendue de la carte ne suit pas la commune.** C'est une
 chaîne fixe centrée sur Moroni : passer à une commune d'une autre île laisse donc
 la vue au-dessus de la haute mer jusqu'à ce que vous fassiez un panoramique. Il
 n'existe pas de variable contenant des coordonnées par commune, et une table de
@@ -521,15 +535,15 @@ correspondance de 55 entrées n'est pas quelque chose qu'une entrée variable sa
 exprimer. Les possibilités sont donc : faire le panoramique à la main, effacer
 l'étendue personnalisée et laisser la carte s'ajuster automatiquement à la
 couche, ou garder une commune par tableau de bord. La solution livrée conserve
-l'étendue fixe et suppose que vous fassiez le panoramique — à soulever comme une
-question de conception plutôt qu'à traiter comme un défaut.
+l'étendue fixe et suppose que vous fassiez le panoramique. C'est à soulever comme
+une question de conception plutôt qu'à traiter comme un défaut.
 
 
 Positions des éléments
 ======================
 
 La solution livrée, pour référence. Il n'est pas nécessaire de les reproduire au
-pixel près — faites glisser jusqu'à une position proche et ajustez.
+pixel près : faites glisser jusqu'à une position proche et ajustez.
 
 .. list-table::
    :header-rows: 1
@@ -561,7 +575,7 @@ pixel près — faites glisser jusqu'à une position proche et ajustez.
      - 20
      - 20
 
-Les trois entrées occupent une seule rangée en haut — gauche, centre, droite —
+Les trois entrées occupent une seule rangée en haut (gauche, centre, droite)
 au-dessus d'une carte dont **Fill Viewport** est activé : sa propre largeur et sa
 hauteur comptent donc moins que son ordre d'empilement.
 
@@ -580,10 +594,10 @@ Vous devriez maintenant avoir :
   déroulante de communes listant les 55, et un nombre **Masque de Probabilité**.
 * Augmenter le masque éclaircit les quatre couches à la fois ; le remettre à 0 les
   restaure.
-* Changer de commune recharge les quatre couches — et laisse la vue là où elle
+* Changer de commune recharge les quatre couches, et laisse la vue là où elle
   était, pour la raison indiquée dans l'avertissement ci-dessus.
 * La couche 10 cm couvrant une emprise visiblement plus grande que la couche
-  100 cm — à Moroni, environ 7 600 cellules contre 59.
+  100 cm : à Moroni, environ 7 600 cellules contre 59.
 
 Si au contraire les couches ne se placent pas, ou si la carte saute loin des
 Comores, relisez l'avertissement en haut de cette page : les rasters sont en
@@ -595,34 +609,36 @@ Points de discussion
 ====================
 
 * **Pourquoi les rampes de probabilité doivent être fixées.** Les quatre couches
-  sont fixées à 0–1 parce que la plage est signifiante et identique pour chacune ;
+  sont fixées à 0-1 parce que la plage est signifiante et identique pour chacune ;
   sans cela, la même couleur voudrait dire un nombre différent sur chaque couche
   et la pile ne pourrait pas se lire. À comparer avec la profondeur, qui n'a pas
   de borne supérieure naturelle et qu'on laisse normalement se mettre à l'échelle
-  automatiquement — une raison parmi d'autres pour que les deux ne cohabitent pas
+  automatiquement : une raison parmi d'autres pour que les deux ne cohabitent pas
   sur la même carte sans précaution.
 * **Deux variables, deux sortes de substitution.** ``${Masque de Probabilité}``
   occupe un champ entier : il se résout donc en un nombre, type compris.
   ``${Commune}`` se trouve à l'intérieur d'une URL plus longue : il est donc
   inséré dans le texte environnant. Même syntaxe, et l'application choisit le bon
-  comportement — mais c'est ce qui permet à une variable de réécrire une partie
+  comportement, mais c'est ce qui permet à une variable de réécrire une partie
   d'un chemin, et c'est ce qui transforme une carte en 55.
 * **Étiquette contre valeur.** La liste déroulante des communes affiche ``Moroni``
-  et stocke ``KM274_Moroni``. Présenter une étiquette lisible à la place d'une clé
-  opaque vaut presque toujours l'indirection, et cela signifie que le schéma de
-  pcodes peut changer sans que l'utilisateur s'en aperçoive.
+  et stocke ``Comoros_Moroni``. Présenter une étiquette lisible à la place d'une
+  clé opaque vaut presque toujours l'indirection, et cela signifie que le nommage
+  des dossiers peut changer sans que l'utilisateur s'en aperçoive. Il a d'ailleurs
+  changé : une version antérieure de ce tableau de bord stockait des pcodes comme
+  ``KM274_Moroni``, et seules les valeurs ont dû être modifiées.
 * **Ce que filtre réellement le masque.** Le porter à 0,2 ne garde pas « les
   cellules ayant 20 % de chances d'être inondées ». Il garde les cellules que
   **plus de 10 des 50 membres** de la prévision ont atteintes à cette profondeur.
-  Ces 50 membres se réduisent à 16 scénarios distincts de la bibliothèque : les
-  valeurs sont donc grossières — la couche 10 cm ne prend que 41 valeurs
-  distinctes sur toute la commune — et la couche s'éclaircit par sauts visibles
-  plutôt que progressivement. À démontrer : c'est la façon la plus claire de
+  Chaque valeur est un compte sur 50, un multiple de 0,02 : les valeurs sont donc
+  grossières (la couche 10 cm ne prend que 41 valeurs distinctes sur toute la
+  commune, zéro compris), et la couche s'éclaircit par sauts visibles plutôt que
+  progressivement. À démontrer : c'est la façon la plus claire de
   montrer à un auditoire que le nombre est une part d'ensemble, et non une
   probabilité calibrée.
 * **L'ordre des couches est l'ordre de dessin, et les seuils sont emboîtés.** La
   première couche de la liste se dessine le plus bas et chacune des suivantes
-  peint par-dessus : la couche 10 cm — ajoutée en dernier, la plus étendue — se
+  peint par-dessus : la couche 10 cm (ajoutée en dernier, la plus étendue) se
   retrouve donc au sommet. Partout où la couche 100 cm a une valeur, la couche
   10 cm en a une aussi : en opacité pleine, les trois couches plus profondes
   seraient invisibles. C'est l'opacité ``.5`` qui garde l'emboîtement lisible ; le
@@ -630,7 +646,7 @@ Points de discussion
 * **Overbank contre pluvial.** Les quatre couches utilisées ici ont l'eau
   stagnante permanente de la commune soustraite. Pour Moroni, cela ne représente
   que 47 cellules : remplacer l'une d'elles par sa jumelle de ``pluvial/`` se voit
-  à peine — mais c'est le principe qui compte, et d'autres communes portent une
+  à peine, mais c'est le principe qui compte, et d'autres communes portent une
   ligne de base plus importante.
 * **La contrainte de projection.** Les rasters du Guatemala ont été copiés en
   EPSG:3857 pour que la carte puisse les lire. Les produits des Comores n'ont pas
@@ -642,7 +658,8 @@ Points de discussion
 Suite
 =====
 
-L'exercice 2 ouvre la bibliothèque Zarr de cartes d'inondation de la commune —
-les 200 scénarios, et pas seulement les 16 auxquels ce cycle correspond — et met
-la tempête sur une entrée variable, de sorte que la profondeur délibérément
-laissée de côté dans cet exercice arrive avec le contexte permettant de la lire.
+L'exercice 2 reste sur le même cycle d'exemple et transforme ses probabilités en
+impact : une liste déroulante de cycles, une entrée de probabilité, et la
+profondeur d'inondation probable sur chaque bâtiment et chaque route, de sorte
+que la profondeur délibérément laissée de côté dans cet exercice arrive avec le
+contexte permettant de la lire.

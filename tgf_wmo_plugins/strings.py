@@ -196,6 +196,14 @@ STRINGS = {
         "axis_likelihood": "Likelihood",
         "axis_severity": "Impact severity",
         "overall_warning": "Overall warning",
+        "depth_filter_label": "Flood Probability",
+        "depth_filter_desc": "Chooses the flood depth whose probability a layer shows.",
+        "depth_filter_tags": ["flood", "probability", "depth", "filter", "english"],
+        "depth_filter_variable": "Flood probability",
+        "depth_filter_choices": {
+            "10cm": "Low (10 cm)", "30cm": "Medium (30 cm)",
+            "70cm": "High (70 cm)", "100cm": "Severe (100 cm)",
+        },
         "risk_filter_label": "Risk Level Filter",
         "risk_filter_desc": "Shows buildings and roads at or above a warning level.",
         "risk_filter_tags": ["flood", "risk", "warning", "filter", "english"],
@@ -399,15 +407,15 @@ STRINGS = {
         "rain_periods": {"forecast": "Pronóstico", "nowcast": "Pronóstico inmediato"},
         "rain_grid_kinds": {"national": "nacional", "flood_sites": "sitios de inundación"},
         "msg_no_summary": "El ciclo {cycle} no publicó datos de {product} ({period}, {statistic}) en {grid}",
-        "soil_layer_label": "Saturación del Suelo",
+        "soil_layer_label": "Humedad de Suelo",
         "soil_layer_desc": (
-            "Saturación máxima del suelo del conjunto para un ciclo de TITO. "
+            "Humedad máxima de suelo del conjunto para un ciclo de TITO. "
             "Vincule el ciclo a una entrada de Ciclos Disponibles o deje el más "
             "reciente."
         ),
         "soil_layer_tags": ["humedad del suelo", "pronóstico", "ráster", "map_layer", "dinámico", "español"],
-        "soil_layer_name": "Saturación del suelo",
-        "soil_legend": "Saturación del suelo (%)",
+        "soil_layer_name": "Humedad de suelo",
+        "soil_legend": "Humedad de suelo (%)",
         "unitq_layer_label": "Caudal Unitario Máximo",
         "unitq_layer_desc": (
             "Caudal unitario máximo del conjunto (caudal por km² de cuenca) para "
@@ -417,7 +425,7 @@ STRINGS = {
         "unitq_layer_tags": ["caudal", "pronóstico", "ráster", "map_layer", "dinámico", "español"],
         "unitq_layer_name": "Caudal unitario máximo",
         "unitq_legend": "Caudal unitario máximo (m³/s por km²)",
-        "summary_products": {"qpeaccum": "lluvia", "maxsm": "saturación del suelo", "maxunitq": "caudal unitario"},
+        "summary_products": {"qpeaccum": "lluvia", "maxsm": "humedad de suelo", "maxunitq": "caudal unitario"},
         "flood_map_layer_label": "Capa de Probabilidad de Inundación",
         "flood_map_layer_desc": (
             "La probabilidad de que la profundidad de inundación alcance un "
@@ -444,6 +452,14 @@ STRINGS = {
         "axis_likelihood": "Probabilidad",
         "axis_severity": "Severidad del impacto",
         "overall_warning": "Alerta general",
+        "depth_filter_label": "Probabilidad de Inundación",
+        "depth_filter_desc": "Elige la profundidad de inundación cuya probabilidad muestra una capa.",
+        "depth_filter_tags": ["inundación", "probabilidad", "profundidad", "filtro", "español"],
+        "depth_filter_variable": "Probabilidad de inundación",
+        "depth_filter_choices": {
+            "10cm": "Mínima (10 cm)", "30cm": "Menor (30 cm)",
+            "70cm": "Significativa (70 cm)", "100cm": "Severa (100 cm)",
+        },
         "risk_filter_label": "Filtro de Nivel de Riesgo",
         "risk_filter_desc": "Muestra edificios y carreteras con un nivel de alerta igual o superior.",
         "risk_filter_tags": ["inundación", "riesgo", "alerta", "filtro", "español"],
@@ -645,15 +661,16 @@ STRINGS = {
         "rain_statistics": {"median": "Médiane", "min": "Minimum", "max": "Maximum"},
         "rain_periods": {"forecast": "Prévision", "nowcast": "Prévision immédiate"},
         "rain_grid_kinds": {"national": "national", "flood_sites": "sites d'inondation"},
-        "msg_no_summary": "Le cycle {cycle} n'a publié aucune donnée de {product} ({period}, {statistic}) sur {grid}",
-        "soil_layer_label": "Saturation du Sol",
+        "msg_no_summary": ("Le cycle {cycle} n'a publié aucune donnée pour : "
+                           "{product} ({period}, {statistic}) sur {grid}"),
+        "soil_layer_label": "Humidité du Sol",
         "soil_layer_desc": (
-            "Saturation maximale du sol de l'ensemble pour un cycle TITO. Liez le "
+            "Humidité maximale du sol de l'ensemble pour un cycle TITO. Liez le "
             "cycle à une entrée Cycles Disponibles, ou laissez le plus récent."
         ),
         "soil_layer_tags": ["humidité du sol", "prévision", "raster", "map_layer", "dynamique", "français"],
-        "soil_layer_name": "Saturation du sol",
-        "soil_legend": "Saturation du sol (%)",
+        "soil_layer_name": "Humidité du sol",
+        "soil_legend": "Humidité du sol (%)",
         "unitq_layer_label": "Débit Unitaire Maximal",
         "unitq_layer_desc": (
             "Débit unitaire maximal de l'ensemble (débit par km² de bassin) pour "
@@ -663,7 +680,7 @@ STRINGS = {
         "unitq_layer_tags": ["débit", "prévision", "raster", "map_layer", "dynamique", "français"],
         "unitq_layer_name": "Débit unitaire maximal",
         "unitq_legend": "Débit unitaire maximal (m³/s par km²)",
-        "summary_products": {"qpeaccum": "pluie", "maxsm": "saturation du sol", "maxunitq": "débit unitaire"},
+        "summary_products": {"qpeaccum": "pluie", "maxsm": "humidité du sol", "maxunitq": "débit unitaire"},
         "flood_map_layer_label": "Couche de Probabilité d'Inondation",
         "flood_map_layer_desc": (
             "La probabilité que la profondeur d'inondation atteigne un seuil, "
@@ -690,6 +707,14 @@ STRINGS = {
         "axis_likelihood": "Probabilité",
         "axis_severity": "Sévérité de l'impact",
         "overall_warning": "Alerte globale",
+        "depth_filter_label": "Probabilité d'Inondation",
+        "depth_filter_desc": "Choisit la profondeur d'inondation dont une couche montre la probabilité.",
+        "depth_filter_tags": ["inondation", "probabilité", "profondeur", "filtre", "français"],
+        "depth_filter_variable": "Probabilité d'inondation",
+        "depth_filter_choices": {
+            "10cm": "Faible (10 cm)", "30cm": "Moyen (30 cm)",
+            "70cm": "Élevé (70 cm)", "100cm": "Sévère (100 cm)",
+        },
         "risk_filter_label": "Filtre de Niveau de Risque",
         "risk_filter_desc": "Affiche les bâtiments et routes à partir d'un niveau d'alerte.",
         "risk_filter_tags": ["inondation", "risque", "alerte", "filtre", "français"],
@@ -797,15 +822,18 @@ THRESHOLD_ARGS = {
 LIVE_ARGS = {
     "en": {"cycle": "cycle", "variant": "flood_source", "gauge": "gauge",
            "likelihood": "min_probability", "min_risk": "min_risk_level", "depth": "depth",
-           "grid": "grid", "statistic": "statistic", "period": "period", "start": "start"},
+           "grid": "grid", "statistic": "statistic", "period": "period", "start": "start",
+           "label_text": "label_text", "show_label": "show_label"},
     "es": {"cycle": "ciclo", "variant": "fuente_inundacion", "gauge": "estacion",
            "likelihood": "probabilidad_minima", "min_risk": "nivel_riesgo_minimo",
            "depth": "profundidad", "grid": "malla", "statistic": "estadistica",
-           "period": "periodo", "start": "inicio"},
+           "period": "periodo", "start": "inicio", "label_text": "texto_etiqueta",
+           "show_label": "mostrar_etiqueta"},
     "fr": {"cycle": "cycle", "variant": "source_inondation", "gauge": "station",
            "likelihood": "probabilite_minimale", "min_risk": "niveau_risque_minimal",
            "depth": "profondeur", "grid": "grille", "statistic": "statistique",
-           "period": "periode", "start": "debut"},
+           "period": "periode", "start": "debut", "label_text": "texte_etiquette",
+           "show_label": "afficher_etiquette"},
 }
 
 
@@ -837,7 +865,8 @@ def check_parity():
         for key in ("levels", "bands", "variants", "forcings", "likely_bands",
                     "risk_levels", "severity_levels", "likelihood_levels",
                     "risk_filter_choices", "depth_choices", "rain_statistics",
-                    "rain_periods", "rain_grid_kinds", "summary_products"):
+                    "rain_periods", "rain_grid_kinds", "summary_products",
+                    "depth_filter_choices"):
             if set(STRINGS["en"][key]) != set(STRINGS[lang][key]):
                 raise ValueError(f"{key} class values differ in {lang}")
 

@@ -1,6 +1,19 @@
 {
   "uffis_cycle_times_antigua_barbuda": {
-    "args": {},
+    "args": {
+      "label_text": "text",
+      "show_label": "checkbox",
+      "start": [
+        {
+          "label": "Latest live cycle",
+          "value": "latest"
+        },
+        {
+          "label": "Newest sample cycle",
+          "value": "sample"
+        }
+      ]
+    },
     "dynamic_map_layer": false,
     "group": "UFFIS: Antigua and Barbuda",
     "label": "Antigua and Barbuda: Available Cycles",
@@ -8,7 +21,20 @@
     "type": "variable_input"
   },
   "uffis_cycle_times_comoros": {
-    "args": {},
+    "args": {
+      "afficher_etiquette": "checkbox",
+      "debut": [
+        {
+          "label": "Dernier cycle en direct",
+          "value": "latest"
+        },
+        {
+          "label": "Cycle d'exemple le plus récent",
+          "value": "sample"
+        }
+      ],
+      "texte_etiquette": "text"
+    },
     "dynamic_map_layer": false,
     "group": "UFFIS: Comores",
     "label": "Comores: Cycles Disponibles",
@@ -26,7 +52,9 @@
           "label": "Ciclo de muestra más reciente",
           "value": "sample"
         }
-      ]
+      ],
+      "mostrar_etiqueta": "checkbox",
+      "texto_etiqueta": "text"
     },
     "dynamic_map_layer": false,
     "group": "UFFIS: Guatemala",
@@ -35,11 +63,68 @@
     "type": "variable_input"
   },
   "uffis_cycle_times_haiti": {
-    "args": {},
+    "args": {
+      "afficher_etiquette": "checkbox",
+      "debut": [
+        {
+          "label": "Dernier cycle en direct",
+          "value": "latest"
+        },
+        {
+          "label": "Cycle d'exemple le plus récent",
+          "value": "sample"
+        }
+      ],
+      "texte_etiquette": "text"
+    },
     "dynamic_map_layer": false,
     "group": "UFFIS: Haiti",
     "label": "Haiti: Cycles Disponibles",
     "name": "uffis_cycle_times_haiti",
+    "type": "variable_input"
+  },
+  "uffis_depth_filter_antigua_barbuda": {
+    "args": {
+      "label_text": "text",
+      "show_label": "checkbox"
+    },
+    "dynamic_map_layer": false,
+    "group": "UFFIS: Antigua and Barbuda",
+    "label": "Antigua and Barbuda: Flood Probability",
+    "name": "uffis_depth_filter_antigua_barbuda",
+    "type": "variable_input"
+  },
+  "uffis_depth_filter_comoros": {
+    "args": {
+      "afficher_etiquette": "checkbox",
+      "texte_etiquette": "text"
+    },
+    "dynamic_map_layer": false,
+    "group": "UFFIS: Comores",
+    "label": "Comores: Probabilité d'Inondation",
+    "name": "uffis_depth_filter_comoros",
+    "type": "variable_input"
+  },
+  "uffis_depth_filter_guatemala": {
+    "args": {
+      "mostrar_etiqueta": "checkbox",
+      "texto_etiqueta": "text"
+    },
+    "dynamic_map_layer": false,
+    "group": "UFFIS: Guatemala",
+    "label": "Guatemala: Probabilidad de Inundación",
+    "name": "uffis_depth_filter_guatemala",
+    "type": "variable_input"
+  },
+  "uffis_depth_filter_haiti": {
+    "args": {
+      "afficher_etiquette": "checkbox",
+      "texte_etiquette": "text"
+    },
+    "dynamic_map_layer": false,
+    "group": "UFFIS: Haiti",
+    "label": "Haiti: Probabilité d'Inondation",
+    "name": "uffis_depth_filter_haiti",
     "type": "variable_input"
   },
   "uffis_discharge_guatemala": {
@@ -81,6 +166,10 @@
         {
           "label": "Dernier cycle",
           "value": "latest"
+        },
+        {
+          "label": "Événement d'exemple",
+          "value": "sample"
         }
       ],
       "station": [
@@ -110,6 +199,40 @@
         {
           "label": "Latest cycle",
           "value": "latest"
+        },
+        {
+          "label": "Sample event",
+          "value": "sample"
+        }
+      ],
+      "parish": [
+        {
+          "label": "Saint John's",
+          "value": "Antigua_SaintJohnS"
+        },
+        {
+          "label": "Saint George",
+          "value": "Antigua_SaintGeorge"
+        },
+        {
+          "label": "Saint Mary",
+          "value": "Antigua_SaintMary"
+        },
+        {
+          "label": "Saint Paul",
+          "value": "Antigua_SaintPaul"
+        },
+        {
+          "label": "Saint Peter",
+          "value": "Antigua_SaintPeter"
+        },
+        {
+          "label": "Saint Philip",
+          "value": "Antigua_SaintPhilip"
+        },
+        {
+          "label": "Barbuda",
+          "value": "Antigua_Barbuda"
         }
       ]
     },
@@ -347,6 +470,10 @@
         {
           "label": "Dernier cycle",
           "value": "latest"
+        },
+        {
+          "label": "Événement d'exemple",
+          "value": "sample"
         }
       ]
     },
@@ -381,6 +508,10 @@
         {
           "label": "Dernier cycle",
           "value": "latest"
+        },
+        {
+          "label": "Événement d'exemple",
+          "value": "sample"
         }
       ],
       "site": [
@@ -406,6 +537,10 @@
         {
           "label": "Latest cycle",
           "value": "latest"
+        },
+        {
+          "label": "Sample event",
+          "value": "sample"
         }
       ],
       "depth": [
@@ -436,7 +571,37 @@
           "value": "pluvial"
         }
       ],
-      "min_probability": "number"
+      "min_probability": "number",
+      "parish": [
+        {
+          "label": "Saint John's",
+          "value": "Antigua_SaintJohnS"
+        },
+        {
+          "label": "Saint George",
+          "value": "Antigua_SaintGeorge"
+        },
+        {
+          "label": "Saint Mary",
+          "value": "Antigua_SaintMary"
+        },
+        {
+          "label": "Saint Paul",
+          "value": "Antigua_SaintPaul"
+        },
+        {
+          "label": "Saint Peter",
+          "value": "Antigua_SaintPeter"
+        },
+        {
+          "label": "Saint Philip",
+          "value": "Antigua_SaintPhilip"
+        },
+        {
+          "label": "Barbuda",
+          "value": "Antigua_Barbuda"
+        }
+      ]
     },
     "dynamic_map_layer": true,
     "group": "UFFIS: Antigua and Barbuda",
@@ -672,6 +837,10 @@
         {
           "label": "Dernier cycle",
           "value": "latest"
+        },
+        {
+          "label": "Événement d'exemple",
+          "value": "sample"
         }
       ],
       "probabilite_minimale": "number",
@@ -780,6 +949,10 @@
         {
           "label": "Dernier cycle",
           "value": "latest"
+        },
+        {
+          "label": "Événement d'exemple",
+          "value": "sample"
         }
       ],
       "probabilite_minimale": "number",
@@ -854,6 +1027,10 @@
         {
           "label": "Training data",
           "value": "training"
+        },
+        {
+          "label": "Sample event",
+          "value": "sample"
         }
       ],
       "flood_source": [
@@ -869,6 +1046,36 @@
       "high_threshold": "number",
       "low_threshold": "number",
       "medium_threshold": "number",
+      "parish": [
+        {
+          "label": "Saint John's",
+          "value": "Antigua_SaintJohnS"
+        },
+        {
+          "label": "Saint George",
+          "value": "Antigua_SaintGeorge"
+        },
+        {
+          "label": "Saint Mary",
+          "value": "Antigua_SaintMary"
+        },
+        {
+          "label": "Saint Paul",
+          "value": "Antigua_SaintPaul"
+        },
+        {
+          "label": "Saint Peter",
+          "value": "Antigua_SaintPeter"
+        },
+        {
+          "label": "Saint Philip",
+          "value": "Antigua_SaintPhilip"
+        },
+        {
+          "label": "Barbuda",
+          "value": "Antigua_Barbuda"
+        }
+      ],
       "severe_threshold": "number"
     },
     "dynamic_map_layer": true,
@@ -1168,6 +1375,10 @@
         {
           "label": "Données de formation",
           "value": "training"
+        },
+        {
+          "label": "Événement d'exemple",
+          "value": "sample"
         }
       ],
       "seuil_eleve": "number",
@@ -1250,6 +1461,10 @@
         {
           "label": "Dernier cycle",
           "value": "latest"
+        },
+        {
+          "label": "Événement d'exemple",
+          "value": "sample"
         }
       ],
       "seuil_eleve": "number",
@@ -1309,11 +1524,45 @@
         {
           "label": "Training data",
           "value": "training"
+        },
+        {
+          "label": "Sample event",
+          "value": "sample"
         }
       ],
       "high_threshold": "number",
       "low_threshold": "number",
       "medium_threshold": "number",
+      "parish": [
+        {
+          "label": "Saint John's",
+          "value": "Antigua_SaintJohnS"
+        },
+        {
+          "label": "Saint George",
+          "value": "Antigua_SaintGeorge"
+        },
+        {
+          "label": "Saint Mary",
+          "value": "Antigua_SaintMary"
+        },
+        {
+          "label": "Saint Paul",
+          "value": "Antigua_SaintPaul"
+        },
+        {
+          "label": "Saint Peter",
+          "value": "Antigua_SaintPeter"
+        },
+        {
+          "label": "Saint Philip",
+          "value": "Antigua_SaintPhilip"
+        },
+        {
+          "label": "Barbuda",
+          "value": "Antigua_Barbuda"
+        }
+      ],
       "severe_threshold": "number"
     },
     "dynamic_map_layer": true,
@@ -1613,6 +1862,10 @@
         {
           "label": "Données de formation",
           "value": "training"
+        },
+        {
+          "label": "Événement d'exemple",
+          "value": "sample"
         }
       ],
       "seuil_eleve": "number",
@@ -1663,6 +1916,10 @@
         {
           "label": "Données de formation",
           "value": "training"
+        },
+        {
+          "label": "Événement d'exemple",
+          "value": "sample"
         }
       ],
       "seuil_eleve": "number",
@@ -1696,11 +1953,45 @@
         {
           "label": "Training data",
           "value": "training"
+        },
+        {
+          "label": "Sample event",
+          "value": "sample"
         }
       ],
       "high_threshold": "number",
       "low_threshold": "number",
       "medium_threshold": "number",
+      "parish": [
+        {
+          "label": "Saint John's",
+          "value": "Antigua_SaintJohnS"
+        },
+        {
+          "label": "Saint George",
+          "value": "Antigua_SaintGeorge"
+        },
+        {
+          "label": "Saint Mary",
+          "value": "Antigua_SaintMary"
+        },
+        {
+          "label": "Saint Paul",
+          "value": "Antigua_SaintPaul"
+        },
+        {
+          "label": "Saint Peter",
+          "value": "Antigua_SaintPeter"
+        },
+        {
+          "label": "Saint Philip",
+          "value": "Antigua_SaintPhilip"
+        },
+        {
+          "label": "Barbuda",
+          "value": "Antigua_Barbuda"
+        }
+      ],
       "severe_threshold": "number"
     },
     "dynamic_map_layer": false,
@@ -2000,6 +2291,10 @@
         {
           "label": "Données de formation",
           "value": "training"
+        },
+        {
+          "label": "Événement d'exemple",
+          "value": "sample"
         }
       ],
       "seuil_eleve": "number",
@@ -2050,6 +2345,10 @@
         {
           "label": "Données de formation",
           "value": "training"
+        },
+        {
+          "label": "Événement d'exemple",
+          "value": "sample"
         }
       ],
       "seuil_eleve": "number",
@@ -2079,6 +2378,10 @@
         {
           "label": "Latest cycle",
           "value": "latest"
+        },
+        {
+          "label": "Sample event",
+          "value": "sample"
         }
       ],
       "grid": [
@@ -2124,6 +2427,10 @@
         {
           "label": "Dernier cycle",
           "value": "latest"
+        },
+        {
+          "label": "Événement d'exemple",
+          "value": "sample"
         }
       ],
       "grille": [
@@ -2222,6 +2529,10 @@
         {
           "label": "Dernier cycle",
           "value": "latest"
+        },
+        {
+          "label": "Événement d'exemple",
+          "value": "sample"
         }
       ],
       "grille": [
@@ -2266,7 +2577,10 @@
     "type": "map_layer"
   },
   "uffis_risk_filter_antigua_barbuda": {
-    "args": {},
+    "args": {
+      "label_text": "text",
+      "show_label": "checkbox"
+    },
     "dynamic_map_layer": false,
     "group": "UFFIS: Antigua and Barbuda",
     "label": "Antigua and Barbuda: Risk Level Filter",
@@ -2274,7 +2588,10 @@
     "type": "variable_input"
   },
   "uffis_risk_filter_comoros": {
-    "args": {},
+    "args": {
+      "afficher_etiquette": "checkbox",
+      "texte_etiquette": "text"
+    },
     "dynamic_map_layer": false,
     "group": "UFFIS: Comores",
     "label": "Comores: Filtre de Niveau de Risque",
@@ -2282,7 +2599,10 @@
     "type": "variable_input"
   },
   "uffis_risk_filter_guatemala": {
-    "args": {},
+    "args": {
+      "mostrar_etiqueta": "checkbox",
+      "texto_etiqueta": "text"
+    },
     "dynamic_map_layer": false,
     "group": "UFFIS: Guatemala",
     "label": "Guatemala: Filtro de Nivel de Riesgo",
@@ -2290,7 +2610,10 @@
     "type": "variable_input"
   },
   "uffis_risk_filter_haiti": {
-    "args": {},
+    "args": {
+      "afficher_etiquette": "checkbox",
+      "texte_etiquette": "text"
+    },
     "dynamic_map_layer": false,
     "group": "UFFIS: Haiti",
     "label": "Haiti: Filtre de Niveau de Risque",
@@ -2303,6 +2626,10 @@
         {
           "label": "Latest cycle",
           "value": "latest"
+        },
+        {
+          "label": "Sample event",
+          "value": "sample"
         }
       ],
       "min_risk_level": [
@@ -2321,6 +2648,36 @@
         {
           "label": "Red only",
           "value": "3"
+        }
+      ],
+      "parish": [
+        {
+          "label": "Saint John's",
+          "value": "Antigua_SaintJohnS"
+        },
+        {
+          "label": "Saint George",
+          "value": "Antigua_SaintGeorge"
+        },
+        {
+          "label": "Saint Mary",
+          "value": "Antigua_SaintMary"
+        },
+        {
+          "label": "Saint Paul",
+          "value": "Antigua_SaintPaul"
+        },
+        {
+          "label": "Saint Peter",
+          "value": "Antigua_SaintPeter"
+        },
+        {
+          "label": "Saint Philip",
+          "value": "Antigua_SaintPhilip"
+        },
+        {
+          "label": "Barbuda",
+          "value": "Antigua_Barbuda"
         }
       ]
     },
@@ -2558,6 +2915,10 @@
         {
           "label": "Dernier cycle",
           "value": "latest"
+        },
+        {
+          "label": "Événement d'exemple",
+          "value": "sample"
         }
       ],
       "niveau_risque_minimal": [
@@ -2628,6 +2989,10 @@
         {
           "label": "Dernier cycle",
           "value": "latest"
+        },
+        {
+          "label": "Événement d'exemple",
+          "value": "sample"
         }
       ],
       "niveau_risque_minimal": [
@@ -2671,6 +3036,40 @@
         {
           "label": "Latest cycle",
           "value": "latest"
+        },
+        {
+          "label": "Sample event",
+          "value": "sample"
+        }
+      ],
+      "parish": [
+        {
+          "label": "Saint John's",
+          "value": "Antigua_SaintJohnS"
+        },
+        {
+          "label": "Saint George",
+          "value": "Antigua_SaintGeorge"
+        },
+        {
+          "label": "Saint Mary",
+          "value": "Antigua_SaintMary"
+        },
+        {
+          "label": "Saint Paul",
+          "value": "Antigua_SaintPaul"
+        },
+        {
+          "label": "Saint Peter",
+          "value": "Antigua_SaintPeter"
+        },
+        {
+          "label": "Saint Philip",
+          "value": "Antigua_SaintPhilip"
+        },
+        {
+          "label": "Barbuda",
+          "value": "Antigua_Barbuda"
         }
       ]
     },
@@ -2908,6 +3307,10 @@
         {
           "label": "Dernier cycle",
           "value": "latest"
+        },
+        {
+          "label": "Événement d'exemple",
+          "value": "sample"
         }
       ]
     },
@@ -2942,6 +3345,10 @@
         {
           "label": "Dernier cycle",
           "value": "latest"
+        },
+        {
+          "label": "Événement d'exemple",
+          "value": "sample"
         }
       ],
       "site": [
@@ -2967,6 +3374,10 @@
         {
           "label": "Latest cycle",
           "value": "latest"
+        },
+        {
+          "label": "Sample event",
+          "value": "sample"
         }
       ],
       "grid": [
@@ -3012,6 +3423,10 @@
         {
           "label": "Dernier cycle",
           "value": "latest"
+        },
+        {
+          "label": "Événement d'exemple",
+          "value": "sample"
         }
       ],
       "grille": [
@@ -3047,7 +3462,7 @@
     },
     "dynamic_map_layer": true,
     "group": "UFFIS: Comores",
-    "label": "Comores: Saturation du Sol",
+    "label": "Comores: Humidité du Sol",
     "name": "uffis_soil_moisture_layer_comoros",
     "type": "map_layer"
   },
@@ -3100,7 +3515,7 @@
     },
     "dynamic_map_layer": true,
     "group": "UFFIS: Guatemala",
-    "label": "Guatemala: Saturación del Suelo",
+    "label": "Guatemala: Humedad de Suelo",
     "name": "uffis_soil_moisture_layer_guatemala",
     "type": "map_layer"
   },
@@ -3110,6 +3525,10 @@
         {
           "label": "Dernier cycle",
           "value": "latest"
+        },
+        {
+          "label": "Événement d'exemple",
+          "value": "sample"
         }
       ],
       "grille": [
@@ -3149,7 +3568,7 @@
     },
     "dynamic_map_layer": true,
     "group": "UFFIS: Haiti",
-    "label": "Haiti: Saturation du Sol",
+    "label": "Haiti: Humidité du Sol",
     "name": "uffis_soil_moisture_layer_haiti",
     "type": "map_layer"
   },
@@ -3159,9 +3578,43 @@
         {
           "label": "Latest cycle",
           "value": "latest"
+        },
+        {
+          "label": "Sample event",
+          "value": "sample"
         }
       ],
-      "min_probability": "number"
+      "min_probability": "number",
+      "parish": [
+        {
+          "label": "Saint John's",
+          "value": "Antigua_SaintJohnS"
+        },
+        {
+          "label": "Saint George",
+          "value": "Antigua_SaintGeorge"
+        },
+        {
+          "label": "Saint Mary",
+          "value": "Antigua_SaintMary"
+        },
+        {
+          "label": "Saint Paul",
+          "value": "Antigua_SaintPaul"
+        },
+        {
+          "label": "Saint Peter",
+          "value": "Antigua_SaintPeter"
+        },
+        {
+          "label": "Saint Philip",
+          "value": "Antigua_SaintPhilip"
+        },
+        {
+          "label": "Barbuda",
+          "value": "Antigua_Barbuda"
+        }
+      ]
     },
     "dynamic_map_layer": false,
     "group": "UFFIS: Antigua and Barbuda",
@@ -4254,6 +4707,10 @@
         {
           "label": "Dernier cycle",
           "value": "latest"
+        },
+        {
+          "label": "Événement d'exemple",
+          "value": "sample"
         }
       ],
       "probabilite_minimale": "number"
@@ -4290,6 +4747,10 @@
         {
           "label": "Dernier cycle",
           "value": "latest"
+        },
+        {
+          "label": "Événement d'exemple",
+          "value": "sample"
         }
       ],
       "probabilite_minimale": "number",
@@ -4316,9 +4777,43 @@
         {
           "label": "Latest cycle",
           "value": "latest"
+        },
+        {
+          "label": "Sample event",
+          "value": "sample"
         }
       ],
-      "min_probability": "number"
+      "min_probability": "number",
+      "parish": [
+        {
+          "label": "Saint John's",
+          "value": "Antigua_SaintJohnS"
+        },
+        {
+          "label": "Saint George",
+          "value": "Antigua_SaintGeorge"
+        },
+        {
+          "label": "Saint Mary",
+          "value": "Antigua_SaintMary"
+        },
+        {
+          "label": "Saint Paul",
+          "value": "Antigua_SaintPaul"
+        },
+        {
+          "label": "Saint Peter",
+          "value": "Antigua_SaintPeter"
+        },
+        {
+          "label": "Saint Philip",
+          "value": "Antigua_SaintPhilip"
+        },
+        {
+          "label": "Barbuda",
+          "value": "Antigua_Barbuda"
+        }
+      ]
     },
     "dynamic_map_layer": true,
     "group": "UFFIS: Antigua and Barbuda",
@@ -5411,6 +5906,10 @@
         {
           "label": "Dernier cycle",
           "value": "latest"
+        },
+        {
+          "label": "Événement d'exemple",
+          "value": "sample"
         }
       ],
       "probabilite_minimale": "number"
@@ -5447,6 +5946,10 @@
         {
           "label": "Dernier cycle",
           "value": "latest"
+        },
+        {
+          "label": "Événement d'exemple",
+          "value": "sample"
         }
       ],
       "probabilite_minimale": "number",
@@ -5473,9 +5976,43 @@
         {
           "label": "Latest cycle",
           "value": "latest"
+        },
+        {
+          "label": "Sample event",
+          "value": "sample"
         }
       ],
-      "min_probability": "number"
+      "min_probability": "number",
+      "parish": [
+        {
+          "label": "Saint John's",
+          "value": "Antigua_SaintJohnS"
+        },
+        {
+          "label": "Saint George",
+          "value": "Antigua_SaintGeorge"
+        },
+        {
+          "label": "Saint Mary",
+          "value": "Antigua_SaintMary"
+        },
+        {
+          "label": "Saint Paul",
+          "value": "Antigua_SaintPaul"
+        },
+        {
+          "label": "Saint Peter",
+          "value": "Antigua_SaintPeter"
+        },
+        {
+          "label": "Saint Philip",
+          "value": "Antigua_SaintPhilip"
+        },
+        {
+          "label": "Barbuda",
+          "value": "Antigua_Barbuda"
+        }
+      ]
     },
     "dynamic_map_layer": false,
     "group": "UFFIS: Antigua and Barbuda",
@@ -6568,6 +7105,10 @@
         {
           "label": "Dernier cycle",
           "value": "latest"
+        },
+        {
+          "label": "Événement d'exemple",
+          "value": "sample"
         }
       ],
       "probabilite_minimale": "number"
@@ -6604,6 +7145,10 @@
         {
           "label": "Dernier cycle",
           "value": "latest"
+        },
+        {
+          "label": "Événement d'exemple",
+          "value": "sample"
         }
       ],
       "probabilite_minimale": "number",
@@ -6630,6 +7175,10 @@
         {
           "label": "Latest cycle",
           "value": "latest"
+        },
+        {
+          "label": "Sample event",
+          "value": "sample"
         }
       ],
       "grid": [
@@ -6675,6 +7224,10 @@
         {
           "label": "Dernier cycle",
           "value": "latest"
+        },
+        {
+          "label": "Événement d'exemple",
+          "value": "sample"
         }
       ],
       "grille": [
@@ -6773,6 +7326,10 @@
         {
           "label": "Dernier cycle",
           "value": "latest"
+        },
+        {
+          "label": "Événement d'exemple",
+          "value": "sample"
         }
       ],
       "grille": [

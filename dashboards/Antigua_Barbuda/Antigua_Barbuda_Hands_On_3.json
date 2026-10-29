@@ -37,7 +37,7 @@
           "source": {
            "type": "GeoTIFF",
            "props": {
-            "url": "https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/antigua_barbuda_IBF/depth_prob/antiguabarbuda_prob_depth_ge_100cm_overbank.tif",
+            "url": "https://tito.uffis.org/sample/antigua/20251010.010000/antigua_30m/fim/stream_sat_stormlab/Antigua_SaintJohnS/pluvial_overbank/prob_depth_ge_100cm_overbank.20251010.010000.tif",
             "mask_below": "0",
             "normalize": false
            },
@@ -165,7 +165,7 @@
           "source": {
            "type": "GeoTIFF",
            "props": {
-            "url": "https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/antigua_barbuda_IBF/depth_prob/antiguabarbuda_prob_depth_ge_70cm_overbank.tif",
+            "url": "https://tito.uffis.org/sample/antigua/20251010.010000/antigua_30m/fim/stream_sat_stormlab/Antigua_SaintJohnS/pluvial_overbank/prob_depth_ge_70cm_overbank.20251010.010000.tif",
             "mask_below": "0",
             "normalize": false
            },
@@ -293,7 +293,7 @@
           "source": {
            "type": "GeoTIFF",
            "props": {
-            "url": "https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/antigua_barbuda_IBF/depth_prob/antiguabarbuda_prob_depth_ge_30cm_overbank.tif",
+            "url": "https://tito.uffis.org/sample/antigua/20251010.010000/antigua_30m/fim/stream_sat_stormlab/Antigua_SaintJohnS/pluvial_overbank/prob_depth_ge_30cm_overbank.20251010.010000.tif",
             "mask_below": "0",
             "normalize": false
            },
@@ -421,7 +421,7 @@
           "source": {
            "type": "GeoTIFF",
            "props": {
-            "url": "https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com/antigua_barbuda_IBF/depth_prob/antiguabarbuda_prob_depth_ge_10cm_overbank.tif",
+            "url": "https://tito.uffis.org/sample/antigua/20251010.010000/antigua_30m/fim/stream_sat_stormlab/Antigua_SaintJohnS/pluvial_overbank/prob_depth_ge_10cm_overbank.20251010.010000.tif",
             "mask_below": "0",
             "normalize": false
            },
@@ -590,7 +590,9 @@
             "low_threshold": "${Low Threshold (P(≥10 cm))}",
             "medium_threshold": "${Medium Threshold (P(≥30 cm))}",
             "high_threshold": "${High Threshold (P(≥70 cm))}",
-            "severe_threshold": "${Severe Threshold (P(≥100 cm))}"
+            "severe_threshold": "${Severe Threshold (P(≥100 cm))}",
+            "cycle": "sample",
+            "parish": "Antigua_SaintJohnS"
            }
           },
           "layerId": "fefea344-7556-4452-9b03-6eb9a38425ed"
@@ -698,7 +700,9 @@
             "low_threshold": "${Low Threshold (P(≥10 cm))}",
             "medium_threshold": "${Medium Threshold (P(≥30 cm))}",
             "high_threshold": "${High Threshold (P(≥70 cm))}",
-            "severe_threshold": "${Severe Threshold (P(≥100 cm))}"
+            "severe_threshold": "${Severe Threshold (P(≥100 cm))}",
+            "cycle": "sample",
+            "parish": "Antigua_SaintJohnS"
            }
           },
           "layerId": "b309060f-f14b-4fc3-9fe4-947ce6004013"
@@ -862,7 +866,9 @@
       "low_threshold": "${Low Threshold (P(≥10 cm))}",
       "medium_threshold": "${Medium Threshold (P(≥30 cm))}",
       "high_threshold": "${High Threshold (P(≥70 cm))}",
-      "severe_threshold": "${Severe Threshold (P(≥100 cm))}"
+      "severe_threshold": "${Severe Threshold (P(≥100 cm))}",
+      "cycle": "sample",
+      "parish": "Antigua_SaintJohnS"
      },
      "metadata_string": {
       "border": {

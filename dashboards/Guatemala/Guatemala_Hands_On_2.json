@@ -238,7 +238,9 @@
           "w": 20,
           "h": 6,
           "source": "uffis_cycle_times_guatemala",
-          "args_string": {},
+          "args_string": {
+            "inicio": "sample"
+          },
           "metadata_string": {}
         },
         {

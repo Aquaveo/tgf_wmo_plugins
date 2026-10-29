@@ -11,7 +11,7 @@ from tethysapp.tethysdash.plugin_helpers import (
     geotiff_source,
 )
 
-from tgf_wmo_plugins.base import CountryPlugin, LiveData
+from tgf_wmo_plugins.base import CountryChoiceInput, CountryPlugin, LiveData
 from tgf_wmo_plugins.countries import ANTIGUA_BARBUDA, COMOROS, DEPTHS, GUATEMALA, HAITI
 from tgf_wmo_plugins.strings import LIVE_ARGS, STRINGS
 from tgf_wmo_plugins.tito import cycle_files, cycle_label, file_url
@@ -93,6 +93,19 @@ class BaseFloodMapLayer(LiveData, CountryPlugin):
         return geotiff_source(file_url(live.slug, cycle, path), mask_below=self.probability_floor())
 
 
+class BaseDepthFilter(CountryChoiceInput):
+    """The flood depth whose probability the flood probability layer shows."""
+
+    family = "depth_filter"
+    strings_key = "depth_filter"
+
+    def choices(self, s):
+        return [(depth, s["depth_filter_choices"][depth]) for depth in DEPTHS]
+
+    def initial(self):
+        return DEPTHS[0]
+
+
 class FloodMapLayerGuatemala(BaseFloodMapLayer):
     country = GUATEMALA
 
@@ -106,4 +119,20 @@ class FloodMapLayerAntiguaBarbuda(BaseFloodMapLayer):
 
 
 class FloodMapLayerComoros(BaseFloodMapLayer):
+    country = COMOROS
+
+
+class DepthFilterGuatemala(BaseDepthFilter):
+    country = GUATEMALA
+
+
+class DepthFilterHaiti(BaseDepthFilter):
+    country = HAITI
+
+
+class DepthFilterAntiguaBarbuda(BaseDepthFilter):
+    country = ANTIGUA_BARBUDA
+
+
+class DepthFilterComoros(BaseDepthFilter):
     country = COMOROS

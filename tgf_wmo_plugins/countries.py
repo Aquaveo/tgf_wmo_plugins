@@ -338,6 +338,7 @@ HAITI = Country(
         ibf_site=lambda site: site,
         site_arg="site",
         site_choices=(("Haiti_LaQuinte", "La Quinte"), ("Haiti_Gris", "Gris")),
+        sample=True,
         rain_grids=(("haiti_900m", "900 m", "national"), ("haiti_90m", "90 m", "flood_sites")),
         gauge_grid="haiti_90m",
         gauges=(
@@ -379,14 +380,25 @@ ANTIGUA_BARBUDA = Country(
         f"antiguabarbuda_prob_depth_ge_{depth}_overbank.tif"
         for depth in DEPTHS
     ],
-    # Rasters are published per parish only where the forecast triggered, so
-    # the national mosaic is read; the receptors come as one national file.
+    # TITO publishes rasters and receptors per parish site, each windowed on
+    # the parish's bounding box; Saint John's site also covers the city.
     live=Live(
         slug="antigua",
         grid="antigua_30m",
         variants=PLUVIAL_VARIANTS,
-        raster_site=lambda _scope: None,
-        ibf_site=lambda _scope: "Antigua_Barbuda",
+        raster_site=lambda site: site,
+        ibf_site=lambda site: site,
+        site_arg="parish",
+        site_choices=(
+            ("Antigua_SaintJohnS", "Saint John's"),
+            ("Antigua_SaintGeorge", "Saint George"),
+            ("Antigua_SaintMary", "Saint Mary"),
+            ("Antigua_SaintPaul", "Saint Paul"),
+            ("Antigua_SaintPeter", "Saint Peter"),
+            ("Antigua_SaintPhilip", "Saint Philip"),
+            ("Antigua_Barbuda", "Barbuda"),
+        ),
+        sample=True,
         rain_grids=(("antigua_30m", "30 m", None),),
     ),
 )
@@ -567,6 +579,7 @@ COMOROS = Country(
         variants=PLUVIAL_VARIANTS,
         raster_site=lambda commune: f"Comoros_{commune.split('_', 1)[1]}",
         ibf_site=lambda commune: f"Comoros_{commune.split('_', 1)[1]}",
+        sample=True,
         rain_grids=(("comoros_30m", "30 m", None),),
     ),
 )

@@ -60,12 +60,22 @@ class CountryPlugin(TethysDashPlugin):
         return STRINGS[self.country.lang]
 
     def unit(self):
-        """The admin unit asked for, or the default when unset or unresolved."""
+        """The admin unit asked for, or the default when unset or unresolved.
+
+        A unit may also be named by its TITO site, so one dropdown can feed both
+        the plugins and raster URLs built from the site folders.
+        """
         units = self.country.units
         if units is None:
             return None
         value = self.get_arg(units.arg)
-        return value if value in units.by_code else units.default
+        if value in units.by_code:
+            return value
+        live = self.country.live
+        if live is not None:
+            by_site = {live.raster_site(code): code for code in units.by_code}
+            return by_site.get(value, units.default)
+        return units.default
 
 
 class LiveData:
@@ -160,3 +170,78 @@ class LiveData:
         if cycle == TRAINING:
             return ""
         return f" ({cycle_label(cycle, self.strings['sample_tag'])})"
+
+
+class LabelledInput:
+    """The label text and show-label settings of a country's variable input.
+
+    TethysDash shows a variable input's name as its label, so the label text is
+    also the variable other plugins bind; left empty, it is `publishes`.
+    """
+
+    publishes = None
+
+    @staticmethod
+    def label_args(country):
+        names = LIVE_ARGS[country.lang]
+        return {names["label_text"]: "text", names["show_label"]: "checkbox"}
+
+    @classmethod
+    def variable_name(cls, args):
+        """The variable a dashboard item publishes, given its stored args."""
+        value = args.get(LIVE_ARGS[cls.country.lang]["label_text"])
+        if isinstance(value, str) and value.strip() and "${" not in value:
+            return value.strip()
+        return cls.publishes
+
+    def label_shown(self):
+        """Shown unless the checkbox is cleared; it may arrive as a bool or a string."""
+        value = self.get_arg(LIVE_ARGS[self.country.lang]["show_label"], True)
+        return str(value).strip().lower() not in ("false", "0", "no", "off")
+
+
+class CountryChoiceInput(LabelledInput, TethysDashPlugin):
+    """A dropdown variable input with a country's choices, in its language.
+
+    A subclass sets `family` and `strings_key` (the label, description, tags
+    and published variable come from `<strings_key>_*` in strings.py), and
+    implements `choices` and `initial`; a country subclass then sets only
+    `country`.
+    """
+
+    family = None
+    strings_key = None
+    country = None
+    type = "variable_input"
+
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        country = cls.__dict__.get("country")
+        if country is None:
+            return
+        s = STRINGS[country.lang]
+        cls.name = f"uffis_{cls.family}_{country.key}"
+        cls.label = country_label(country, s[f"{cls.strings_key}_label"])
+        cls.group = country_group(country)
+        cls.tags = list(s[f"{cls.strings_key}_tags"])
+        cls.description = s[f"{cls.strings_key}_desc"]
+        cls.publishes = s[f"{cls.strings_key}_variable"]
+        cls.args = cls.label_args(country)
+
+    def choices(self, s):
+        """(value, label) pairs, in display order."""
+        raise NotImplementedError
+
+    def initial(self):
+        raise NotImplementedError
+
+    def run(self):
+        s = STRINGS[self.country.lang]
+        return {
+            "variable_name": self.variable_name(self.received_args),
+            "show_label": self.label_shown(),
+            "initial_value": self.initial(),
+            "variable_options_source": "dropdown",
+            "metadata": {"choices": [{"label": label, "value": value}
+                                     for value, label in self.choices(s)]},
+        }

@@ -2,7 +2,7 @@
 .. está junto a este archivo como exercise_3_en.rst.
 
 ==============================================================
-Ejercicio 3 — Clasificación de peligro con umbrales ajustables
+Ejercicio 3: Clasificación de peligro con umbrales ajustables
 ==============================================================
 
 Construcción de **Guatemala Práctica 3 (Español)**, paso a paso.
@@ -19,7 +19,7 @@ campos se dejan en inglés y en negrita.
 Qué va a construir
 ==================
 
-Un mapa a pantalla completa con los cinco rásteres del ejercicio 1 más dos capas
+Un mapa a pantalla completa con los cuatro rásteres del ejercicio 1 más dos capas
 calculadas: una clasificación de peligro y los edificios y carreteras que caen
 dentro de ella. Cuatro campos numéricos en la parte superior definen el umbral de
 probabilidad de cada nivel de peligro, y debajo de ellos hay una tabla de impacto.
@@ -33,10 +33,11 @@ vuelven a calcular.
    **Captura:** el tablero terminado: mapa a pantalla completa, cuatro campos de
    umbral en la parte superior y la tabla de impacto a la derecha.
 
-**Consejo** — ``notebooks/Guatemala/03_hazard_classification_es.ipynb`` deriva esta
+**Consejo:** ``notebooks/Guatemala/03_hazard_classification_es.ipynb`` deriva esta
 clasificación en Python, incluido el barrido de umbrales que muestra qué controla
 cada uno. Vale la pena ejecutarlo primero si quiere entender el análisis antes de
-armar la interfaz.
+armar la interfaz. El cuaderno todavía usa los archivos de capacitación
+anteriores, así que sus números difieren de los de este tablero.
 
 
 Entender los cuatro umbrales
@@ -54,36 +55,51 @@ umbral de probabilidad:
      - Color
      - Umbral inicial
    * - Bajo
-     - P(≥ 7.6 cm)
+     - P(≥ 10 cm)
      - verde
      - 0.8
    * - Medio
-     - P(≥ 10 cm)
+     - P(≥ 30 cm)
      - amarillo
      - 0.8
    * - Alto
-     - P(≥ 30 cm)
+     - P(≥ 70 cm)
      - rojo
      - 0.8
    * - Severo
-     - P(≥ 76 cm)
+     - P(≥ 100 cm)
      - morado
      - 0.8
 
 Una celda toma el nivel del umbral **más profundo** que logra superar.
 
-**Advertencia** — Dos cosas que conviene saber antes de presentar esto, ambas
-tratadas en detalle en ``notebooks/Guatemala/03_hazard_classification_es.ipynb``:
+**Todos los niveles son alcanzables en la muestra.** Las probabilidades son
+fracciones de 50 miembros del conjunto, así que cada valor es múltiplo de 0.02, y
+cada uno de los cuatro rásteres llega a 1.0 en algún punto. Con los umbrales por
+defecto de 0.8, el número de celdas que superan su umbral es:
 
-**El ráster de 76 cm solo contiene los valores 0 y 0.2.** A lo sumo el 20% de los
-miembros del conjunto alcanzó esa profundidad en algún punto del dominio. Por eso,
-cualquier umbral Severo por encima de 0.2 vuelve *inalcanzable* la clase Severo: el
-color simplemente nunca aparece, y quien mueva ese control no recibe ninguna señal
-que distinga entre "nada califica" y "el control está roto".
+.. list-table::
+   :header-rows: 1
+   :widths: 25 25 25 25
+
+   * - P(≥ 10 cm)
+     - P(≥ 30 cm)
+     - P(≥ 70 cm)
+     - P(≥ 100 cm)
+   * - 3,900
+     - 3,155
+     - 2,880
+     - 2,646
+
+Así que los cuatro colores aparecen con los valores por defecto. Bajar un umbral
+solo deja que más celdas lo superen: en las cuatro profundidades, 15,877, 12,269,
+10,219 y 9,315 celdas, respectivamente, tienen alguna probabilidad. Una celda que
+supera varios umbrales se muestra en el más profundo, así que estas cifras se
+superponen y no se suman.
 
 
-Paso 1 — Crear el tablero
-=========================
+Paso 1: Crear el tablero
+========================
 
 #. Cree un tablero nuevo (vea
    `Crear un tablero <getting_started_es.rst#crear-un-tablero>`_) con:
@@ -101,8 +117,8 @@ Paso 1 — Crear el tablero
    esquina superior derecha, para entrar en modo de edición.
 
 
-Paso 2 — Agregar el selector de mapa base
-=========================================
+Paso 2: Agregar el selector de mapa base
+========================================
 
 El mapa base es una variable de entrada, para que el usuario pueda cambiarlo sin
 editar nada. Construya primero la variable y después apunte el mapa a ella.
@@ -134,7 +150,7 @@ editar nada. Construya primero la variable y después apunte el mapa a ella.
    el desplegable flota sobre el mapa sin fondo y es difícil de leer.
 
 #. Elija un valor inicial para el desplegable desde la previsualización, en el lado
-   derecho del editor. La solución entregada usa ``World Light Gray Base``, pero
+   derecho del editor. La solución entregada usa ``World Imagery``, pero
    cualquier mapa base sirve.
 
 #. Guarde el elemento haciendo clic en **Save**, en la esquina inferior derecha del
@@ -156,8 +172,8 @@ editar nada. Construya primero la variable y después apunte el mapa a ella.
    **Captura:** los argumentos de **Variable Input** del selector de mapa base.
 
 
-Paso 3 — Agregar los cuatro campos de umbral
-============================================
+Paso 3: Agregar los cuatro campos de umbral
+===========================================
 
 Construya los cuatro antes que las capas que los consumen. Cada uno es un
 **Variable Input** con ``variable_options_source`` en ``number``:
@@ -167,10 +183,10 @@ Construya los cuatro antes que las capas que los consumen. Cada uno es un
    :widths: 100
 
    * - ``Variable Name``
-   * - ``Umbral Bajo (P(≥7.6 cm))``
-   * - ``Umbral Medio (P(≥10 cm))``
-   * - ``Umbral Alto (P(≥30 cm))``
-   * - ``Umbral Severo (P(≥76 cm))``
+   * - ``Umbral Bajo (P(≥10 cm))``
+   * - ``Umbral Medio (P(≥30 cm))``
+   * - ``Umbral Alto (P(≥70 cm))``
+   * - ``Umbral Severo (P(≥100 cm))``
 
 Para **cada** uno de los cuatro:
 
@@ -229,11 +245,11 @@ Para **cada** uno de los cuatro:
    etiqueta y su valor.
 
 
-Paso 4 — Agregar el mapa y los cinco rásteres
+Paso 4: Agregar el mapa y los cuatro rásteres
 =============================================
 
 Si tiene el ejercicio 1, siga los pasos de abajo. Si no lo tiene, construya el mapa
-y los cinco rásteres desde cero como en el
+y los cuatro rásteres desde cero como en el
 `Ejercicio 1 <exercise_1_es.rst>`_.
 
 #. Abra el tablero del ejercicio 1.
@@ -252,7 +268,7 @@ y los cinco rásteres desde cero como en el
    el cursor sobre **Order** y seleccione **Send to Back**. Los selectores deberían
    quedar visibles sobre el mapa.
 
-#. Edite el elemento del mapa. Para cada uno de los cinco rásteres, edite la capa y
+#. Edite el elemento del mapa. Para cada uno de los cuatro rásteres, edite la capa y
    desactive **Default Visibility** en la pestaña **Layer**. Así las capas quedarán
    ocultas cuando el tablero se cargue por primera vez. Asegúrese de guardar la
    capa después de editarla.
@@ -261,8 +277,8 @@ y los cinco rásteres desde cero como en el
    derecha del editor del tablero.
 
 
-Paso 5 — Agregar la capa de clasificación de peligro
-====================================================
+Paso 5: Agregar la capa de clasificación de peligro
+===================================================
 
 #. Ponga el tablero en modo de edición haciendo clic en el botón
    **Edit Dashboard**, en la esquina superior derecha.
@@ -274,7 +290,7 @@ Paso 5 — Agregar la capa de clasificación de peligro
 #. Junto a **Layers**, haga clic en **Add Layer**.
 
 #. Vaya directamente a la pestaña **Source** y ponga **Source Type** en
-   **Capa de Peligro (Español)**.
+   **Guatemala: Capa de Peligro** (en el grupo **UFFIS: Guatemala**).
 
 #. Aparecen los argumentos del módulo. Complete:
 
@@ -285,13 +301,22 @@ Paso 5 — Agregar la capa de clasificación de peligro
       * - Argumento
         - Valor
       * - ``Umbral Bajo``
-        - ``${Umbral Bajo (P(≥7.6 cm))}``
+        - ``${Umbral Bajo (P(≥10 cm))}``
       * - ``Umbral Medio``
-        - ``${Umbral Medio (P(≥10 cm))}``
+        - ``${Umbral Medio (P(≥30 cm))}``
       * - ``Umbral Alto``
-        - ``${Umbral Alto (P(≥30 cm))}``
+        - ``${Umbral Alto (P(≥70 cm))}``
       * - ``Umbral Severo``
-        - ``${Umbral Severo (P(≥76 cm))}``
+        - ``${Umbral Severo (P(≥100 cm))}``
+      * - ``Ciclo``
+        - **Evento de muestra** (``sample``)
+
+   ``Ciclo`` elige el ciclo de TITO que clasifica el módulo. **Evento de muestra**
+   es el ciclo de muestra publicado para el país, el mismo del que vienen las
+   cuatro capas ráster. Si se deja vacío, el módulo lee el último ciclo en vivo, y
+   el peligro dejaría de coincidir con los rásteres de abajo. Deje
+   ``Fuente Inundacion`` vacío; su valor por defecto es la fuente combinada con
+   desborde que usan los rásteres.
 
 #. Haga clic en **Fetch plugin defaults**. La capa recibe el nombre
    **Clasificación de peligro**, un estilo con cuatro reglas sobre el atributo
@@ -304,19 +329,20 @@ Paso 5 — Agregar la capa de clasificación de peligro
    :width: 100%
 
    **Captura:** la pestaña **Source** de la capa de peligro, con los cuatro
-   argumentos vinculados a las cuatro variables de umbral.
+   argumentos vinculados a las cuatro variables de umbral y ``Ciclo`` en
+   **Evento de muestra**.
 
 
-Paso 6 — Agregar la capa de elementos afectados
-===============================================
+Paso 6: Agregar la capa de elementos afectados
+==============================================
 
 #. Junto a **Layers**, haga clic otra vez en **Add Layer**.
 
 #. Vaya directamente a la pestaña **Source** y ponga **Source Type** en
-   **Capa de Impacto (Español)**.
+   **Guatemala: Capa de Impacto**.
 
 #. Vincule los mismos cuatro argumentos a las mismas cuatro variables que en el
-   paso anterior.
+   paso anterior, y ponga otra vez ``Ciclo`` en **Evento de muestra**.
 
 #. Haga clic en **Fetch plugin defaults**. La capa llega con el nombre
    **Edificios y carreteras en peligro**, ocho reglas (polígono y línea por cada
@@ -330,8 +356,8 @@ separadas permite que el usuario apague el sombreado del terreno y mire solo lo 
 está afectado.
 
 
-Paso 7 — Terminar el mapa
-=========================
+Paso 7: Terminar el mapa
+========================
 
 #. En el argumento **Map Extent**, elija **Use a Custom Extent** e ingrese:
 
@@ -353,16 +379,16 @@ Paso 7 — Terminar el mapa
 #. Guarde el tablero haciendo clic en **Save Changes**, en la esquina superior
    derecha del editor del tablero.
 
-**Importante** — Los rásteres deben ser las copias en EPSG:3857 de
-``PBI_Actividad_2``. Si alguna capa apunta a un original en UTM de
-``Guatemala_IBF``, el mapa se ajustará automáticamente a la proyección de ese
-ráster, saltará a un lugar lejano de Guatemala y las capas vectoriales parecerán
-cargar y luego desaparecerán. Este error exacto costó tiempo real de depuración en
+**Importante:** Los rásteres deben estar en EPSG:3857 (o EPSG:4326), como los de
+la muestra. Si alguna capa apunta a un ráster en otra proyección, como UTM, el
+mapa se ajustará automáticamente a la proyección de ese ráster, saltará a un lugar
+lejano de Guatemala y las capas vectoriales parecerán cargar y luego
+desaparecerán. Este error exacto costó tiempo real de depuración en
 este tablero.
 
 
-Paso 8 — Agregar la tabla de resumen de impacto
-===============================================
+Paso 8: Agregar la tabla de resumen de impacto
+==============================================
 
 #. Ponga el tablero en modo de edición haciendo clic en el botón
    **Edit Dashboard**, en la esquina superior derecha.
@@ -372,11 +398,15 @@ Paso 8 — Agregar la tabla de resumen de impacto
 
 #. Haga clic en el menú de 3 puntos del elemento nuevo y seleccione **Edit**.
 
-#. Ponga **Visualization Type** en **Resumen de Impacto (Español)** (en el grupo
-   **Mapas de Inundación (Español)**).
+#. Ponga **Visualization Type** en **Guatemala: Resumen de Impacto** (en el grupo
+   **UFFIS: Guatemala**).
 
 #. Vincule los mismos cuatro argumentos a las mismas cuatro variables que en el
-   paso 5.
+   paso 5, y ponga ``Ciclo`` en **Evento de muestra**.
+
+   La tabla cuenta las personas, edificios y carreteras de cada nivel de peligro,
+   con los mismos umbrales que el mapa, y termina con una fila
+   **TOTAL en peligro**.
 
 #. En la pestaña **Settings**, ponga **Background Color** en ``#ffffff`` y agregue
    bordes a la izquierda, a la derecha y abajo, para que se una a la franja de
@@ -396,17 +426,17 @@ Paso 8 — Agregar la tabla de resumen de impacto
    :width: 100%
 
    **Captura:** los argumentos de la tabla de resumen de impacto vinculados a las
-   cuatro variables de umbral.
+   cuatro variables de umbral, con ``Ciclo`` en **Evento de muestra**.
 
 
-Paso 9 — Probar las conexiones
-==============================
+Paso 9: Probar las conexiones
+=============================
 
 Cambie un umbral. El sombreado de peligro, los elementos afectados y la tabla
 deberían recalcularse juntos, con mensajes de progreso mientras las capas se
 reconstruyen. Como demostración, baje el umbral Severo a 0.2. La clase Severo, en
-morado, se expande hasta cubrir la mayor parte del cauce, y la tabla muestra más
-edificios y carreteras afectados.
+morado, se extiende más a lo largo del cauce, y la tabla muestra más edificios y
+carreteras en la fila Severo.
 
 .. figure:: images/ex3-thresholds-before.png
    :alt: El tablero antes de bajar un umbral
@@ -426,34 +456,94 @@ Punto de control
 
 A estas alturas debería tener:
 
-* Un mapa que ocupa la ventana, con ocho capas en el control de capas (incluido el
-  mapa base).
+* Un mapa que ocupa la ventana, con siete capas en el control de capas (cuatro
+  rásteres, las dos capas calculadas y el mapa base).
 * Cuatro campos de umbral etiquetados en la parte superior, cada uno con paso de
   0.05.
+* Con los umbrales por defecto de 0.8: 1,127 polígonos de peligro con los cuatro
+  colores, 453 edificios y carreteras en peligro, y una tabla de impacto cuya fila
+  **TOTAL en peligro** muestra 342 edificios y 886 personas.
 * Al mover cualquier umbral se actualizan la capa de peligro, la capa de impacto y
   la tabla.
-* Subir el umbral Severo por encima de 0.2 hace que el morado desaparezca por
-  completo, y así debe ser, por la razón que explica la advertencia de arriba.
 * Mensajes de progreso mientras las capas se recalculan.
 
 
 Puntos de discusión
 ===================
 
-* **Cuatro umbrales sobre cuatro preguntas distintas.** "Severo" significa
-  P(≥76 cm) ≥ 0.15, mientras que "Alto" significa P(≥30 cm) ≥ 0.1. Son preguntas
+* **Cuatro umbrales sobre cuatro preguntas distintas.** Con umbrales distintos,
+  "Severo" podría significar P(≥100 cm) ≥ 0.15, mientras que "Alto" significa
+  P(≥70 cm) ≥ 0.1. Son preguntas
   diferentes con cortes diferentes, así que los nombres de los niveles no son
   comparables entre sí y "severo" no significa nada por sí solo. Poner los cuatro
   umbrales en el mismo valor es una buena demostración: los niveles se diferencian
   entonces solo por la profundidad, que es mucho más fácil de explicar.
-* **Una clase inalcanzable es un problema de interfaz.** El umbral Severo se puede
-  poner donde nada puede calificar, y la interfaz no da ninguna pista. Pregunte a
-  los participantes cómo lo resolverían: ¿limitar el campo a 0.2? ¿mostrar el rango
-  de valores? ¿anotar la leyenda? No hay una única respuesta correcta, y la
-  discusión es justamente el objetivo.
+* **Una clase vacía es un problema de interfaz.** En la muestra todos los niveles
+  son alcanzables, pero en un evento menor un umbral profundo puede no acercarse
+  nunca al valor elegido, y entonces ese color simplemente no aparece. Quien mueva
+  ese control no recibe ninguna señal que distinga entre "nada califica" y "el
+  control está roto". Pregunte a los participantes cómo lo resolverían: ¿mostrar
+  el rango de valores? ¿anotar la leyenda? No hay una única respuesta correcta, y
+  la discusión es justamente el objetivo.
+* **Las probabilidades van en pasos de 0.02.** Con 50 miembros, una probabilidad
+  solo puede ser múltiplo de 0.02, así que un umbral de 0.8 significa "al menos 40
+  de los 50 miembros". Presentar un umbral como un número de miembros suele ser
+  más fácil de explicar que una probabilidad.
 * **Vectorizar una clasificación.** Una capa de mapa solo puede apuntar a una URL, y
   aquí nada sirve un ráster calculado, así que el módulo vectoriza la cuadrícula
-  clasificada en unos 600 polígonos. Las celdas contiguas de la misma clase se
-  fusionan, así que esto es exacto y no una aproximación. Los niveles Normal y
-  NoData se descartan —cerca del 90% de la cuadrícula— porque un mapa base muestra
-  el terreno no afectado mejor que una capa de color.
+  clasificada en polígonos (1,127 con los umbrales por defecto). Las celdas
+  contiguas de la misma clase se fusionan, así que esto es exacto y no una
+  aproximación. Las celdas Normal y NoData, la mayor parte de la cuadrícula, se
+  descartan, porque un mapa base muestra el terreno no afectado mejor que una
+  capa de color.
+
+
+Posiciones de los elementos
+===========================
+
+La solución entregada coloca sus elementos así, en la cuadrícula de 100 columnas:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 15 15 15 15
+
+   * - Elemento
+     - ``x``
+     - ``y``
+     - ``w``
+     - ``h``
+   * - Mapa
+     - 0
+     - 0
+     - 99
+     - 41
+   * - Variable Mapa Base
+     - 0
+     - 0
+     - 17
+     - 6
+   * - Umbral Bajo
+     - 56
+     - 0
+     - 11
+     - 7
+   * - Umbral Medio
+     - 67
+     - 0
+     - 11
+     - 7
+   * - Umbral Alto
+     - 78
+     - 0
+     - 11
+     - 7
+   * - Umbral Severo
+     - 89
+     - 0
+     - 11
+     - 7
+   * - Tabla de resumen de impacto
+     - 56
+     - 7
+     - 44
+     - 26

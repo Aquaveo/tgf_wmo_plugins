@@ -11,7 +11,8 @@ HAZARD_FAMILIES = {"hazard_layer"}
 RECEPTOR_FAMILIES = {"impact_summary", "impact_layer"}
 STORM_FAMILIES = {"storm_card", "storm_impact_layer", "storm_impact_summary"}
 LIVE_FAMILIES = {"cycle_times", "precip_layer", "soil_moisture_layer", "unit_streamflow_layer",
-                 "flood_map_layer", "risk_matrix", "risk_filter", "risk_layer", "event_summary"}
+                 "flood_map_layer", "depth_filter", "risk_matrix", "risk_filter", "risk_layer",
+                 "event_summary"}
 
 REGISTERED = {
     ep.name for ep in entry_points(group="intake.drivers")
@@ -58,3 +59,16 @@ def test_country_is_consistent(key):
         assert len(codes) == len(set(codes))
         if country.receptors.layers is None:
             pytest.fail("unit filtering needs a geopackage")
+
+
+@pytest.mark.parametrize("value, expected", [
+    ("KM111_BambaoMtsanga", "KM111_BambaoMtsanga"),
+    ("Comoros_BambaoMtsanga", "KM111_BambaoMtsanga"),  # the sample's site folder name
+    ("Nowhere", "KM274_Moroni"),
+])
+def test_unit_accepts_code_or_site(value, expected):
+    from tgf_wmo_plugins.hazard_layer import HazardLayerComoros
+
+    plugin = HazardLayerComoros.__new__(HazardLayerComoros)
+    plugin.get_arg = lambda name, default=None: value
+    assert plugin.unit() == expected
