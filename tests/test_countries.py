@@ -10,7 +10,8 @@ from tgf_wmo_plugins.strings import STRINGS
 HAZARD_FAMILIES = {"hazard_layer"}
 RECEPTOR_FAMILIES = {"impact_summary", "impact_layer"}
 STORM_FAMILIES = {"storm_card", "storm_impact_layer", "storm_impact_summary"}
-LIVE_FAMILIES = {"cycle_times", "precip_layer", "risk_matrix", "risk_filter", "risk_layer", "event_summary"}
+LIVE_FAMILIES = {"cycle_times", "precip_layer", "soil_moisture_layer", "unit_streamflow_layer",
+                 "flood_map_layer", "risk_matrix", "risk_filter", "risk_layer", "event_summary"}
 
 REGISTERED = {
     ep.name for ep in entry_points(group="intake.drivers")

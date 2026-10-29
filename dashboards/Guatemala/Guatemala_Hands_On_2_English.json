@@ -90,7 +90,7 @@
                 "configuration": {
                   "type": "WebGLTile",
                   "props": {
-                    "name": "Rainfall forecast (ensemble median)",
+                    "name": "Lluvia acumulada pronosticada (mediana del conjunto)",
                     "source": {
                       "type": "GeoTIFF",
                       "props": {}
@@ -98,10 +98,10 @@
                     "pluginSource": {
                       "source": "uffis_precip_layer_guatemala",
                       "args": {
-                        "cycle": "${Date}",
-                        "grid": "guatemala_90m",
-                        "statistic": "median",
-                        "period": "forecast"
+                        "ciclo": "${Date}",
+                        "malla": "guatemala_90m",
+                        "estadistica": "median",
+                        "periodo": "forecast"
                       }
                     },
                     "layerId": "7f93e25d-83ff-4467-8b1c-0ad6a7612cf1",
@@ -155,7 +155,7 @@
                   }
                 },
                 "legend": {
-                  "title": "Rainfall accumulation (mm)",
+                  "title": "Lluvia acumulada (mm)",
                   "items": [
                     {
                       "label": "1 - 5",
@@ -198,7 +198,7 @@
                       "symbol": "square"
                     },
                     {
-                      "label": "250 or more",
+                      "label": "250 o más",
                       "color": "#6a3d9a",
                       "symbol": "square"
                     }

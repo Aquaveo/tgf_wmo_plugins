@@ -16,7 +16,7 @@ import numpy as np
 import pyogrio
 from tethysapp.tethysdash.plugin_helpers import LayerConfigurationBuilder, TethysDashPlugin
 
-from tgf_wmo_plugins.base import CountryPlugin, LiveData
+from tgf_wmo_plugins.base import CountryPlugin, LiveData, country_group, country_label
 from tgf_wmo_plugins.countries import ANTIGUA_BARBUDA, COMOROS, COUNTRIES, GUATEMALA, HAITI
 from tgf_wmo_plugins.impact_layer import _load, feature_collection, feature_style
 from tgf_wmo_plugins.strings import LIVE_ARGS, STRINGS
@@ -100,10 +100,10 @@ class BaseRiskMatrix(LiveOnly, CountryPlugin):
         if districts is not None and len(districts):
             worst = int(districts.max())
             overall = (f'<p style="margin:8px 0 0">{escape(s["overall_warning"])} '
-                       f'({escape(cycle_label(cycle))}): {_chip(s["risk_levels"][worst], RISK_COLORS[worst])}</p>')
+                       f'({escape(cycle_label(cycle, s["sample_tag"]))}): {_chip(s["risk_levels"][worst], RISK_COLORS[worst])}</p>')
         else:
             overall = (f'<p style="margin:8px 0 0;color:#555">{escape(s["overall_warning"])} '
-                       f'({escape(cycle_label(cycle))}): {escape(s["status_quiet"])}</p>')
+                       f'({escape(cycle_label(cycle, s["sample_tag"]))}): {escape(s["status_quiet"])}</p>')
         return {"text": f'<h4 style="margin:0 0 6px">{escape(s["risk_matrix_title"])}</h4>'
                         f'{table}<div style="margin-top:6px">{chips}</div>{overall}'}
 
@@ -122,8 +122,8 @@ class BaseRiskFilter(TethysDashPlugin):
             return
         s = STRINGS[country.lang]
         cls.name = f"uffis_{cls.family}_{country.key}"
-        cls.label = f"{s['risk_filter_label']} ({country.label_name})"
-        cls.group = s["group"]
+        cls.label = country_label(country, s["risk_filter_label"])
+        cls.group = country_group(country)
         cls.tags = list(s["risk_filter_tags"])
         cls.description = s["risk_filter_desc"]
         cls.publishes = s["risk_filter_variable"]
@@ -216,8 +216,8 @@ class BaseEventSummary(LiveOnly, CountryPlugin):
         cycle = self.selected_cycle()
         df, rec, _population = self.receptors(cycle)
         cols = rec.columns
-        title = (f'<h4 style="margin:0 0 6px">{escape(s["event_summary_title"])} — '
-                 f'{escape(cycle_label(cycle))}</h4>')
+        title = (f'<h4 style="margin:0 0 6px">{escape(s["event_summary_title"])} '
+                 f'({escape(cycle_label(cycle, s["sample_tag"]))})</h4>')
         if df is None:
             note = s["msg_no_receptors"].format(site=self.scope_label(), cycle=cycle)
             return {"text": f'{title}<p style="color:#555">{escape(note)}</p>'}

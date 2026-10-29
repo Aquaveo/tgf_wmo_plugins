@@ -318,7 +318,7 @@
           "args_string": {
             "variable_name": "Commune",
             "show_label": true,
-            "variable_options_source": "Cartes d'Inondation (Français): Résumé d'Impact par Tempête (Comores) - Commune",
+            "variable_options_source": "UFFIS: Comores: Comores: Résumé d'Impact par Tempête - Commune",
             "initial_value": "KM274_Moroni"
           },
           "metadata_string": {

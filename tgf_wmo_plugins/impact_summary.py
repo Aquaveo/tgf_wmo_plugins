@@ -33,7 +33,7 @@ class BaseImpactSummary(ThresholdGates, LiveData, CountryPlugin):
 
         if df is None:
             # Zeros rather than an error: nothing published is an answer too.
-            title += " — " + s["msg_no_receptors"].format(
+            title += ". " + s["msg_no_receptors"].format(
                 site=self.scope_label(), cycle=cycle
             )
             cols = rec.columns

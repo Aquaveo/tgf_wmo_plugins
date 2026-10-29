@@ -13,43 +13,54 @@ first choice and the initial value instead.
 
 from tethysapp.tethysdash.plugin_helpers import TethysDashPlugin
 
+from tgf_wmo_plugins.base import country_group, country_label
 from tgf_wmo_plugins.countries import ANTIGUA_BARBUDA, COMOROS, GUATEMALA, HAITI
-from tgf_wmo_plugins.tito import available_cycles, cycle_label
+from tgf_wmo_plugins.strings import LIVE_ARGS, STRINGS
+from tgf_wmo_plugins.tito import LATEST, SAMPLE, available_cycles, cycle_label
 
 
 class BaseCycleTimes(TethysDashPlugin):
-    """Set `country`; everything else follows from it.
+    """Set `country`; everything else follows from it, in the country's language.
 
-    The labels are English in every country, as they were when only the
-    Guatemala input existed, since dashboards store them.
+    The published variable stays `Date` in every language: every dashboard
+    binds ${Date}.
     """
 
     country = None
-    group = "UFFIS Live"
     type = "variable_input"
-    publishes = "Date"  # the variable a dashboard binds with ${Date}
+    publishes = "Date"
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
         country = cls.__dict__.get("country")
         if country is None:
             return
+        s = STRINGS[country.lang]
         cls.name = f"uffis_cycle_times_{country.key}"
-        cls.label = f"Available Cycles ({country.label_name})"
-        cls.tags = ["uffis", "tito", country.key, "date"]
-        cls.description = (
-            f"Every hourly TITO cycle still published for {country.label_name}, "
-            "newest first, valued as the cycle stamp the file URLs use."
-        )
+        cls.label = country_label(country, s["cycle_times_label"])
+        cls.group = country_group(country)
+        cls.tags = list(s["cycle_times_tags"])
+        cls.description = s["cycle_times_desc"]
+        # Where a sample exists, a demo dashboard can open on it instead.
+        if country.live.sample:
+            cls.args = {LIVE_ARGS[country.lang]["start"]: [
+                {"value": LATEST, "label": s["start_latest"]},
+                {"value": SAMPLE, "label": s["start_sample"]},
+            ]}
 
     def run(self):
-        cycles = available_cycles(self.country.live.slug)
+        live, s = self.country.live, STRINGS[self.country.lang]
+        cycles = available_cycles(live.slug)
+        # The sample cycles go after every live one.
+        samples = available_cycles(live.slug, sample=True) if live.sample else []
+        start_on_sample = samples and self.get_arg(LIVE_ARGS[self.country.lang]["start"]) == SAMPLE
         return {
             "variable_name": self.publishes,
-            "initial_value": cycles[0],
+            "initial_value": samples[0] if start_on_sample else cycles[0],
             "variable_options_source": "dropdown",
             "metadata": {
-                "choices": [{"label": cycle_label(c), "value": c} for c in cycles]
+                "choices": [{"label": cycle_label(c, s["sample_tag"]), "value": c}
+                            for c in cycles + samples]
             },
         }
 

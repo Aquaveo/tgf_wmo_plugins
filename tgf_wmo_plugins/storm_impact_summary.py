@@ -63,7 +63,7 @@ class LiveStormImpactSummary(LikelyDepth, CountryPlugin):
         title = s["likely_summary_title"].format(p=p) + self.title_suffix(cycle)
 
         if df is None:
-            title += " — " + s["msg_no_receptors"].format(site=self.scope_label(), cycle=cycle)
+            title += ". " + s["msg_no_receptors"].format(site=self.scope_label(), cycle=cycle)
             cols = rec.columns
             df = pd.DataFrame(columns=[cols.type, *cols.measures, *rec.probabilities])
             band = np.zeros(0, dtype=np.uint8)

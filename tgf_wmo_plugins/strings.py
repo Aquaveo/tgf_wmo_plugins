@@ -17,7 +17,6 @@ LANGUAGES = ("en", "es", "fr")
 STRINGS = {
     "en": {
         "language": "English",
-        "group": "Flood Maps (English)",
         # Hazard levels, keyed by the `peligro` class value.
         "levels": {1: "Low", 2: "Medium", 3: "High", 4: "Severe"},
         # Feature attribute names the plugins emit and their own style rules key
@@ -71,7 +70,7 @@ STRINGS = {
             "same probability gates as the hazard map."
         ),
         # Storm (depth-sampled) plugins.
-        "storm_summary_title": "Impact by depth — storm {index}",
+        "storm_summary_title": "Impact by depth, storm {index}",
         "storm_summary_label": "Storm Impact Summary",
         "storm_summary_desc": (
             "People, buildings and roads by flood depth for one storm of the "
@@ -107,6 +106,8 @@ STRINGS = {
         # Live TITO cycles.
         "cycle_latest": "Latest cycle",
         "cycle_training": "Training data",
+        "cycle_sample": "Sample event",
+        "sample_tag": "SAMPLE",
         "variants": {
             "combined_overbank": "Combined (overbank)",
             "combined": "Combined",
@@ -124,9 +125,60 @@ STRINGS = {
             "and median of each rainfall forcing's members."
         ),
         "discharge_tags": ["flood", "discharge", "hydrograph", "forecast", "plotly", "english"],
-        "discharge_title": "Discharge forecast — {gauge}",
+        "discharge_title": "Discharge forecast: {gauge}",
         "axis_discharge": "Discharge (m³/s)",
         "axis_time": "Time (UTC)",
+        # The cycle dropdown.
+        "cycle_times_label": "Available Cycles",
+        "cycle_times_desc": (
+            "Every hourly TITO cycle still published, newest first, then any "
+            "sample cycles. Bind other plugins' cycle to ${Date}."
+        ),
+        "cycle_times_tags": ["tito", "cycle", "date", "forecast", "english"],
+        "start_latest": "Latest live cycle",
+        "start_sample": "Newest sample cycle",
+        # Ensemble rainfall accumulation from a TITO cycle.
+        "precip_layer_label": "Rainfall Accumulation",
+        "precip_layer_desc": (
+            "Ensemble rainfall accumulation from one TITO cycle. Bind the cycle "
+            "to an Available Cycles input, or leave it at the latest."
+        ),
+        "precip_layer_tags": ["rainfall", "forecast", "raster", "map_layer", "dynamic", "english"],
+        "precip_layer_name": "Rainfall accumulation",
+        "precip_legend": "Rainfall accumulation (mm)",
+        "or_more": "{value} or more",
+        "rain_statistics": {"median": "Median", "min": "Minimum", "max": "Maximum"},
+        "rain_periods": {"forecast": "Forecast", "nowcast": "Nowcast"},
+        "rain_grid_kinds": {"national": "national", "flood_sites": "flood sites"},
+        "msg_no_summary": "The {cycle} cycle published no {period} {statistic} {product} on {grid}",
+        "soil_layer_label": "Soil Saturation",
+        "soil_layer_desc": (
+            "Ensemble maximum soil saturation from one TITO cycle. Bind the cycle "
+            "to an Available Cycles input, or leave it at the latest."
+        ),
+        "soil_layer_tags": ["soil moisture", "forecast", "raster", "map_layer", "dynamic", "english"],
+        "soil_layer_name": "Soil saturation",
+        "soil_legend": "Soil saturation (%)",
+        "unitq_layer_label": "Max Unit Streamflow",
+        "unitq_layer_desc": (
+            "Ensemble maximum unit streamflow (discharge per km² of catchment) "
+            "from one TITO cycle. Bind the cycle to an Available Cycles input, "
+            "or leave it at the latest."
+        ),
+        "unitq_layer_tags": ["streamflow", "forecast", "raster", "map_layer", "dynamic", "english"],
+        "unitq_layer_name": "Max unit streamflow",
+        "unitq_legend": "Max unit streamflow (m³/s per km²)",
+        "summary_products": {"qpeaccum": "rainfall", "maxsm": "soil saturation", "maxunitq": "unit streamflow"},
+        # Flood probability rasters, as TITO publishes them.
+        "flood_map_layer_label": "Flood Probability Layer",
+        "flood_map_layer_desc": (
+            "TITO's probability of flood depth reaching a threshold, for one "
+            "cycle, as a raster. Cells under the minimum probability are hidden."
+        ),
+        "flood_map_layer_tags": ["flood", "probability", "raster", "map_layer", "dynamic", "english"],
+        "flood_map_layer_name": "Flood probability",
+        "flood_map_legend": "Flood probability",
+        "depth_choices": {"10cm": "≥ 10 cm", "30cm": "≥ 30 cm", "70cm": "≥ 70 cm", "100cm": "≥ 100 cm"},
         # SFFS/FGS flood risk matrix (Speight et al., 2018), from live cycles.
         "risk_levels": {0: "VERY LOW", 1: "LOW", 2: "MEDIUM", 3: "HIGH"},
         "severity_levels": {0: "Minimal", 1: "Minor", 2: "Significant", 3: "Severe"},
@@ -174,7 +226,7 @@ STRINGS = {
             3: "0.7 - 1 m",
             4: "1 m or more",
         },
-        "likely_summary_title": "Likely flood depth — probability ≥ {p:.0%}",
+        "likely_summary_title": "Likely flood depth, probability ≥ {p:.0%}",
         "likely_layer_name": "Likely flood depth on buildings and roads",
         "likely_legend": "Likely depth (P ≥ {p:.0%})",
         "likely_card_desc": (
@@ -192,7 +244,7 @@ STRINGS = {
         ),
         "card_status": "Forecast",
         "status_triggered": "Flood mapping triggered",
-        "status_quiet": "Quiet — not triggered",
+        "status_quiet": "Quiet: not triggered",
         "card_rain": "Forecast rainfall (median / max member)",
         "card_likely_area": "Area flooded ≥ 0.1 m (P ≥ {p:.0%})",
         "card_expected_people": "Expected people with ≥ 0.3 m",
@@ -219,7 +271,6 @@ STRINGS = {
     },
     "es": {
         "language": "Español",
-        "group": "Mapas de Inundación (Español)",
         "levels": {1: "Bajo", 2: "Medio", 3: "Alto", 4: "Severo"},
         # Feature attribute names the plugins emit and their own style rules key
         # on. These reach the viewer -- they are the column headers in the
@@ -270,7 +321,7 @@ STRINGS = {
             "Edificios y carreteras coloreados por nivel de peligro, usando "
             "los mismos umbrales de probabilidad que el mapa de peligro."
         ),
-        "storm_summary_title": "Impacto por profundidad — tormenta {index}",
+        "storm_summary_title": "Impacto por profundidad, tormenta {index}",
         "storm_summary_label": "Resumen de Impacto por Tormenta",
         "storm_summary_desc": (
             "Personas, edificios y carreteras por profundidad de inundación "
@@ -304,6 +355,8 @@ STRINGS = {
         "msg_flooded": "{count:,} elementos inundados",
         "cycle_latest": "Último ciclo",
         "cycle_training": "Datos de capacitación",
+        "cycle_sample": "Evento de muestra",
+        "sample_tag": "MUESTRA",
         "variants": {
             "combined_overbank": "Combinada (desborde)",
             "combined": "Combinada",
@@ -321,9 +374,60 @@ STRINGS = {
             "y la mediana de los miembros de cada forzante de lluvia."
         ),
         "discharge_tags": ["inundación", "caudal", "hidrograma", "pronóstico", "plotly", "español"],
-        "discharge_title": "Pronóstico de caudal — {gauge}",
+        "discharge_title": "Pronóstico de caudal: {gauge}",
         "axis_discharge": "Caudal (m³/s)",
         "axis_time": "Hora (UTC)",
+        "cycle_times_label": "Ciclos Disponibles",
+        "cycle_times_desc": (
+            "Cada ciclo horario de TITO aún publicado, del más reciente al más "
+            "antiguo, y luego los ciclos de muestra. Vincule el ciclo de los "
+            "demás complementos a ${Date}."
+        ),
+        "cycle_times_tags": ["tito", "ciclo", "fecha", "pronóstico", "español"],
+        "start_latest": "Último ciclo en vivo",
+        "start_sample": "Ciclo de muestra más reciente",
+        "precip_layer_label": "Lluvia Acumulada",
+        "precip_layer_desc": (
+            "Lluvia acumulada del conjunto para un ciclo de TITO. Vincule el "
+            "ciclo a una entrada de Ciclos Disponibles o deje el más reciente."
+        ),
+        "precip_layer_tags": ["lluvia", "pronóstico", "ráster", "map_layer", "dinámico", "español"],
+        "precip_layer_name": "Lluvia acumulada",
+        "precip_legend": "Lluvia acumulada (mm)",
+        "or_more": "{value} o más",
+        "rain_statistics": {"median": "Mediana", "min": "Mínimo", "max": "Máximo"},
+        "rain_periods": {"forecast": "Pronóstico", "nowcast": "Pronóstico inmediato"},
+        "rain_grid_kinds": {"national": "nacional", "flood_sites": "sitios de inundación"},
+        "msg_no_summary": "El ciclo {cycle} no publicó datos de {product} ({period}, {statistic}) en {grid}",
+        "soil_layer_label": "Saturación del Suelo",
+        "soil_layer_desc": (
+            "Saturación máxima del suelo del conjunto para un ciclo de TITO. "
+            "Vincule el ciclo a una entrada de Ciclos Disponibles o deje el más "
+            "reciente."
+        ),
+        "soil_layer_tags": ["humedad del suelo", "pronóstico", "ráster", "map_layer", "dinámico", "español"],
+        "soil_layer_name": "Saturación del suelo",
+        "soil_legend": "Saturación del suelo (%)",
+        "unitq_layer_label": "Caudal Unitario Máximo",
+        "unitq_layer_desc": (
+            "Caudal unitario máximo del conjunto (caudal por km² de cuenca) para "
+            "un ciclo de TITO. Vincule el ciclo a una entrada de Ciclos "
+            "Disponibles o deje el más reciente."
+        ),
+        "unitq_layer_tags": ["caudal", "pronóstico", "ráster", "map_layer", "dinámico", "español"],
+        "unitq_layer_name": "Caudal unitario máximo",
+        "unitq_legend": "Caudal unitario máximo (m³/s por km²)",
+        "summary_products": {"qpeaccum": "lluvia", "maxsm": "saturación del suelo", "maxunitq": "caudal unitario"},
+        "flood_map_layer_label": "Capa de Probabilidad de Inundación",
+        "flood_map_layer_desc": (
+            "La probabilidad de que la profundidad de inundación alcance un "
+            "umbral, según TITO, para un ciclo, como ráster. Se ocultan las "
+            "celdas bajo la probabilidad mínima."
+        ),
+        "flood_map_layer_tags": ["inundación", "probabilidad", "ráster", "map_layer", "dinámico", "español"],
+        "flood_map_layer_name": "Probabilidad de inundación",
+        "flood_map_legend": "Probabilidad de inundación",
+        "depth_choices": {"10cm": "≥ 10 cm", "30cm": "≥ 30 cm", "70cm": "≥ 70 cm", "100cm": "≥ 100 cm"},
         "risk_levels": {0: "MUY BAJO", 1: "BAJO", 2: "MEDIO", 3: "ALTO"},
         "severity_levels": {0: "Mínima", 1: "Menor", 2: "Significativa", 3: "Severa"},
         "likelihood_levels": {0: "Muy baja", 1: "Baja", 2: "Media", 3: "Alta"},
@@ -369,7 +473,7 @@ STRINGS = {
             3: "0.7 - 1 m",
             4: "1 m o más",
         },
-        "likely_summary_title": "Profundidad probable — probabilidad ≥ {p:.0%}",
+        "likely_summary_title": "Profundidad probable, probabilidad ≥ {p:.0%}",
         "likely_layer_name": "Profundidad probable en edificios y carreteras",
         "likely_legend": "Profundidad probable (P ≥ {p:.0%})",
         "likely_card_desc": (
@@ -413,7 +517,6 @@ STRINGS = {
     },
     "fr": {
         "language": "Français",
-        "group": "Cartes d'Inondation (Français)",
         "levels": {1: "Faible", 2: "Moyen", 3: "Élevé", 4: "Sévère"},
         # Feature attribute names the plugins emit and their own style rules key
         # on. These reach the viewer -- they are the column headers in the
@@ -464,7 +567,7 @@ STRINGS = {
             "Bâtiments et routes colorés par niveau d'aléa, selon les mêmes "
             "seuils de probabilité que la carte d'aléa."
         ),
-        "storm_summary_title": "Impact par profondeur — tempête {index}",
+        "storm_summary_title": "Impact par profondeur, tempête {index}",
         "storm_summary_label": "Résumé d'Impact par Tempête",
         "storm_summary_desc": (
             "Personnes, bâtiments et routes par profondeur d'inondation pour "
@@ -499,6 +602,8 @@ STRINGS = {
         "msg_flooded": "{count:,} éléments inondés",
         "cycle_latest": "Dernier cycle",
         "cycle_training": "Données de formation",
+        "cycle_sample": "Événement d'exemple",
+        "sample_tag": "ÉCHANTILLON",
         "variants": {
             "combined_overbank": "Combinée (débordement)",
             "combined": "Combinée",
@@ -516,9 +621,59 @@ STRINGS = {
             "médiane des membres de chaque forçage de pluie."
         ),
         "discharge_tags": ["inondation", "débit", "hydrogramme", "prévision", "plotly", "français"],
-        "discharge_title": "Prévision de débit — {gauge}",
+        "discharge_title": "Prévision de débit : {gauge}",
         "axis_discharge": "Débit (m³/s)",
         "axis_time": "Heure (UTC)",
+        "cycle_times_label": "Cycles Disponibles",
+        "cycle_times_desc": (
+            "Chaque cycle horaire TITO encore publié, du plus récent au plus "
+            "ancien, puis les cycles d'exemple. Liez le cycle des autres "
+            "modules à ${Date}."
+        ),
+        "cycle_times_tags": ["tito", "cycle", "date", "prévision", "français"],
+        "start_latest": "Dernier cycle en direct",
+        "start_sample": "Cycle d'exemple le plus récent",
+        "precip_layer_label": "Cumul de Pluie",
+        "precip_layer_desc": (
+            "Cumul de pluie de l'ensemble pour un cycle TITO. Liez le cycle à "
+            "une entrée Cycles Disponibles, ou laissez le plus récent."
+        ),
+        "precip_layer_tags": ["pluie", "prévision", "raster", "map_layer", "dynamique", "français"],
+        "precip_layer_name": "Cumul de pluie",
+        "precip_legend": "Cumul de pluie (mm)",
+        "or_more": "{value} ou plus",
+        "rain_statistics": {"median": "Médiane", "min": "Minimum", "max": "Maximum"},
+        "rain_periods": {"forecast": "Prévision", "nowcast": "Prévision immédiate"},
+        "rain_grid_kinds": {"national": "national", "flood_sites": "sites d'inondation"},
+        "msg_no_summary": "Le cycle {cycle} n'a publié aucune donnée de {product} ({period}, {statistic}) sur {grid}",
+        "soil_layer_label": "Saturation du Sol",
+        "soil_layer_desc": (
+            "Saturation maximale du sol de l'ensemble pour un cycle TITO. Liez le "
+            "cycle à une entrée Cycles Disponibles, ou laissez le plus récent."
+        ),
+        "soil_layer_tags": ["humidité du sol", "prévision", "raster", "map_layer", "dynamique", "français"],
+        "soil_layer_name": "Saturation du sol",
+        "soil_legend": "Saturation du sol (%)",
+        "unitq_layer_label": "Débit Unitaire Maximal",
+        "unitq_layer_desc": (
+            "Débit unitaire maximal de l'ensemble (débit par km² de bassin) pour "
+            "un cycle TITO. Liez le cycle à une entrée Cycles Disponibles, ou "
+            "laissez le plus récent."
+        ),
+        "unitq_layer_tags": ["débit", "prévision", "raster", "map_layer", "dynamique", "français"],
+        "unitq_layer_name": "Débit unitaire maximal",
+        "unitq_legend": "Débit unitaire maximal (m³/s par km²)",
+        "summary_products": {"qpeaccum": "pluie", "maxsm": "saturation du sol", "maxunitq": "débit unitaire"},
+        "flood_map_layer_label": "Couche de Probabilité d'Inondation",
+        "flood_map_layer_desc": (
+            "La probabilité que la profondeur d'inondation atteigne un seuil, "
+            "selon TITO, pour un cycle, sous forme de raster. Les cellules sous "
+            "la probabilité minimale sont masquées."
+        ),
+        "flood_map_layer_tags": ["inondation", "probabilité", "raster", "map_layer", "dynamique", "français"],
+        "flood_map_layer_name": "Probabilité d'inondation",
+        "flood_map_legend": "Probabilité d'inondation",
+        "depth_choices": {"10cm": "≥ 10 cm", "30cm": "≥ 30 cm", "70cm": "≥ 70 cm", "100cm": "≥ 100 cm"},
         "risk_levels": {0: "TRÈS FAIBLE", 1: "FAIBLE", 2: "MOYEN", 3: "ÉLEVÉ"},
         "severity_levels": {0: "Minimale", 1: "Mineure", 2: "Significative", 3: "Sévère"},
         "likelihood_levels": {0: "Très faible", 1: "Faible", 2: "Moyenne", 3: "Élevée"},
@@ -564,7 +719,7 @@ STRINGS = {
             3: "0.7 - 1 m",
             4: "1 m ou plus",
         },
-        "likely_summary_title": "Profondeur probable — probabilité ≥ {p:.0%}",
+        "likely_summary_title": "Profondeur probable, probabilité ≥ {p:.0%}",
         "likely_layer_name": "Profondeur probable sur les bâtiments et routes",
         "likely_legend": "Profondeur probable (P ≥ {p:.0%})",
         "likely_card_desc": (
@@ -582,7 +737,7 @@ STRINGS = {
         ),
         "card_status": "Prévision",
         "status_triggered": "Cartographie des inondations déclenchée",
-        "status_quiet": "Calme — non déclenchée",
+        "status_quiet": "Calme : non déclenchée",
         "card_rain": "Pluie prévue (médiane / membre max.)",
         "card_likely_area": "Superficie inondée ≥ 0.1 m (P ≥ {p:.0%})",
         "card_expected_people": "Personnes attendues avec ≥ 0.3 m",
@@ -641,11 +796,16 @@ THRESHOLD_ARGS = {
 # Argument names for the live-data choices, one per language like the gates.
 LIVE_ARGS = {
     "en": {"cycle": "cycle", "variant": "flood_source", "gauge": "gauge",
-           "likelihood": "min_probability", "min_risk": "min_risk_level"},
+           "likelihood": "min_probability", "min_risk": "min_risk_level", "depth": "depth",
+           "grid": "grid", "statistic": "statistic", "period": "period", "start": "start"},
     "es": {"cycle": "ciclo", "variant": "fuente_inundacion", "gauge": "estacion",
-           "likelihood": "probabilidad_minima", "min_risk": "nivel_riesgo_minimo"},
+           "likelihood": "probabilidad_minima", "min_risk": "nivel_riesgo_minimo",
+           "depth": "profundidad", "grid": "malla", "statistic": "estadistica",
+           "period": "periodo", "start": "inicio"},
     "fr": {"cycle": "cycle", "variant": "source_inondation", "gauge": "station",
-           "likelihood": "probabilite_minimale", "min_risk": "niveau_risque_minimal"},
+           "likelihood": "probabilite_minimale", "min_risk": "niveau_risque_minimal",
+           "depth": "profondeur", "grid": "grille", "statistic": "statistique",
+           "period": "periode", "start": "debut"},
 }
 
 
@@ -676,7 +836,8 @@ def check_parity():
             )
         for key in ("levels", "bands", "variants", "forcings", "likely_bands",
                     "risk_levels", "severity_levels", "likelihood_levels",
-                    "risk_filter_choices"):
+                    "risk_filter_choices", "depth_choices", "rain_statistics",
+                    "rain_periods", "rain_grid_kinds", "summary_products"):
             if set(STRINGS["en"][key]) != set(STRINGS[lang][key]):
                 raise ValueError(f"{key} class values differ in {lang}")
 

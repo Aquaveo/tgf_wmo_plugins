@@ -11,6 +11,8 @@ from dataclasses import dataclass
 from functools import cached_property
 from typing import Callable, NamedTuple
 
+from tgf_wmo_plugins.tito import stamp
+
 BUCKET = "https://cog-s3-test-401506828094-us-east-1-an.s3.us-east-1.amazonaws.com"
 
 # Every country's thresholds, shallowest first -- the order the hazard levels
@@ -137,12 +139,15 @@ class Live:
     site_arg: str | None = None
     site_choices: tuple[tuple[str, str], ...] = ()
     receptors: Receptors = LIVE_RECEPTORS
+    # Whether a sample cycle is published under sample/<slug>/.
+    sample: bool = False
     # River gauges with forecast hydrographs, as (TITO id, label), and the grid
     # whose members to plot.
     gauges: tuple[tuple[str, str], ...] = ()
     gauge_grid: str | None = None
-    # Grids with ensemble rainfall summaries, as (TITO grid, label).
-    rain_grids: tuple[tuple[str, str], ...] = ()
+    # Grids with ensemble rainfall summaries, as (TITO grid, resolution, kind);
+    # kind is "national", "flood_sites" or None where there is only one grid.
+    rain_grids: tuple[tuple[str, str, str | None], ...] = ()
 
     def __post_init__(self):
         if bool(self.site_arg) != bool(self.site_choices):
@@ -156,12 +161,12 @@ class Live:
             base = f"{base}/{site}"
         suffix = "_overbank" if variant.endswith("_overbank") else ""
         return [
-            f"{base}/{variant}/prob_depth_ge_{depth}{suffix}.{cycle}.tif"
+            f"{base}/{variant}/prob_depth_ge_{depth}{suffix}.{stamp(cycle)}.tif"
             for depth in DEPTHS
         ]
 
     def receptor_path(self, scope, cycle):
-        return f"{self.grid}/ibf/{self.ibf_site(scope)}/ibf_receptors.{cycle}.gpkg"
+        return f"{self.grid}/ibf/{self.ibf_site(scope)}/ibf_receptors.{stamp(cycle)}.gpkg"
 
 
 @dataclass(frozen=True)
@@ -273,8 +278,9 @@ GUATEMALA = Country(
         variants=ALL_VARIANTS,
         raster_site=lambda _scope: "Guatemala_SantaInesPetapa",
         ibf_site=lambda _scope: "Guatemala_SantaInesPetapa",
+        sample=True,
         # The 90 m members, which also drive the flood maps.
-        rain_grids=(("guatemala_900m", "900 m (national)"), ("guatemala_90m", "90 m (flood sites)")),
+        rain_grids=(("guatemala_900m", "900 m", "national"), ("guatemala_90m", "90 m", "flood_sites")),
         gauge_grid="guatemala_90m",
         gauges=(
             ("cuenca_villalobos_out", "Cuenca Villalobos (salida)"),
@@ -332,7 +338,7 @@ HAITI = Country(
         ibf_site=lambda site: site,
         site_arg="site",
         site_choices=(("Haiti_LaQuinte", "La Quinte"), ("Haiti_Gris", "Gris")),
-        rain_grids=(("haiti_900m", "900 m (national)"), ("haiti_90m", "90 m (flood sites)")),
+        rain_grids=(("haiti_900m", "900 m", "national"), ("haiti_90m", "90 m", "flood_sites")),
         gauge_grid="haiti_90m",
         gauges=(
             ("cuenca_laquinta_1", "Cuenca Laquinta 1"),
@@ -381,7 +387,7 @@ ANTIGUA_BARBUDA = Country(
         variants=PLUVIAL_VARIANTS,
         raster_site=lambda _scope: None,
         ibf_site=lambda _scope: "Antigua_Barbuda",
-        rain_grids=(("antigua_30m", "30 m"),),
+        rain_grids=(("antigua_30m", "30 m", None),),
     ),
 )
 
@@ -561,7 +567,7 @@ COMOROS = Country(
         variants=PLUVIAL_VARIANTS,
         raster_site=lambda commune: f"Comoros_{commune.split('_', 1)[1]}",
         ibf_site=lambda commune: f"Comoros_{commune.split('_', 1)[1]}",
-        rain_grids=(("comoros_30m", "30 m"),),
+        rain_grids=(("comoros_30m", "30 m", None),),
     ),
 )
 

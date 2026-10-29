@@ -20,12 +20,14 @@ from tgf_wmo_plugins.base import CountryPlugin, LiveData
 from tgf_wmo_plugins.countries import GUATEMALA, HAITI
 from tgf_wmo_plugins.strings import LIVE_ARGS, STRINGS
 from tgf_wmo_plugins.tito import (
-    CYCLE_FORMAT,
     LATEST,
+    SAMPLE,
     _get,
     cycle_files,
     cycle_label,
+    cycle_time,
     file_url,
+    stamp,
 )
 
 TIME, DISCHARGE, OBSERVED = "Time", "Discharge(m^3 s^-1)", "Observed(m^3 s^-1)"
@@ -55,7 +57,7 @@ def gauge_members(slug, cycle, grid, gauge):
     Cached per cycle, since a published cycle never changes; the members are
     fetched in parallel, as there are about seventy small files.
     """
-    suffix = f"/ts.{gauge}.crest.{cycle}.csv"
+    suffix = f"/ts.{gauge}.crest.{stamp(cycle)}.csv"
     paths = sorted(
         p for p in cycle_files(slug, cycle) if p.startswith(f"{grid}/") and p.endswith(suffix)
     )
@@ -81,8 +83,11 @@ class BaseDischarge(LiveData, CountryPlugin):
     @classmethod
     def country_args(cls, country):
         s, names = STRINGS[country.lang], LIVE_ARGS[country.lang]
+        cycles = [{"value": LATEST, "label": s["cycle_latest"]}]
+        if country.live.sample:
+            cycles.append({"value": SAMPLE, "label": s["cycle_sample"]})
         return {
-            names["cycle"]: [{"value": LATEST, "label": s["cycle_latest"]}],
+            names["cycle"]: cycles,
             names["gauge"]: [{"value": g, "label": label} for g, label in country.live.gauges],
         }
 
@@ -98,7 +103,8 @@ class BaseDischarge(LiveData, CountryPlugin):
         members = gauge_members(live.slug, cycle, live.gauge_grid, gauge)
 
         layout = {
-            "title": {"text": f"{s['discharge_title'].format(gauge=label)} — {cycle_label(cycle)}"},
+            "title": {"text": f"{s['discharge_title'].format(gauge=label)} "
+                              f"({cycle_label(cycle, s['sample_tag'])})"},
             "xaxis": {"title": {"text": s["axis_time"]}, "showgrid": False},
             "yaxis": {"title": {"text": s["axis_discharge"]}, "rangemode": "tozero",
                       "gridcolor": "#e6e5e0"},
@@ -107,8 +113,8 @@ class BaseDischarge(LiveData, CountryPlugin):
             "margin": {"t": 50, "r": 20, "b": 170},
             "shapes": [{
                 "type": "line", "xref": "x", "yref": "paper", "y0": 0, "y1": 1,
-                "x0": f"{datetime.strptime(cycle, CYCLE_FORMAT):%Y-%m-%d %H:%M}",
-                "x1": f"{datetime.strptime(cycle, CYCLE_FORMAT):%Y-%m-%d %H:%M}",
+                "x0": f"{cycle_time(cycle):%Y-%m-%d %H:%M}",
+                "x1": f"{cycle_time(cycle):%Y-%m-%d %H:%M}",
                 "line": {"color": INK, "width": 1.5, "dash": "dash"},
             }],
         }

@@ -1,5 +1,5 @@
 {
-  "name": "Haïti — Prévision d'inondation en direct",
+  "name": "Haïti: Prévision d'inondation en direct",
   "description": "Prévision TITO en direct pour La Quinte et Gris : pluie, aléa, profondeur probable, alertes SFFS/FGS et débit des rivières pour tout cycle publié",
   "publicDashboard": false,
   "userPermission": "admin",
@@ -85,7 +85,7 @@
           "args_string": {
             "variable_name": "Site",
             "show_label": true,
-            "variable_options_source": "Cartes d'Inondation (Français): Résumé d'Impact par Tempête (Haiti) - Site",
+            "variable_options_source": "UFFIS: Haiti: Haiti: Résumé d'Impact par Tempête - Site",
             "initial_value": "Haiti_LaQuinte"
           },
           "metadata_string": {}
@@ -114,9 +114,9 @@
                       "source": "uffis_precip_layer_haiti",
                       "args": {
                         "cycle": "${Date}",
-                        "grid": "haiti_90m",
-                        "statistic": "median",
-                        "period": "forecast"
+                        "grille": "haiti_90m",
+                        "statistique": "median",
+                        "periode": "forecast"
                       }
                     },
                     "layerId": "406c2828-8720-4dca-a37d-974e23700ba4",
@@ -170,7 +170,7 @@
                   }
                 },
                 "legend": {
-                  "title": "Rainfall accumulation (mm)",
+                  "title": "Cumul de pluie (mm)",
                   "items": [
                     {
                       "label": "1 - 5",
@@ -213,7 +213,7 @@
                       "symbol": "square"
                     },
                     {
-                      "label": "250 or more",
+                      "label": "250 ou plus",
                       "color": "#6a3d9a",
                       "symbol": "square"
                     }
@@ -772,7 +772,7 @@
           "args_string": {
             "variable_name": "Site",
             "show_label": true,
-            "variable_options_source": "Cartes d'Inondation (Français): Résumé d'Impact par Tempête (Haiti) - Site",
+            "variable_options_source": "UFFIS: Haiti: Haiti: Résumé d'Impact par Tempête - Site",
             "initial_value": "Haiti_LaQuinte"
           },
           "metadata_string": {}

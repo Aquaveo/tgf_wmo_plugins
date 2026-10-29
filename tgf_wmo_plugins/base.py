@@ -4,7 +4,17 @@ from tethysapp.tethysdash.plugin_helpers import TethysDashPlugin
 
 from tgf_wmo_plugins.receptors import load_receptors
 from tgf_wmo_plugins.strings import LIVE_ARGS, STRINGS
-from tgf_wmo_plugins.tito import LATEST, TRAINING, cycle_label, resolve_cycle
+from tgf_wmo_plugins.tito import LATEST, SAMPLE, TRAINING, cycle_label, resolve_cycle
+
+
+def country_group(country):
+    """One plugin group per country, so its plugins list together."""
+    return f"UFFIS: {country.label_name}"
+
+
+def country_label(country, name):
+    """Country first, so a country's plugins read as a block."""
+    return f"{country.label_name}: {name}"
 
 
 class CountryPlugin(TethysDashPlugin):
@@ -28,8 +38,8 @@ class CountryPlugin(TethysDashPlugin):
             return
         s = STRINGS[country.lang]
         cls.name = f"uffis_{cls.family}_{country.key}"
-        cls.label = f"{s[f'{cls.strings_key}_label']} ({country.label_name})"
-        cls.group = s["group"]
+        cls.label = country_label(country, s[f"{cls.strings_key}_label"])
+        cls.group = country_group(country)
         cls.tags = list(s[f"{cls.strings_key}_tags"])
         cls.description = s[f"{cls.strings_key}_desc"]
         cls.args = cls.country_args(country)
@@ -82,6 +92,8 @@ class LiveData:
         cycles = [{"value": LATEST, "label": s["cycle_latest"]}]
         if cls.has_training(country):
             cycles.append({"value": TRAINING, "label": s["cycle_training"]})
+        if live.sample:
+            cycles.append({"value": SAMPLE, "label": s["cycle_sample"]})
         args = {names["cycle"]: cycles}
         if live.site_arg:
             args[live.site_arg] = [
@@ -144,6 +156,7 @@ class LiveData:
         population = 0.0 if df is None else df[rec.columns.population].sum()
         return df, rec, population
 
-    @staticmethod
-    def title_suffix(cycle):
-        return "" if cycle == TRAINING else f" — {cycle_label(cycle)}"
+    def title_suffix(self, cycle):
+        if cycle == TRAINING:
+            return ""
+        return f" ({cycle_label(cycle, self.strings['sample_tag'])})"

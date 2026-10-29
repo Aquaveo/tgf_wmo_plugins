@@ -62,6 +62,10 @@ uffis_storm_card_comoros = "tgf_wmo_plugins.storm_card:StormCardComoros"
 uffis_storm_impact_layer_comoros = "tgf_wmo_plugins.storm_impact_layer:StormImpactLayerComoros"
 uffis_storm_impact_summary_comoros = "tgf_wmo_plugins.storm_impact_summary:StormImpactSummaryComoros"
 # live TITO inputs and products
+uffis_flood_map_layer_guatemala = "tgf_wmo_plugins.flood_map_layer:FloodMapLayerGuatemala"
+uffis_flood_map_layer_haiti = "tgf_wmo_plugins.flood_map_layer:FloodMapLayerHaiti"
+uffis_flood_map_layer_antigua_barbuda = "tgf_wmo_plugins.flood_map_layer:FloodMapLayerAntiguaBarbuda"
+uffis_flood_map_layer_comoros = "tgf_wmo_plugins.flood_map_layer:FloodMapLayerComoros"
 uffis_risk_matrix_guatemala = "tgf_wmo_plugins.ibf:RiskMatrixGuatemala"
 uffis_risk_filter_guatemala = "tgf_wmo_plugins.ibf:RiskFilterGuatemala"
 uffis_risk_layer_guatemala = "tgf_wmo_plugins.ibf:RiskLayerGuatemala"
@@ -88,6 +92,14 @@ uffis_precip_layer_guatemala = "tgf_wmo_plugins.precip_layer:PrecipLayerGuatemal
 uffis_precip_layer_haiti = "tgf_wmo_plugins.precip_layer:PrecipLayerHaiti"
 uffis_precip_layer_antigua_barbuda = "tgf_wmo_plugins.precip_layer:PrecipLayerAntiguaBarbuda"
 uffis_precip_layer_comoros = "tgf_wmo_plugins.precip_layer:PrecipLayerComoros"
+uffis_soil_moisture_layer_guatemala = "tgf_wmo_plugins.precip_layer:SoilMoistureLayerGuatemala"
+uffis_soil_moisture_layer_haiti = "tgf_wmo_plugins.precip_layer:SoilMoistureLayerHaiti"
+uffis_soil_moisture_layer_antigua_barbuda = "tgf_wmo_plugins.precip_layer:SoilMoistureLayerAntiguaBarbuda"
+uffis_soil_moisture_layer_comoros = "tgf_wmo_plugins.precip_layer:SoilMoistureLayerComoros"
+uffis_unit_streamflow_layer_guatemala = "tgf_wmo_plugins.precip_layer:UnitStreamflowLayerGuatemala"
+uffis_unit_streamflow_layer_haiti = "tgf_wmo_plugins.precip_layer:UnitStreamflowLayerHaiti"
+uffis_unit_streamflow_layer_antigua_barbuda = "tgf_wmo_plugins.precip_layer:UnitStreamflowLayerAntiguaBarbuda"
+uffis_unit_streamflow_layer_comoros = "tgf_wmo_plugins.precip_layer:UnitStreamflowLayerComoros"
 
 [tool.setuptools.packages.find]
 include = ["tgf_wmo_plugins*"]

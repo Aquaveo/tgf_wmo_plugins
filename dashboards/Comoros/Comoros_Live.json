@@ -1,5 +1,5 @@
 {
-  "name": "Comores — Prévision d'inondation en direct",
+  "name": "Comores: Prévision d'inondation en direct",
   "description": "Prévision TITO en direct par commune : pluie, aléa, profondeur probable et alertes SFFS/FGS pour tout cycle publié",
   "publicDashboard": false,
   "userPermission": "admin",
@@ -85,7 +85,7 @@
           "args_string": {
             "variable_name": "Commune",
             "show_label": true,
-            "variable_options_source": "Cartes d'Inondation (Français): Résumé d'Impact par Tempête (Comores) - Commune",
+            "variable_options_source": "UFFIS: Comores: Comores: Résumé d'Impact par Tempête - Commune",
             "initial_value": "KM274_Moroni"
           },
           "metadata_string": {}
@@ -114,9 +114,9 @@
                       "source": "uffis_precip_layer_comoros",
                       "args": {
                         "cycle": "${Date}",
-                        "grid": "comoros_30m",
-                        "statistic": "median",
-                        "period": "forecast"
+                        "grille": "comoros_30m",
+                        "statistique": "median",
+                        "periode": "forecast"
                       }
                     },
                     "layerId": "82a06592-d2f2-4aeb-85c2-cfa3f336e57b",
@@ -170,7 +170,7 @@
                   }
                 },
                 "legend": {
-                  "title": "Rainfall accumulation (mm)",
+                  "title": "Cumul de pluie (mm)",
                   "items": [
                     {
                       "label": "1 - 5",
@@ -213,7 +213,7 @@
                       "symbol": "square"
                     },
                     {
-                      "label": "250 or more",
+                      "label": "250 ou plus",
                       "color": "#6a3d9a",
                       "symbol": "square"
                     }
@@ -907,7 +907,7 @@
           "args_string": {
             "variable_name": "Commune",
             "show_label": true,
-            "variable_options_source": "Cartes d'Inondation (Français): Résumé d'Impact par Tempête (Comores) - Commune",
+            "variable_options_source": "UFFIS: Comores: Comores: Résumé d'Impact par Tempête - Commune",
             "initial_value": "KM274_Moroni"
           },
           "metadata_string": {}

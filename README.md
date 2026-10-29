@@ -13,6 +13,9 @@ them as plain Python. All three are organised by country; start at
 
 Each plugin family has one implementation. Each country gets a one-line
 subclass per family its data supports, registered as `uffis_<family>_<country>`.
+Every plugin is labelled country first (`Guatemala: Capa de Peligro`) and
+sits in its country's group (`UFFIS: Guatemala`), so a
+country's plugins list together.
 
 | family | type | what it shows |
 |---|---|---|
@@ -25,10 +28,10 @@ subclass per family its data supports, registered as `uffis_<family>_<country>`.
 
 | country | language | hazard family | storm family | unit argument | live TITO data |
 |---|---|---|---|---|---|
-| Guatemala | es | ✓ | ✓ live | — | ✓ |
-| Haiti | fr | ✓ (hazard layer live only) | ✓ live | — | ✓, `site` La Quinte or Gris |
-| Antigua and Barbuda | en | ✓ | ✓ live | — | ✓ |
-| Barbados | en | ✓ | ✓ training library, per parish | `parish` | — |
+| Guatemala | es | ✓ | ✓ live | none | ✓ |
+| Haiti | fr | ✓ (hazard layer live only) | ✓ live | none | ✓, `site` La Quinte or Gris |
+| Antigua and Barbuda | en | ✓ | ✓ live | none | ✓ |
+| Barbados | en | ✓ | ✓ training library, per parish | `parish` | no |
 | Comoros | fr | ✓ | ✓ live (no receptors published) | `commune` | ✓ |
 
 The map layers are `dynamic_map_layer`s: they re-fetch whenever a bound
@@ -65,6 +68,17 @@ Two more live plugins take the same `cycle` binding:
 - `uffis_precip_layer_guatemala`: ensemble rainfall accumulation (forecast or
   nowcast; median, minimum or maximum) on the 900 m or 90 m grid, as a dynamic
   GeoTIFF layer coloured with the tito.uffis.org rainfall classes.
+- `uffis_soil_moisture_layer_<country>` and `uffis_unit_streamflow_layer_<country>`:
+  the ensemble maximum soil saturation (%) and unit streamflow (m³/s per km²),
+  with the same grid, statistic and period choices as the rainfall layer and
+  the tito.uffis.org viewer's colour classes. All three share one implementation
+  in `precip_layer.py`.
+- `uffis_flood_map_layer_<country>`: TITO's flood probability raster itself,
+  as a dynamic GeoTIFF layer -- the probability of the water reaching 10, 30,
+  70 or 100 cm, for any flood source -- coloured in the FGS likelihood bands
+  and hiding cells under a minimum probability (default 5 %). It follows the
+  cycle binding into sample cycles like every other live plugin, so a layer
+  never needs a hand-written TITO URL.
 - `uffis_discharge_<country>` (Guatemala, Haiti): the forecast hydrograph at a
   river gauge in the style of the tito.uffis.org viewer -- for each rainfall
   forcing, the range of its members as a shaded band and their median as a
@@ -73,6 +87,28 @@ Two more live plugins take the same `cycle` binding:
   StormLab forecast the ~30 h after it, the SCaMPR nowcast both), and the
   cycle start is marked. Antigua's one gauge is a placeholder that never
   flows, and Comoros has none, so neither has the plot.
+
+### Sample mode
+
+When nothing is happening live, a country can show a sample event instead:
+past TITO cycles copied to `https://tito.uffis.org/sample/<country>/`, laid out
+exactly like `outputs/` (`latest.json`, then `<cycle>/index.json` and the
+cycle's files). Guatemala has one -- four hourly cycles from 16 October 2026,
+reaching ALTO -- and `Live.sample` in `countries.py` marks it.
+
+- Every live plugin's cycle argument gains a **Sample event** choice (the
+  newest sample cycle).
+- The cycle input lists the sample cycles at the bottom, marked SAMPLE, so a
+  dashboard can step through the event hour by hour; its **start** setting
+  opens a dashboard on the sample instead of the latest live cycle.
+- Internally a sample cycle is `sample:<stamp>`; `tito.stamp()` gives the bare
+  stamp its file names use, and every title marks it (SAMPLE / MUESTRA /
+  ÉCHANTILLON) so it is never mistaken for a live forecast.
+
+`dashboards/Guatemala/Guatemala_Sample_Demo.json` is the live Guatemala
+dashboard set to open on the sample. The `/sample/*` CloudFront behavior needs
+the same response headers policy as `outputs/*`, for CORS, or the browser
+cannot draw the sample rainfall layer.
 
 ## Warnings (SFFS/FGS risk matrix)
 
