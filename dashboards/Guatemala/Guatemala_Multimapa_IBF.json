@@ -1,0 +1,598 @@
+{
+  "name": "UFFIS Guatemala",
+  "description": "",
+  "publicDashboard": false,
+  "userPermission": "admin",
+  "permissions": [
+    {
+      "username": "admin",
+      "permission": "admin"
+    }
+  ],
+  "unrestrictedPlacement": true,
+  "autoThumbnail": true,
+  "image": "/media/tethysdash/app/fff0229f-f1de-44fe-9218-336dca1a2aba.png?v=1793309602737",
+  "owner": "admin",
+  "notes": "",
+  "tabs": [
+    {
+      "id": 16,
+      "name": "Main",
+      "gridItems": [
+        {
+          "i": "1",
+          "x": 0,
+          "y": 0,
+          "w": 33,
+          "h": 56,
+          "source": "Map",
+          "args_string": {
+            "baseMap": "https://server.arcgisonline.com/arcgis/rest/services/Canvas/World_Light_Gray_Base/MapServer",
+            "layerControl": true,
+            "layers": [
+              {
+                "configuration": {
+                  "type": "WebGLTile",
+                  "props": {
+                    "name": "Precipitación Acumulada",
+                    "layerId": "b2d70e33-5b2c-4ed2-ac61-a6600513c135",
+                    "source": {
+                      "type": "GeoTIFF",
+                      "props": {}
+                    },
+                    "pluginSource": {
+                      "source": "uffis_precip_layer_guatemala",
+                      "args": {
+                        "ciclo": "${Fecha}",
+                        "malla": "guatemala_900m",
+                        "estadistica": "max",
+                        "periodo": "forecast"
+                      }
+                    }
+                  },
+                  "style": {
+                    "styleMode": "ranges",
+                    "classes": [
+                      {
+                        "value": "5",
+                        "color": "#d9f0a3",
+                        "label": "1 - 5"
+                      },
+                      {
+                        "value": "10",
+                        "color": "#addd8e",
+                        "label": "5 - 10"
+                      },
+                      {
+                        "value": "25",
+                        "color": "#41ab5d",
+                        "label": "10 - 25"
+                      },
+                      {
+                        "value": "50",
+                        "color": "#ffffb2",
+                        "label": "25 - 50"
+                      },
+                      {
+                        "value": "75",
+                        "color": "#fdae61",
+                        "label": "50 - 75"
+                      },
+                      {
+                        "value": "100",
+                        "color": "#f46d43",
+                        "label": "75 - 100"
+                      },
+                      {
+                        "value": "150",
+                        "color": "#d73027",
+                        "label": "100 - 150"
+                      },
+                      {
+                        "value": "250",
+                        "color": "#a50026",
+                        "label": "150 - 250"
+                      }
+                    ],
+                    "fallbackColor": "#6a3d9a"
+                  }
+                },
+                "legend": {
+                  "title": "Lluvia acumulada (mm)",
+                  "items": [
+                    {
+                      "label": "1 - 5",
+                      "color": "#d9f0a3",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "5 - 10",
+                      "color": "#addd8e",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "10 - 25",
+                      "color": "#41ab5d",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "25 - 50",
+                      "color": "#ffffb2",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "50 - 75",
+                      "color": "#fdae61",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "75 - 100",
+                      "color": "#f46d43",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "100 - 150",
+                      "color": "#d73027",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "150 - 250",
+                      "color": "#a50026",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "250 o más",
+                      "color": "#6a3d9a",
+                      "symbol": "square"
+                    }
+                  ]
+                }
+              }
+            ],
+            "map_extent": {
+              "extent": "-9937450.08,1849540.18,7.13",
+              "viewGroup": "1"
+            },
+            "mapDrawing": {}
+          },
+          "metadata_string": {}
+        },
+        {
+          "i": "2",
+          "x": 33,
+          "y": 0,
+          "w": 34,
+          "h": 56,
+          "source": "Map",
+          "args_string": {
+            "baseMap": "https://server.arcgisonline.com/arcgis/rest/services/Canvas/World_Light_Gray_Base/MapServer",
+            "layerControl": true,
+            "layers": [
+              {
+                "configuration": {
+                  "type": "WebGLTile",
+                  "props": {
+                    "name": "Humedad de Suelo",
+                    "layerId": "559577d2-7396-47b7-af7b-8b01ca46900b",
+                    "pluginSource": {
+                      "source": "uffis_soil_moisture_layer_guatemala",
+                      "args": {
+                        "ciclo": "${Fecha}",
+                        "malla": "guatemala_900m",
+                        "estadistica": "max",
+                        "periodo": "forecast"
+                      }
+                    },
+                    "source": {
+                      "type": "GeoTIFF",
+                      "props": {}
+                    }
+                  },
+                  "style": {
+                    "styleMode": "ranges",
+                    "classes": [
+                      {
+                        "value": "30",
+                        "color": "#f6e8c3",
+                        "label": "10 - 30"
+                      },
+                      {
+                        "value": "50",
+                        "color": "#dfc27d",
+                        "label": "30 - 50"
+                      },
+                      {
+                        "value": "70",
+                        "color": "#80cdc1",
+                        "label": "50 - 70"
+                      },
+                      {
+                        "value": "85",
+                        "color": "#35978f",
+                        "label": "70 - 85"
+                      },
+                      {
+                        "value": "95",
+                        "color": "#01665e",
+                        "label": "85 - 95"
+                      },
+                      {
+                        "value": "100",
+                        "color": "#003c30",
+                        "label": "95 - 100"
+                      }
+                    ],
+                    "fallbackColor": "#003c30",
+                    "rampName": "turbo"
+                  }
+                },
+                "legend": {
+                  "title": "Saturación del suelo (%)",
+                  "items": [
+                    {
+                      "label": "10 - 30",
+                      "color": "#f6e8c3",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "30 - 50",
+                      "color": "#dfc27d",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "50 - 70",
+                      "color": "#80cdc1",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "70 - 85",
+                      "color": "#35978f",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "85 - 95",
+                      "color": "#01665e",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "95 - 100",
+                      "color": "#003c30",
+                      "symbol": "square"
+                    }
+                  ]
+                }
+              }
+            ],
+            "map_extent": {
+              "extent": "-10056996.56,1847305.78,7.13",
+              "viewGroup": "1",
+              "isGroupInitialExtent": true
+            },
+            "mapDrawing": {}
+          },
+          "metadata_string": {}
+        },
+        {
+          "i": "3",
+          "x": 67,
+          "y": 0,
+          "w": 33,
+          "h": 56,
+          "source": "Map",
+          "args_string": {
+            "baseMap": "https://server.arcgisonline.com/arcgis/rest/services/Canvas/World_Light_Gray_Base/MapServer",
+            "layerControl": true,
+            "layers": [
+              {
+                "configuration": {
+                  "type": "WebGLTile",
+                  "props": {
+                    "name": "Caudal Unitario Máximo",
+                    "layerId": "4a4c1a72-c4df-4331-8a77-31988edb549d",
+                    "pluginSource": {
+                      "source": "uffis_unit_streamflow_layer_guatemala",
+                      "args": {
+                        "ciclo": "${Fecha}",
+                        "malla": "guatemala_900m",
+                        "estadistica": "max",
+                        "periodo": "forecast"
+                      }
+                    },
+                    "source": {
+                      "type": "GeoTIFF",
+                      "props": {}
+                    }
+                  },
+                  "style": {
+                    "styleMode": "ranges",
+                    "classes": [
+                      {
+                        "value": "1",
+                        "color": "#bdbdbd",
+                        "label": "0.1 - 1"
+                      },
+                      {
+                        "value": "2",
+                        "color": "#d9ef8b",
+                        "label": "1 - 2"
+                      },
+                      {
+                        "value": "4",
+                        "color": "#fdae61",
+                        "label": "2 - 4"
+                      },
+                      {
+                        "value": "6",
+                        "color": "#d73027",
+                        "label": "4 - 6"
+                      },
+                      {
+                        "value": "10",
+                        "color": "#c51b7d",
+                        "label": "6 - 10"
+                      },
+                      {
+                        "value": "20",
+                        "color": "#2c7bb6",
+                        "label": "10 - 20"
+                      }
+                    ],
+                    "fallbackColor": "#08306b",
+                    "rampName": "turbo"
+                  }
+                },
+                "legend": {
+                  "title": "Caudal unitario máximo (m³/s por km²)",
+                  "items": [
+                    {
+                      "label": "0.1 - 1",
+                      "color": "#bdbdbd",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "1 - 2",
+                      "color": "#d9ef8b",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "2 - 4",
+                      "color": "#fdae61",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "4 - 6",
+                      "color": "#d73027",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "6 - 10",
+                      "color": "#c51b7d",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "10 - 20",
+                      "color": "#2c7bb6",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "20 o más",
+                      "color": "#08306b",
+                      "symbol": "square"
+                    }
+                  ]
+                }
+              },
+              {
+                "configuration": {
+                  "type": "VectorLayer",
+                  "props": {
+                    "name": "IBF",
+                    "layerId": "fb5954b8-721f-4a60-8c9b-7f6a7ce6e8bc",
+                    "pluginSource": {
+                      "source": "uffis_risk_layer_guatemala",
+                      "args": {
+                        "ciclo": "${Fecha}",
+                        "nivel_riesgo_minimo": "0"
+                      }
+                    },
+                    "source": {
+                      "type": "GeoJSON",
+                      "props": {},
+                      "geojson": {
+                        "type": "FeatureCollection",
+                        "features": [],
+                        "crs": {
+                          "type": "name",
+                          "properties": {
+                            "name": "EPSG:4326"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "style": {
+                    "default": {
+                      "polygon": {
+                        "fill": "#9e9e9e",
+                        "stroke": "#9e9e9e",
+                        "strokeWidth": "0"
+                      },
+                      "linestring": {
+                        "stroke": "#9e9e9e",
+                        "strokeWidth": "1"
+                      }
+                    },
+                    "rules": [
+                      {
+                        "name": "MUY BAJO (edificios)",
+                        "geometryType": "polygon",
+                        "strokeWidth": "1",
+                        "conditionField": "alerta",
+                        "conditionType": "=",
+                        "conditionValue": "0",
+                        "fill": "#63BE5F",
+                        "stroke": "#63BE5F"
+                      },
+                      {
+                        "name": "MUY BAJO (carreteras)",
+                        "geometryType": "linestring",
+                        "conditionField": "alerta",
+                        "conditionType": "=",
+                        "conditionValue": "0",
+                        "stroke": "#63BE5F",
+                        "strokeWidth": "3"
+                      },
+                      {
+                        "name": "BAJO (edificios)",
+                        "geometryType": "polygon",
+                        "strokeWidth": "1",
+                        "conditionField": "alerta",
+                        "conditionType": "=",
+                        "conditionValue": "1",
+                        "fill": "#FFD500",
+                        "stroke": "#FFD500"
+                      },
+                      {
+                        "name": "BAJO (carreteras)",
+                        "geometryType": "linestring",
+                        "conditionField": "alerta",
+                        "conditionType": "=",
+                        "conditionValue": "1",
+                        "stroke": "#FFD500",
+                        "strokeWidth": "3"
+                      },
+                      {
+                        "name": "MEDIO (edificios)",
+                        "geometryType": "polygon",
+                        "strokeWidth": "1",
+                        "conditionField": "alerta",
+                        "conditionType": "=",
+                        "conditionValue": "2",
+                        "fill": "#F58220",
+                        "stroke": "#F58220"
+                      },
+                      {
+                        "name": "MEDIO (carreteras)",
+                        "geometryType": "linestring",
+                        "conditionField": "alerta",
+                        "conditionType": "=",
+                        "conditionValue": "2",
+                        "stroke": "#F58220",
+                        "strokeWidth": "3"
+                      },
+                      {
+                        "name": "ALTO (edificios)",
+                        "geometryType": "polygon",
+                        "strokeWidth": "1",
+                        "conditionField": "alerta",
+                        "conditionType": "=",
+                        "conditionValue": "3",
+                        "fill": "#DA291C",
+                        "stroke": "#DA291C"
+                      },
+                      {
+                        "name": "ALTO (carreteras)",
+                        "geometryType": "linestring",
+                        "conditionField": "alerta",
+                        "conditionType": "=",
+                        "conditionValue": "3",
+                        "stroke": "#DA291C",
+                        "strokeWidth": "3"
+                      }
+                    ]
+                  }
+                },
+                "legend": {
+                  "title": "Nivel de alerta",
+                  "items": [
+                    {
+                      "label": "MUY BAJO",
+                      "color": "#63BE5F",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "BAJO",
+                      "color": "#FFD500",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "MEDIO",
+                      "color": "#F58220",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "ALTO",
+                      "color": "#DA291C",
+                      "symbol": "square"
+                    }
+                  ]
+                }
+              }
+            ],
+            "map_extent": {
+              "extent": "-9937450.08,1849540.18,7.13",
+              "viewGroup": "1"
+            },
+            "mapDrawing": {}
+          },
+          "metadata_string": {}
+        },
+        {
+          "i": "4",
+          "x": 0,
+          "y": 3,
+          "w": 14,
+          "h": 5,
+          "source": "uffis_cycle_times_guatemala",
+          "args_string": {
+            "inicio": "sample",
+            "texto_etiqueta": "Fecha"
+          },
+          "metadata_string": {}
+        },
+        {
+          "i": "5",
+          "x": 34,
+          "y": 0,
+          "w": 30,
+          "h": 5,
+          "source": "Text",
+          "args_string": {
+            "text": "<h1 style=\"text-align: center;\">Humedad de Suelo</h1>"
+          },
+          "metadata_string": {
+            "hideScrollbar": true
+          }
+        },
+        {
+          "i": "6",
+          "x": 69,
+          "y": 0,
+          "w": 29,
+          "h": 5,
+          "source": "Text",
+          "args_string": {
+            "text": "<h1 style=\"text-align: center;\">Caudal Unitario</h1>"
+          },
+          "metadata_string": {
+            "hideScrollbar": true
+          }
+        },
+        {
+          "i": "7",
+          "x": 2,
+          "y": 0,
+          "w": 28,
+          "h": 5,
+          "source": "Text",
+          "args_string": {
+            "text": "<h1 style=\"text-align: center;\">Precipitación</h1>"
+          },
+          "metadata_string": {
+            "hideScrollbar": true
+          }
+        }
+      ]
+    }
+  ]
+}

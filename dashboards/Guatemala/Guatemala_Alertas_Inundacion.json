@@ -1,0 +1,323 @@
+{
+  "name": "Guatema: Alertas de inundación",
+  "description": "Alertas TITO en vivo para Santa Inés Petapa: edificios y carreteras por nivel de alerta, matriz de riesgo SFFS/FGS y resumen del evento para cualquier ciclo publicado",
+  "publicDashboard": false,
+  "userPermission": "admin",
+  "permissions": [
+    {
+      "username": "admin",
+      "permission": "admin"
+    }
+  ],
+  "unrestrictedPlacement": true,
+  "autoThumbnail": true,
+  "image": "/media/tethysdash/app/57e5c86d-d8f9-49d3-ba20-1bedde8dc6bd.png?v=1793304994461",
+  "owner": "admin",
+  "notes": "",
+  "tabs": [
+    {
+      "id": 20,
+      "name": "Alertas",
+      "gridItems": [
+        {
+          "i": "1",
+          "x": 76,
+          "y": 38,
+          "w": 24,
+          "h": 18,
+          "source": "uffis_event_summary_guatemala",
+          "args_string": {
+            "ciclo": "${Fecha}"
+          },
+          "metadata_string": {
+            "hideScrollbar": true,
+            "backgroundColor": "#ffffff"
+          }
+        },
+        {
+          "i": "2",
+          "x": 76,
+          "y": 33,
+          "w": 24,
+          "h": 6,
+          "source": "uffis_risk_filter_guatemala",
+          "args_string": {},
+          "metadata_string": {
+            "backgroundColor": "#ffffff"
+          }
+        },
+        {
+          "i": "3",
+          "x": 76,
+          "y": 10,
+          "w": 24,
+          "h": 24,
+          "source": "uffis_risk_matrix_guatemala",
+          "args_string": {
+            "ciclo": "${Fecha}"
+          },
+          "metadata_string": {
+            "hideScrollbar": true,
+            "backgroundColor": "#ffffff"
+          }
+        },
+        {
+          "i": "4",
+          "x": 76,
+          "y": 5,
+          "w": 24,
+          "h": 6,
+          "source": "uffis_depth_filter_guatemala",
+          "args_string": {
+            "texto_etiqueta": "Probabilidad de Inundación",
+            "mostrar_etiqueta": true
+          },
+          "metadata_string": {}
+        },
+        {
+          "i": "5",
+          "x": 0,
+          "y": 0,
+          "w": 76,
+          "h": 56,
+          "source": "Map",
+          "args_string": {
+            "baseMap": "${Basemap}",
+            "layerControl": true,
+            "layers": [
+              {
+                "configuration": {
+                  "type": "VectorLayer",
+                  "props": {
+                    "name": "Edificios y carreteras por nivel de alerta",
+                    "pluginSource": {
+                      "source": "uffis_risk_layer_guatemala",
+                      "args": {
+                        "ciclo": "${Fecha}",
+                        "nivel_riesgo_minimo": "${Nivel de riesgo}"
+                      }
+                    },
+                    "layerId": "e70da492-cb00-4c31-a743-5e0083246b11",
+                    "source": {
+                      "type": "GeoJSON",
+                      "props": {},
+                      "geojson": {
+                        "type": "FeatureCollection",
+                        "features": [],
+                        "crs": {
+                          "type": "name",
+                          "properties": {
+                            "name": "EPSG:4326"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "style": {
+                    "default": {
+                      "polygon": {
+                        "fill": "#9e9e9e",
+                        "stroke": "#9e9e9e",
+                        "strokeWidth": "0"
+                      },
+                      "linestring": {
+                        "stroke": "#9e9e9e",
+                        "strokeWidth": "1"
+                      }
+                    },
+                    "rules": [
+                      {
+                        "name": "MUY BAJO (edificios)",
+                        "geometryType": "polygon",
+                        "strokeWidth": "1",
+                        "conditionField": "alerta",
+                        "conditionType": "=",
+                        "conditionValue": "0",
+                        "fill": "#63BE5F",
+                        "stroke": "#63BE5F"
+                      },
+                      {
+                        "name": "MUY BAJO (carreteras)",
+                        "geometryType": "linestring",
+                        "conditionField": "alerta",
+                        "conditionType": "=",
+                        "conditionValue": "0",
+                        "stroke": "#63BE5F",
+                        "strokeWidth": "3"
+                      },
+                      {
+                        "name": "BAJO (edificios)",
+                        "geometryType": "polygon",
+                        "strokeWidth": "1",
+                        "conditionField": "alerta",
+                        "conditionType": "=",
+                        "conditionValue": "1",
+                        "fill": "#FFD500",
+                        "stroke": "#FFD500"
+                      },
+                      {
+                        "name": "BAJO (carreteras)",
+                        "geometryType": "linestring",
+                        "conditionField": "alerta",
+                        "conditionType": "=",
+                        "conditionValue": "1",
+                        "stroke": "#FFD500",
+                        "strokeWidth": "3"
+                      },
+                      {
+                        "name": "MEDIO (edificios)",
+                        "geometryType": "polygon",
+                        "strokeWidth": "1",
+                        "conditionField": "alerta",
+                        "conditionType": "=",
+                        "conditionValue": "2",
+                        "fill": "#F58220",
+                        "stroke": "#F58220"
+                      },
+                      {
+                        "name": "MEDIO (carreteras)",
+                        "geometryType": "linestring",
+                        "conditionField": "alerta",
+                        "conditionType": "=",
+                        "conditionValue": "2",
+                        "stroke": "#F58220",
+                        "strokeWidth": "3"
+                      },
+                      {
+                        "name": "ALTO (edificios)",
+                        "geometryType": "polygon",
+                        "strokeWidth": "1",
+                        "conditionField": "alerta",
+                        "conditionType": "=",
+                        "conditionValue": "3",
+                        "fill": "#DA291C",
+                        "stroke": "#DA291C"
+                      },
+                      {
+                        "name": "ALTO (carreteras)",
+                        "geometryType": "linestring",
+                        "conditionField": "alerta",
+                        "conditionType": "=",
+                        "conditionValue": "3",
+                        "stroke": "#DA291C",
+                        "strokeWidth": "3"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "configuration": {
+                  "type": "WebGLTile",
+                  "props": {
+                    "name": "Flood Depth",
+                    "layerId": "400fec5d-5dc0-44f4-916e-cdcc89586274",
+                    "pluginSource": {
+                      "source": "uffis_flood_map_layer_guatemala",
+                      "args": {
+                        "ciclo": "${Fecha}",
+                        "fuente_inundacion": "combined",
+                        "profundidad": "${Probabilidad de Inundación}"
+                      }
+                    },
+                    "source": {
+                      "type": "GeoTIFF",
+                      "props": {
+                        "mask_below": "0.1"
+                      }
+                    }
+                  },
+                  "style": {
+                    "styleMode": "ranges",
+                    "classes": [
+                      {
+                        "value": "0.1999",
+                        "color": "#9ec5f4",
+                        "label": "Muy baja (< 20 %)"
+                      },
+                      {
+                        "value": "0.3999",
+                        "color": "#5598e7",
+                        "label": "Baja (20 – 40 %)"
+                      },
+                      {
+                        "value": "0.5999",
+                        "color": "#256abf",
+                        "label": "Media (40 – 60 %)"
+                      },
+                      {
+                        "value": "1.0",
+                        "color": "#104281",
+                        "label": "Alta (≥ 60 %)"
+                      }
+                    ],
+                    "rampName": "turbo"
+                  }
+                },
+                "legend": {
+                  "title": "Probabilidad de inundación",
+                  "items": [
+                    {
+                      "label": "Muy baja (< 20 %)",
+                      "color": "#9ec5f4",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "Baja (20 – 40 %)",
+                      "color": "#5598e7",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "Media (40 – 60 %)",
+                      "color": "#256abf",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "Alta (≥ 60 %)",
+                      "color": "#104281",
+                      "symbol": "square"
+                    }
+                  ]
+                }
+              }
+            ],
+            "map_extent": {
+              "extent": "-10078413.13,1629754.90,15"
+            },
+            "mapDrawing": {}
+          },
+          "metadata_string": {}
+        },
+        {
+          "i": "6",
+          "x": 0,
+          "y": 0,
+          "w": 15,
+          "h": 5,
+          "source": "Variable Input",
+          "args_string": {
+            "variable_name": "Basemap",
+            "show_label": false,
+            "variable_options_source": "Base Map Layers",
+            "initial_value": "https://server.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer"
+          },
+          "metadata_string": {}
+        },
+        {
+          "i": "7",
+          "x": 76,
+          "y": 0,
+          "w": 24,
+          "h": 6,
+          "source": "uffis_cycle_times_guatemala",
+          "args_string": {
+            "inicio": "sample",
+            "texto_etiqueta": "Fecha",
+            "mostrar_etiqueta": true
+          },
+          "metadata_string": {}
+        }
+      ]
+    }
+  ]
+}
