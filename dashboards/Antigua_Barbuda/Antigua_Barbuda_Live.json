@@ -1,0 +1,879 @@
+{
+  "name": "Antigua and Barbuda Live Flood Forecast",
+  "description": "Live TITO flood forecast for Antigua and Barbuda: rainfall, hazard, likely flood depth and SFFS/FGS warnings for any published cycle",
+  "publicDashboard": false,
+  "userPermission": "admin",
+  "permissions": [
+    {
+      "username": "admin",
+      "permission": "admin"
+    }
+  ],
+  "unrestrictedPlacement": true,
+  "autoThumbnail": true,
+  "image": "/media/tethysdash/app/d0fcbc4a-65a8-41e9-8948-73149fdefdd9.png",
+  "owner": "admin",
+  "notes": "",
+  "tabs": [
+    {
+      "id": 1,
+      "name": "Live forecast",
+      "gridItems": [
+        {
+          "i": "1",
+          "x": 0,
+          "y": 0,
+          "w": 22,
+          "h": 6,
+          "source": "uffis_cycle_times_antigua_barbuda",
+          "args_string": {},
+          "metadata_string": {}
+        },
+        {
+          "i": "2",
+          "x": 22,
+          "y": 0,
+          "w": 14,
+          "h": 6,
+          "source": "Variable Input",
+          "args_string": {
+            "variable_name": "Probability",
+            "show_label": true,
+            "variable_options_source": "number",
+            "initial_value": 0.5,
+            "variable_options_source.metadata": {
+              "min": 0.05,
+              "max": 1,
+              "step": 0.05,
+              "dataType": "Number",
+              "outputFormat": "{{n}}",
+              "rangeMode": false,
+              "speedOptions": [
+                2000,
+                1000,
+                500,
+                250,
+                100
+              ],
+              "initialValue": 0.5
+            }
+          },
+          "metadata_string": {}
+        },
+        {
+          "i": "3",
+          "x": 36,
+          "y": 0,
+          "w": 10,
+          "h": 6,
+          "source": "Variable Input",
+          "args_string": {
+            "variable_name": "Base Map",
+            "show_label": true,
+            "variable_options_source": "Base Map Layers",
+            "initial_value": "https://server.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer"
+          },
+          "metadata_string": {}
+        },
+        {
+          "i": "5",
+          "x": 0,
+          "y": 6,
+          "w": 55,
+          "h": 48,
+          "source": "Map",
+          "args_string": {
+            "baseMap": "${Base Map}",
+            "layerControl": true,
+            "layers": [
+              {
+                "configuration": {
+                  "type": "WebGLTile",
+                  "props": {
+                    "name": "Rainfall forecast (ensemble median)",
+                    "source": {
+                      "type": "GeoTIFF",
+                      "props": {}
+                    },
+                    "pluginSource": {
+                      "source": "uffis_precip_layer_antigua_barbuda",
+                      "args": {
+                        "cycle": "${Date}",
+                        "grid": "antigua_30m",
+                        "statistic": "median",
+                        "period": "forecast"
+                      }
+                    },
+                    "layerId": "313cef38-c32e-478a-80b8-08511060580d",
+                    "opacity": 0.7
+                  },
+                  "style": {
+                    "styleMode": "ranges",
+                    "classes": [
+                      {
+                        "value": "5",
+                        "color": "#d9f0a3",
+                        "label": "1 - 5"
+                      },
+                      {
+                        "value": "10",
+                        "color": "#addd8e",
+                        "label": "5 - 10"
+                      },
+                      {
+                        "value": "25",
+                        "color": "#41ab5d",
+                        "label": "10 - 25"
+                      },
+                      {
+                        "value": "50",
+                        "color": "#ffffb2",
+                        "label": "25 - 50"
+                      },
+                      {
+                        "value": "75",
+                        "color": "#fdae61",
+                        "label": "50 - 75"
+                      },
+                      {
+                        "value": "100",
+                        "color": "#f46d43",
+                        "label": "75 - 100"
+                      },
+                      {
+                        "value": "150",
+                        "color": "#d73027",
+                        "label": "100 - 150"
+                      },
+                      {
+                        "value": "250",
+                        "color": "#a50026",
+                        "label": "150 - 250"
+                      }
+                    ],
+                    "fallbackColor": "#6a3d9a"
+                  }
+                },
+                "legend": {
+                  "title": "Rainfall accumulation (mm)",
+                  "items": [
+                    {
+                      "label": "1 - 5",
+                      "color": "#d9f0a3",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "5 - 10",
+                      "color": "#addd8e",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "10 - 25",
+                      "color": "#41ab5d",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "25 - 50",
+                      "color": "#ffffb2",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "50 - 75",
+                      "color": "#fdae61",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "75 - 100",
+                      "color": "#f46d43",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "100 - 150",
+                      "color": "#d73027",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "150 - 250",
+                      "color": "#a50026",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "250 or more",
+                      "color": "#6a3d9a",
+                      "symbol": "square"
+                    }
+                  ]
+                }
+              },
+              {
+                "configuration": {
+                  "type": "VectorLayer",
+                  "props": {
+                    "name": "Hazard classification",
+                    "source": {
+                      "type": "GeoJSON",
+                      "props": {},
+                      "geojson": {
+                        "type": "FeatureCollection",
+                        "features": [],
+                        "crs": {
+                          "type": "name",
+                          "properties": {
+                            "name": "EPSG:4326"
+                          }
+                        }
+                      }
+                    },
+                    "pluginSource": {
+                      "source": "uffis_hazard_layer_antigua_barbuda",
+                      "args": {
+                        "cycle": "${Date}"
+                      }
+                    },
+                    "layerId": "3c0bfc00-7ba7-4a09-b41b-71552cd3d4ee"
+                  },
+                  "style": {
+                    "default": {
+                      "polygon": {
+                        "fill": "#9e9e9e",
+                        "stroke": "#9e9e9e",
+                        "strokeWidth": "0"
+                      }
+                    },
+                    "rules": [
+                      {
+                        "name": "Low",
+                        "geometryType": "polygon",
+                        "conditionField": "hazard",
+                        "conditionType": "=",
+                        "conditionValue": "1",
+                        "fill": "green",
+                        "stroke": "green",
+                        "strokeWidth": "0"
+                      },
+                      {
+                        "name": "Medium",
+                        "geometryType": "polygon",
+                        "conditionField": "hazard",
+                        "conditionType": "=",
+                        "conditionValue": "2",
+                        "fill": "yellow",
+                        "stroke": "yellow",
+                        "strokeWidth": "0"
+                      },
+                      {
+                        "name": "High",
+                        "geometryType": "polygon",
+                        "conditionField": "hazard",
+                        "conditionType": "=",
+                        "conditionValue": "3",
+                        "fill": "red",
+                        "stroke": "red",
+                        "strokeWidth": "0"
+                      },
+                      {
+                        "name": "Severe",
+                        "geometryType": "polygon",
+                        "conditionField": "hazard",
+                        "conditionType": "=",
+                        "conditionValue": "4",
+                        "fill": "purple",
+                        "stroke": "purple",
+                        "strokeWidth": "0"
+                      }
+                    ]
+                  }
+                },
+                "legend": {
+                  "title": "Hazard",
+                  "items": [
+                    {
+                      "label": "Low",
+                      "color": "green",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "Medium",
+                      "color": "yellow",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "High",
+                      "color": "red",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "Severe",
+                      "color": "purple",
+                      "symbol": "square"
+                    }
+                  ]
+                }
+              },
+              {
+                "configuration": {
+                  "type": "VectorLayer",
+                  "props": {
+                    "name": "Buildings and roads at risk",
+                    "source": {
+                      "type": "GeoJSON",
+                      "props": {},
+                      "geojson": {
+                        "type": "FeatureCollection",
+                        "features": [],
+                        "crs": {
+                          "type": "name",
+                          "properties": {
+                            "name": "EPSG:4326"
+                          }
+                        }
+                      }
+                    },
+                    "pluginSource": {
+                      "source": "uffis_impact_layer_antigua_barbuda",
+                      "args": {
+                        "cycle": "${Date}"
+                      }
+                    },
+                    "layerId": "0c97baf7-ffbe-4cf5-ade4-b6e908e6ad6f"
+                  },
+                  "style": {
+                    "default": {
+                      "polygon": {
+                        "fill": "#9e9e9e",
+                        "stroke": "#9e9e9e",
+                        "strokeWidth": "0"
+                      },
+                      "linestring": {
+                        "stroke": "#9e9e9e",
+                        "strokeWidth": "1"
+                      }
+                    },
+                    "rules": [
+                      {
+                        "name": "Low (buildings)",
+                        "geometryType": "polygon",
+                        "strokeWidth": "1",
+                        "conditionField": "hazard",
+                        "conditionType": "=",
+                        "conditionValue": "1",
+                        "fill": "green",
+                        "stroke": "green"
+                      },
+                      {
+                        "name": "Low (roads)",
+                        "geometryType": "linestring",
+                        "conditionField": "hazard",
+                        "conditionType": "=",
+                        "conditionValue": "1",
+                        "stroke": "green",
+                        "strokeWidth": "3"
+                      },
+                      {
+                        "name": "Medium (buildings)",
+                        "geometryType": "polygon",
+                        "strokeWidth": "1",
+                        "conditionField": "hazard",
+                        "conditionType": "=",
+                        "conditionValue": "2",
+                        "fill": "yellow",
+                        "stroke": "yellow"
+                      },
+                      {
+                        "name": "Medium (roads)",
+                        "geometryType": "linestring",
+                        "conditionField": "hazard",
+                        "conditionType": "=",
+                        "conditionValue": "2",
+                        "stroke": "yellow",
+                        "strokeWidth": "3"
+                      },
+                      {
+                        "name": "High (buildings)",
+                        "geometryType": "polygon",
+                        "strokeWidth": "1",
+                        "conditionField": "hazard",
+                        "conditionType": "=",
+                        "conditionValue": "3",
+                        "fill": "red",
+                        "stroke": "red"
+                      },
+                      {
+                        "name": "High (roads)",
+                        "geometryType": "linestring",
+                        "conditionField": "hazard",
+                        "conditionType": "=",
+                        "conditionValue": "3",
+                        "stroke": "red",
+                        "strokeWidth": "3"
+                      },
+                      {
+                        "name": "Severe (buildings)",
+                        "geometryType": "polygon",
+                        "strokeWidth": "1",
+                        "conditionField": "hazard",
+                        "conditionType": "=",
+                        "conditionValue": "4",
+                        "fill": "purple",
+                        "stroke": "purple"
+                      },
+                      {
+                        "name": "Severe (roads)",
+                        "geometryType": "linestring",
+                        "conditionField": "hazard",
+                        "conditionType": "=",
+                        "conditionValue": "4",
+                        "stroke": "purple",
+                        "strokeWidth": "3"
+                      }
+                    ]
+                  },
+                  "layerVisibility": false
+                },
+                "legend": {
+                  "title": "Hazard",
+                  "items": [
+                    {
+                      "label": "Low",
+                      "color": "green",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "Medium",
+                      "color": "yellow",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "High",
+                      "color": "red",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "Severe",
+                      "color": "purple",
+                      "symbol": "square"
+                    }
+                  ]
+                }
+              },
+              {
+                "configuration": {
+                  "type": "VectorLayer",
+                  "props": {
+                    "name": "Likely flood depth on buildings and roads",
+                    "source": {
+                      "type": "GeoJSON",
+                      "props": {},
+                      "geojson": {
+                        "type": "FeatureCollection",
+                        "features": [],
+                        "crs": {
+                          "type": "name",
+                          "properties": {
+                            "name": "EPSG:4326"
+                          }
+                        }
+                      }
+                    },
+                    "pluginSource": {
+                      "source": "uffis_storm_impact_layer_antigua_barbuda",
+                      "args": {
+                        "cycle": "${Date}",
+                        "min_probability": "${Probability}"
+                      }
+                    },
+                    "layerId": "1aa43d41-a873-460d-8cff-19bbba0576d9"
+                  },
+                  "style": {
+                    "default": {
+                      "polygon": {
+                        "fill": "#9e9e9e",
+                        "stroke": "#9e9e9e",
+                        "strokeWidth": "0"
+                      },
+                      "linestring": {
+                        "stroke": "#9e9e9e",
+                        "strokeWidth": "1"
+                      }
+                    },
+                    "rules": [
+                      {
+                        "name": "0.1 - 0.3 m (buildings)",
+                        "geometryType": "polygon",
+                        "strokeWidth": "1",
+                        "conditionField": "band",
+                        "conditionType": "=",
+                        "conditionValue": "1",
+                        "fill": "green",
+                        "stroke": "green"
+                      },
+                      {
+                        "name": "0.1 - 0.3 m (roads)",
+                        "geometryType": "linestring",
+                        "conditionField": "band",
+                        "conditionType": "=",
+                        "conditionValue": "1",
+                        "stroke": "green",
+                        "strokeWidth": "3"
+                      },
+                      {
+                        "name": "0.3 - 0.7 m (buildings)",
+                        "geometryType": "polygon",
+                        "strokeWidth": "1",
+                        "conditionField": "band",
+                        "conditionType": "=",
+                        "conditionValue": "2",
+                        "fill": "yellow",
+                        "stroke": "yellow"
+                      },
+                      {
+                        "name": "0.3 - 0.7 m (roads)",
+                        "geometryType": "linestring",
+                        "conditionField": "band",
+                        "conditionType": "=",
+                        "conditionValue": "2",
+                        "stroke": "yellow",
+                        "strokeWidth": "3"
+                      },
+                      {
+                        "name": "0.7 - 1 m (buildings)",
+                        "geometryType": "polygon",
+                        "strokeWidth": "1",
+                        "conditionField": "band",
+                        "conditionType": "=",
+                        "conditionValue": "3",
+                        "fill": "red",
+                        "stroke": "red"
+                      },
+                      {
+                        "name": "0.7 - 1 m (roads)",
+                        "geometryType": "linestring",
+                        "conditionField": "band",
+                        "conditionType": "=",
+                        "conditionValue": "3",
+                        "stroke": "red",
+                        "strokeWidth": "3"
+                      },
+                      {
+                        "name": "1 m or more (buildings)",
+                        "geometryType": "polygon",
+                        "strokeWidth": "1",
+                        "conditionField": "band",
+                        "conditionType": "=",
+                        "conditionValue": "4",
+                        "fill": "purple",
+                        "stroke": "purple"
+                      },
+                      {
+                        "name": "1 m or more (roads)",
+                        "geometryType": "linestring",
+                        "conditionField": "band",
+                        "conditionType": "=",
+                        "conditionValue": "4",
+                        "stroke": "purple",
+                        "strokeWidth": "3"
+                      }
+                    ]
+                  }
+                },
+                "legend": {
+                  "title": "Depth",
+                  "items": [
+                    {
+                      "label": "0.1 - 0.3 m",
+                      "color": "green",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "0.3 - 0.7 m",
+                      "color": "yellow",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "0.7 - 1 m",
+                      "color": "red",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "1 m or more",
+                      "color": "purple",
+                      "symbol": "square"
+                    }
+                  ]
+                }
+              }
+            ],
+            "map_extent": {
+              "extent": "-6878431.34,1928974.98,11.6"
+            },
+            "mapDrawing": {}
+          },
+          "metadata_string": {
+            "border": {
+              "border": "1px solid black"
+            },
+            "backgroundColor": "#ffffff"
+          }
+        },
+        {
+          "i": "6",
+          "x": 55,
+          "y": 0,
+          "w": 45,
+          "h": 12,
+          "source": "uffis_storm_card_antigua_barbuda",
+          "args_string": {
+            "cycle": "${Date}",
+            "min_probability": "${Probability}"
+          },
+          "metadata_string": {}
+        },
+        {
+          "i": "7",
+          "x": 55,
+          "y": 12,
+          "w": 45,
+          "h": 22,
+          "source": "uffis_storm_impact_summary_antigua_barbuda",
+          "args_string": {
+            "cycle": "${Date}",
+            "min_probability": "${Probability}"
+          },
+          "metadata_string": {}
+        },
+        {
+          "i": "8",
+          "x": 55,
+          "y": 34,
+          "w": 45,
+          "h": 20,
+          "source": "uffis_impact_summary_antigua_barbuda",
+          "args_string": {
+            "cycle": "${Date}"
+          },
+          "metadata_string": {}
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Warnings (SFFS/FGS)",
+      "gridItems": [
+        {
+          "i": "1",
+          "x": 0,
+          "y": 0,
+          "w": 22,
+          "h": 6,
+          "source": "uffis_cycle_times_antigua_barbuda",
+          "args_string": {},
+          "metadata_string": {}
+        },
+        {
+          "i": "2",
+          "x": 22,
+          "y": 0,
+          "w": 18,
+          "h": 6,
+          "source": "uffis_risk_filter_antigua_barbuda",
+          "args_string": {},
+          "metadata_string": {}
+        },
+        {
+          "i": "3",
+          "x": 0,
+          "y": 6,
+          "w": 55,
+          "h": 50,
+          "source": "Map",
+          "args_string": {
+            "baseMap": "${Base Map}",
+            "layerControl": true,
+            "layers": [
+              {
+                "configuration": {
+                  "type": "VectorLayer",
+                  "props": {
+                    "name": "Buildings and roads by warning level",
+                    "source": {
+                      "type": "GeoJSON",
+                      "props": {},
+                      "geojson": {
+                        "type": "FeatureCollection",
+                        "features": [],
+                        "crs": {
+                          "type": "name",
+                          "properties": {
+                            "name": "EPSG:4326"
+                          }
+                        }
+                      }
+                    },
+                    "pluginSource": {
+                      "source": "uffis_risk_layer_antigua_barbuda",
+                      "args": {
+                        "cycle": "${Date}",
+                        "min_risk_level": "${Risk level}"
+                      }
+                    },
+                    "layerId": "315ee98f-bad8-4850-bf19-f29b536fa1d2"
+                  },
+                  "style": {
+                    "default": {
+                      "polygon": {
+                        "fill": "#9e9e9e",
+                        "stroke": "#9e9e9e",
+                        "strokeWidth": "0"
+                      },
+                      "linestring": {
+                        "stroke": "#9e9e9e",
+                        "strokeWidth": "1"
+                      }
+                    },
+                    "rules": [
+                      {
+                        "name": "VERY LOW (buildings)",
+                        "geometryType": "polygon",
+                        "strokeWidth": "1",
+                        "conditionField": "warning",
+                        "conditionType": "=",
+                        "conditionValue": "0",
+                        "fill": "#63BE5F",
+                        "stroke": "#63BE5F"
+                      },
+                      {
+                        "name": "VERY LOW (roads)",
+                        "geometryType": "linestring",
+                        "conditionField": "warning",
+                        "conditionType": "=",
+                        "conditionValue": "0",
+                        "stroke": "#63BE5F",
+                        "strokeWidth": "3"
+                      },
+                      {
+                        "name": "LOW (buildings)",
+                        "geometryType": "polygon",
+                        "strokeWidth": "1",
+                        "conditionField": "warning",
+                        "conditionType": "=",
+                        "conditionValue": "1",
+                        "fill": "#FFD500",
+                        "stroke": "#FFD500"
+                      },
+                      {
+                        "name": "LOW (roads)",
+                        "geometryType": "linestring",
+                        "conditionField": "warning",
+                        "conditionType": "=",
+                        "conditionValue": "1",
+                        "stroke": "#FFD500",
+                        "strokeWidth": "3"
+                      },
+                      {
+                        "name": "MEDIUM (buildings)",
+                        "geometryType": "polygon",
+                        "strokeWidth": "1",
+                        "conditionField": "warning",
+                        "conditionType": "=",
+                        "conditionValue": "2",
+                        "fill": "#F58220",
+                        "stroke": "#F58220"
+                      },
+                      {
+                        "name": "MEDIUM (roads)",
+                        "geometryType": "linestring",
+                        "conditionField": "warning",
+                        "conditionType": "=",
+                        "conditionValue": "2",
+                        "stroke": "#F58220",
+                        "strokeWidth": "3"
+                      },
+                      {
+                        "name": "HIGH (buildings)",
+                        "geometryType": "polygon",
+                        "strokeWidth": "1",
+                        "conditionField": "warning",
+                        "conditionType": "=",
+                        "conditionValue": "3",
+                        "fill": "#DA291C",
+                        "stroke": "#DA291C"
+                      },
+                      {
+                        "name": "HIGH (roads)",
+                        "geometryType": "linestring",
+                        "conditionField": "warning",
+                        "conditionType": "=",
+                        "conditionValue": "3",
+                        "stroke": "#DA291C",
+                        "strokeWidth": "3"
+                      }
+                    ]
+                  }
+                },
+                "legend": {
+                  "title": "Warning level",
+                  "items": [
+                    {
+                      "label": "VERY LOW",
+                      "color": "#63BE5F",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "LOW",
+                      "color": "#FFD500",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "MEDIUM",
+                      "color": "#F58220",
+                      "symbol": "square"
+                    },
+                    {
+                      "label": "HIGH",
+                      "color": "#DA291C",
+                      "symbol": "square"
+                    }
+                  ]
+                }
+              }
+            ],
+            "map_extent": {
+              "extent": "-6878431.34,1928974.98,11.6"
+            },
+            "mapDrawing": {}
+          },
+          "metadata_string": {
+            "border": {
+              "border": "1px solid black"
+            },
+            "backgroundColor": "#ffffff"
+          }
+        },
+        {
+          "i": "4",
+          "x": 55,
+          "y": 0,
+          "w": 45,
+          "h": 24,
+          "source": "uffis_risk_matrix_antigua_barbuda",
+          "args_string": {
+            "cycle": "${Date}"
+          },
+          "metadata_string": {}
+        },
+        {
+          "i": "5",
+          "x": 55,
+          "y": 24,
+          "w": 45,
+          "h": 22,
+          "source": "uffis_event_summary_antigua_barbuda",
+          "args_string": {
+            "cycle": "${Date}"
+          },
+          "metadata_string": {}
+        }
+      ]
+    }
+  ]
+}

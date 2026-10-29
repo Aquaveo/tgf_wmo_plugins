@@ -2,13 +2,9 @@
 
 A map layer config can only point at a URL, and there is no endpoint that serves
 a computed raster, so the classified grid is vectorized: each connected run of
-equal class becomes one polygon carrying a `peligro` attribute. Guatemala comes
-to roughly 600 polygons at the default gates, Antigua and Barbuda to about 3,400,
-and Moroni -- one commune rather than a country -- to about 150.
-
-Being a dynamic map_layer, `fetch_features` re-runs whenever a bound variable
-input changes, so wiring the four gates to variable inputs makes the
-classification interactive.
+equal class becomes one polygon carrying the hazard-class attribute. Being a
+dynamic map_layer, `fetch_features` re-runs whenever a bound variable input
+changes, which is what makes the gates interactive.
 """
 
 from functools import lru_cache
@@ -16,96 +12,75 @@ from functools import lru_cache
 import rasterio
 from rasterio.features import shapes
 from rasterio.warp import transform_geom
-from tethysapp.tethysdash.plugin_helpers import (
-    LayerConfigurationBuilder,
-    TethysDashPlugin,
-)
+from tethysapp.tethysdash.plugin_helpers import LayerConfigurationBuilder
 
+from tgf_wmo_plugins.base import CountryPlugin, LiveData
 from tgf_wmo_plugins.classification import (
     LEVELS,
     NODATA,
-    PROB_URLS,
-    BarbadosParish,
-    ComorosUnit,
     ThresholdGates,
-    barbados_prob_urls,
     clasificar_peligro,
-    comoros_prob_urls,
 )
-from tgf_wmo_plugins.common import BARBADOS_PARISH_OPTIONS, COMOROS_UNIT_OPTIONS
-from tgf_wmo_plugins.strings import STRINGS, threshold_args
+from tgf_wmo_plugins.countries import (
+    ANTIGUA_BARBUDA,
+    BARBADOS,
+    COMOROS,
+    GUATEMALA,
+    HAITI,
+)
+from tgf_wmo_plugins.receptors import OUTPUT_CRS
+from tgf_wmo_plugins.tito import TRAINING, cycle_files, file_url
 
-# Vectorizing a heavily fragmented classification could produce a huge payload.
-# Warn loudly rather than silently shipping megabytes of geometry.
+# Warn rather than silently ship megabytes of geometry from a fragmented grid.
 POLYGON_WARN_LIMIT = 20000
 
-# Display name of each country, for the plugin label. Keys match PROB_URLS.
-COUNTRY_NAMES = {
-    "guatemala": "Guatemala",
-    "antigua_barbuda": "Antigua and Barbuda",
-    "comoros": "Comores",
-    "barbados": "Barbados",
-}
-
-# The frontend does not bundle proj4, so OpenLayers resolves only these two.
-# Guatemala's rasters are already EPSG:3857 and Antigua and Barbuda's EPSG:4326,
-# so their polygons go out in the grid's own CRS. The Comoros grid is EPSG:5629
-# (Moznet / UTM zone 38S), which would be read as raw map units and land nowhere
-# near the Indian Ocean, so those polygons are reprojected before they are sent.
+# CRSs OpenLayers resolves without proj4. A grid in any other (Comoros is
+# EPSG:5629) has its polygons reprojected on the way out.
 RESOLVABLE_CRS = {"EPSG:4326", "EPSG:3857"}
-OUTPUT_CRS = "EPSG:4326"
 
 
 @lru_cache(maxsize=16)
 def _read_raster(url):
-    """First band as a masked array, with the grid it sits on.
+    """First band as a masked array, with its grid. Cached: only the gates change
+    between requests."""
+    # Without these GDAL probes for .aux.xml/.ovr sidecars over HTTP, which
+    # costs seconds per file.
+    with rasterio.Env(
+        GDAL_DISABLE_READDIR_ON_OPEN="EMPTY_DIR", CPL_VSIL_CURL_ALLOWED_EXTENSIONS=".tif"
+    ):
+        with rasterio.open(url) as ds:
+            return ds.read(1, masked=True), ds.transform, ds.crs
 
-    Cached: the rasters never change between requests, only the gates do, and
-    re-fetching four multi-megabyte files on every slider move is what would
-    make the layer feel slow.
-    """
-    with rasterio.open(url) as ds:
-        return ds.read(1, masked=True), ds.transform, ds.crs
 
-
-class BaseHazardLayer(ThresholdGates, TethysDashPlugin):
-    """One hazard layer per (country, language); subclasses set only those.
-
-    TethysDash reads `label`, `args`, `tags` and `description` off the class
-    at discovery time, not off an instance, so they cannot be computed in
-    `__init__`. `__init_subclass__` fills them in from LANG and country the
-    moment a subclass is defined, which is what makes a new variant three
-    lines and one entry point.
-    """
-
-    LANG = None
-    country = None
+class BaseHazardLayer(ThresholdGates, LiveData, CountryPlugin):
+    family = "hazard_layer"
+    strings_key = "hazard_layer"
     type = "map_layer"
     dynamic_map_layer = True
+    uses_rasters = True
 
-    def __init_subclass__(cls, **kwargs):
-        super().__init_subclass__(**kwargs)
-        s = STRINGS[cls.LANG]
-        if "args" not in cls.__dict__:
-            cls.args = threshold_args(cls.LANG)
-        cls.group = s["group"]
-        cls.tags = list(s["hazard_layer_tags"])
-        cls.description = s["hazard_layer_desc"]
-        # A subclass may pin its own label -- the two legacy Guatemala plugins
-        # keep the "(English)" / "(Español)" they were published with.
-        if "label" not in cls.__dict__:
-            cls.label = (
-                f"{s['hazard_layer_label']} "
-                f"({COUNTRY_NAMES[cls.country]}, {s['language']})"
-            )
+    @classmethod
+    def has_training(cls, country):
+        return country.prob_urls is not None
+
+    def prob_urls(self):
+        """The four rasters to classify, or None when the cycle has none for
+        this scope -- TITO maps floods only where the forecast triggers."""
+        cycle, scope = self.selected_cycle(), self.scope()
+        if cycle == TRAINING:
+            return self.country.prob_urls(scope)
+        live = self.country.live
+        paths = live.prob_paths(scope, self.variant(), cycle)
+        if not set(paths) <= cycle_files(live.slug, cycle):
+            return None
+        return [file_url(live.slug, cycle, path) for path in paths]
 
     def run(self):
         """Configure-time scaffold: source binding, style and legend."""
-        s = STRINGS[self.LANG]
+        s = self.strings
         builder = LayerConfigurationBuilder(s["hazard_layer_name"], "GeoJSON")
-        # received_args, not args: `self.args` is the schema, while the runtime
-        # re-invocation needs the configured values, including any "${Variable}"
-        # bindings to resolve later.
+        # received_args, not args: the runtime re-invocation needs the configured
+        # values, including any "${Variable}" bindings still to resolve.
         builder.set_plugin_source(self.name, self.received_args)
         builder.set_style(self._style(s))
         builder.set_legend(
@@ -119,17 +94,21 @@ class BaseHazardLayer(ThresholdGates, TethysDashPlugin):
         )
         return builder.build()
 
-    def prob_urls(self):
-        """The four rasters to classify. Fixed per country unless overridden."""
-        return PROB_URLS[self.country]
-
     def fetch_features(self):
         """Runtime features: re-run on load and on variable-input change."""
-        s = STRINGS[self.LANG]
-        urls = self.prob_urls()
+        s = self.strings
         gates = self.gates()
 
         self.send_update(s["msg_reading"], percentage_complete=10)
+        urls = self.prob_urls()
+        if urls is None:
+            message = s["msg_not_triggered"].format(site=self.scope_label(), cycle=self.selected_cycle())
+            self.send_update(message, percentage_complete=100)
+            return {
+                "type": "FeatureCollection",
+                "features": [],
+                "crs": {"type": "name", "properties": {"name": OUTPUT_CRS}},
+            }
         layers, transform, crs = self._read(urls)
 
         self.send_update(s["msg_classifying"], percentage_complete=50)
@@ -148,13 +127,8 @@ class BaseHazardLayer(ThresholdGates, TethysDashPlugin):
 
     @staticmethod
     def _to_resolvable_crs(features, crs):
-        """Reproject the polygons when the grid's CRS is one the frontend cannot read.
-
-        A no-op for Guatemala and Antigua and Barbuda. Done on the GeoJSON
-        geometries rather than on the raster so the classification still happens
-        cell for cell on the model's own grid -- warping the probabilities first
-        would resample them and move the class boundaries.
-        """
+        """Reproject the polygons, not the rasters, so the classification still
+        happens cell for cell on the model's own grid."""
         name = str(crs)
         if name in RESOLVABLE_CRS:
             return features, name
@@ -181,8 +155,8 @@ class BaseHazardLayer(ThresholdGates, TethysDashPlugin):
     def _vectorize(s, peligro, transform):
         """One polygon per connected run of equal class.
 
-        Normal and NoData are left out: Normal is ~90% of the grid and would
-        dominate the payload while adding nothing a basemap does not show.
+        Normal and NoData are left out: Normal is ~90% of the grid and adds
+        nothing a basemap does not show.
         """
         mask = (peligro > 0) & (peligro != NODATA)
         features = [
@@ -199,8 +173,7 @@ class BaseHazardLayer(ThresholdGates, TethysDashPlugin):
         if len(features) > POLYGON_WARN_LIMIT:
             print(
                 f"hazard layer: {len(features):,} polygons exceeds "
-                f"{POLYGON_WARN_LIMIT:,}; the classification is heavily "
-                "fragmented and the payload will be large"
+                f"{POLYGON_WARN_LIMIT:,}; the payload will be large"
             )
         return features
 
@@ -208,11 +181,9 @@ class BaseHazardLayer(ThresholdGates, TethysDashPlugin):
     def _style(s):
         """Rule-based styling keyed on the hazard-class attribute.
 
-        The shape matters: createJsonStyleFunction reads `geometryType` (not
-        `geometry`), takes the condition from `conditionField`/`conditionType`
-        on the rule itself, and merges the rule's own keys as the style -- there
-        is no nested `style` object, and the operator is "=" not "==". A rule in
-        any other shape silently never matches, leaving every feature grey.
+        createJsonStyleFunction wants `geometryType`, the condition keys on the
+        rule itself, the style keys merged in flat and "=" rather than "==". A
+        rule in any other shape silently never matches.
         """
         return {
             "default": {
@@ -235,41 +206,20 @@ class BaseHazardLayer(ThresholdGates, TethysDashPlugin):
 
 
 class HazardLayerGuatemala(BaseHazardLayer):
-    LANG = "es"
-    country = "guatemala"
-    name = "uffis_hazard_layer_guatemala"
-    label = f"{STRINGS['es']['hazard_layer_label']} (Guatemala)"
+    country = GUATEMALA
+
+
+class HazardLayerHaiti(BaseHazardLayer):
+    country = HAITI
 
 
 class HazardLayerAntiguaBarbuda(BaseHazardLayer):
-    LANG = "en"
-    country = "antigua_barbuda"
-    name = "uffis_hazard_layer_antigua_barbuda"
-    label = f"{STRINGS['en']['hazard_layer_label']} (Antigua and Barbuda)"
+    country = ANTIGUA_BARBUDA
 
 
-class HazardLayerBarbados(BarbadosParish, BaseHazardLayer):
-    LANG = "en"
-    country = "barbados"
-    name = "uffis_hazard_layer_barbados"
-    label = f"{STRINGS['en']['hazard_layer_label']} (Barbados)"
-    # The four gates plus the parish. The island mosaic in PROB_URLS stays the
-    # right input for an island-wide view; this plugin works a parish at a time,
-    # so it reads that parish's own window.
-    args = {**threshold_args("en"), "parish": BARBADOS_PARISH_OPTIONS}
-
-    def prob_urls(self):
-        return barbados_prob_urls(self.unit())
+class HazardLayerBarbados(BaseHazardLayer):
+    country = BARBADOS
 
 
-class HazardLayerComoros(ComorosUnit, BaseHazardLayer):
-    LANG = "fr"
-    country = "comoros"
-    name = "uffis_hazard_layer_comoros"
-    label = f"{STRINGS['fr']['hazard_layer_label']} (Comores)"
-    # The four gates plus the commune, because Comoros publishes one raster set
-    # per commune rather than one national grid.
-    args = {**threshold_args("fr"), "commune": COMOROS_UNIT_OPTIONS}
-
-    def prob_urls(self):
-        return comoros_prob_urls(self.unit())
+class HazardLayerComoros(BaseHazardLayer):
+    country = COMOROS

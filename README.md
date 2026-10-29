@@ -1,11 +1,7 @@
 # tgf_wmo_plugins
 
-TethysDash visualizations for the WMO impact-based forecasting trainings in
-Guatemala, Haiti and Antigua and Barbuda, in English, Spanish and French.
-
-Every plugin family shares one implementation, and its language variants differ
-only in the strings they render — all of which live in `strings.py`, in the
-three languages — so the languages cannot disagree about a number.
+TethysDash visualizations for the WMO impact-based flood forecasting trainings
+in Guatemala, Haiti, Antigua and Barbuda, Barbados and Comoros.
 
 The repository has three parts besides the plugins: `docs/` holds the
 step-by-step guides for building the hands-on dashboards, `dashboards/` the
@@ -15,113 +11,218 @@ them as plain Python. All three are organised by country; start at
 
 ## Plugins
 
-| entry point | type | what it shows |
-|---|---|---|
-| `wmo_impact_summary_en` / `_es` | table | People, buildings and roads in each hazard level |
-| `wmo_hazard_layer_en` / `_es` | map_layer | Hazard classification as map polygons |
-| `wmo_impact_layer_en` / `_es` | map_layer | Buildings and roads coloured by hazard level |
-| `wmo_storm_card_en` / `_es` | card | Magnitude, flooded area and depth for one storm |
-| `wmo_storm_impact_summary_en` / `_es` | table | People, buildings and roads by flood depth for one storm |
-| `wmo_storm_impact_layer_en` / `_es` | map_layer | Buildings and roads coloured by flood depth for one storm |
+Each plugin family has one implementation. Each country gets a one-line
+subclass per family its data supports, registered as `uffis_<family>_<country>`.
+Every plugin is labelled country first (`Guatemala: Capa de Peligro`) and
+sits in its country's group (`UFFIS: Guatemala`), so a
+country's plugins list together.
 
-The three map layers are `dynamic_map_layer`s: they re-fetch whenever a bound
+| family | type | what it shows |
+|---|---|---|
+| `hazard_layer` | map_layer | Hazard classification as map polygons |
+| `impact_summary` | table | People, buildings and roads in each hazard level |
+| `impact_layer` | map_layer | Buildings and roads coloured by hazard level |
+| `storm_card` | card | Magnitude, flooded area and depth for one storm |
+| `storm_impact_summary` | table | People, buildings and roads by flood depth for one storm |
+| `storm_impact_layer` | map_layer | Buildings and roads coloured by flood depth for one storm |
+
+| country | language | hazard family | storm family | unit argument | live TITO data |
+|---|---|---|---|---|---|
+| Guatemala | es | ✓ | ✓ live | none | ✓ |
+| Haiti | fr | ✓ (hazard layer live only) | ✓ live | none | ✓, `site` La Quinte or Gris |
+| Antigua and Barbuda | en | ✓ | ✓ live | none | ✓ |
+| Barbados | en | ✓ | ✓ training library, per parish | `parish` | no |
+| Comoros | fr | ✓ | ✓ live (no receptors published) | `commune` | ✓ |
+
+The map layers are `dynamic_map_layer`s: they re-fetch whenever a bound
 variable input changes, which is what makes the thresholds and the storm slider
 interactive.
 
-### Country variants
+## Live data
 
-The hazard family also ships per-country variants under the `uffis_` prefix.
-Each one is a subclass that sets `LANG`, `country` and `name` and nothing
-else; the country selects the data (`PROB_URLS`, `FEATURES_URLS`, `PROB_FIELDS`,
-`GPKG_LAYERS`) and the language selects the strings.
+The hazard family reads the hourly cycles TITO publishes at
+`https://tito.uffis.org/outputs/<country>/<cycle>/`, for every country that has
+a `live` entry in `countries.py`. Three arguments control it, named in the
+country's language:
 
-| entry point | language | data |
-|---|---|---|
-| `uffis_impact_summary_guatemala` | es | `Guatemala_IBF/impact_features.csv` |
-| `uffis_impact_layer_guatemala` | es | `Guatemala_IBF/impact_features.geojson` |
-| `uffis_impact_summary_haiti` / `uffis_impact_layer_haiti` | fr | `Haiti training/outputs/impact_features.gpkg` |
-| `uffis_impact_summary_antigua_barbuda` / `uffis_impact_layer_antigua_barbuda` | en | `antigua_barbuda_IBF/AntiguaBarbuda_Jerry_cycle_10151010_IBF_outputs.gpkg` |
-| `uffis_hazard_layer_antigua_barbuda` | en | `antigua_barbuda_IBF/depth_prob/antiguabarbuda_prob_depth_ge_*_overbank.tif` |
+- `cycle` / `ciclo`: `latest` (also what an unset argument means), `training`
+  for the static training data the exercises use, or a cycle stamp such as
+  `20261023.170000`. Bind it to a `uffis_cycle_times_<country>` variable input
+  to get a dropdown of every cycle still published, about a day's worth.
+- `flood_source` / `fuente_inundacion` / `source_inondation` (hazard layer
+  only): which probability rasters to classify -- pluvial, fluvial or combined,
+  overbank or not. The default is the variant TITO samples the receptors from
+  (`combined_overbank`, or `pluvial_overbank` where only pluvial is modelled),
+  so the map and the impact figures agree unless another is chosen.
+- `site` (Haiti only): La Quinte or Gris.
 
-Haiti and Antigua and Barbuda ship geopackages with buildings and roads as
-separate layers, which are stacked into one frame with a `type` column; in
-both, the buildings layer misnames its severe probability `probability_30cm`,
-and `GPKG_LAYERS` renames it back before the gates apply. The Antigua and
-Barbuda probability rasters are EPSG:4326 at 1 arc-second (2658×921), unlike
-Guatemala's EPSG:3857 copies, and are served in that CRS since OpenLayers
-resolves it natively.
+TITO only maps floods, and only assesses impact, where the forecast triggers.
+A quiet site has no rasters or receptors in that cycle, and the plugins say so
+-- an empty layer with a message, a table of zeros -- rather than failing.
+Comoros publishes no receptors yet, so its impact plugins are always empty on
+live cycles. A live population share is of the people in the site's receptor
+file, which carries no separate census total.
+
+Two more live plugins take the same `cycle` binding:
+
+- `uffis_precip_layer_guatemala`: ensemble rainfall accumulation (forecast or
+  nowcast; median, minimum or maximum) on the 900 m or 90 m grid, as a dynamic
+  GeoTIFF layer coloured with the tito.uffis.org rainfall classes.
+- `uffis_soil_moisture_layer_<country>` and `uffis_unit_streamflow_layer_<country>`:
+  the ensemble maximum soil saturation (%) and unit streamflow (m³/s per km²),
+  with the same grid, statistic and period choices as the rainfall layer and
+  the tito.uffis.org viewer's colour classes. All three share one implementation
+  in `precip_layer.py`.
+- `uffis_flood_map_layer_<country>`: TITO's flood probability raster itself,
+  as a dynamic GeoTIFF layer -- the probability of the water reaching 10, 30,
+  70 or 100 cm, for any flood source -- coloured in the FGS likelihood bands
+  and hiding cells under a minimum probability (default 5 %). It follows the
+  cycle binding into sample cycles like every other live plugin, so a layer
+  never needs a hand-written TITO URL.
+- `uffis_discharge_<country>` (Guatemala, Haiti): the forecast hydrograph at a
+  river gauge in the style of the tito.uffis.org viewer -- for each rainfall
+  forcing, the range of its members as a shaded band and their median as a
+  line, with each median's peak listed underneath. The forcings cover
+  different windows (satellite rainfall the hours before the cycle, the
+  StormLab forecast the ~30 h after it, the SCaMPR nowcast both), and the
+  cycle start is marked. Antigua's one gauge is a placeholder that never
+  flows, and Comoros has none, so neither has the plot.
+
+### Sample mode
+
+When nothing is happening live, a country can show a sample event instead:
+past TITO cycles copied to `https://tito.uffis.org/sample/<country>/`, laid out
+exactly like `outputs/` (`latest.json`, then `<cycle>/index.json` and the
+cycle's files). Guatemala has one -- four hourly cycles from 16 October 2026,
+reaching ALTO -- and `Live.sample` in `countries.py` marks it.
+
+- Every live plugin's cycle argument gains a **Sample event** choice (the
+  newest sample cycle).
+- The cycle input lists the sample cycles at the bottom, marked SAMPLE, so a
+  dashboard can step through the event hour by hour; its **start** setting
+  opens a dashboard on the sample instead of the latest live cycle.
+- Internally a sample cycle is `sample:<stamp>`; `tito.stamp()` gives the bare
+  stamp its file names use, and every title marks it (SAMPLE / MUESTRA /
+  ÉCHANTILLON) so it is never mistaken for a live forecast.
+
+`dashboards/Guatemala/Guatemala_Sample_Demo.json` is the live Guatemala
+dashboard set to open on the sample. The `/sample/*` CloudFront behavior needs
+the same response headers policy as `outputs/*`, for CORS, or the browser
+cannot draw the sample rainfall layer.
+
+## Warnings (SFFS/FGS risk matrix)
+
+Four live plugins per TITO country follow the Scottish Flood Forecasting
+Service and Flood Guidance Statement standard (Speight et al., 2018), as the
+[AHWA IBF viewer](https://ahwalab.github.io/ibf_viz/guatemala/) does:
+
+- `uffis_risk_matrix_<country>`: the likelihood × severity matrix, the four
+  warning colours and the cycle's overall warning (the highest district level).
+- `uffis_risk_filter_<country>`: a dropdown -- All, Yellow and up, Amber and
+  up, Red only -- for the layer below.
+- `uffis_risk_layer_<country>`: buildings and roads coloured VERY LOW to HIGH.
+  "All" means every feature with a reportable probability (P(≥ 0.1 m) ≥ 5%);
+  the never-wet rest of the stock is left out, since it runs to a third of a
+  million features in Haiti Gris.
+- `uffis_event_summary_<country>`: buildings, road km and districts at each
+  warning level, and the population in buildings at yellow or worse.
+
+A feature's warning is the highest the matrix gives across its P(≥ 0.1 m),
+P(≥ 0.3 m) and P(≥ 0.7 m) -- Minor, Significant and Severe -- with likelihood
+bands at 20 / 40 / 60 % and probabilities under 5 % ignored. This reproduces
+the `risk_class` TITO writes on every feature, and the counts match its
+`ibf_summary.json`. District warnings are TITO's own, since its district rule
+counts properties per district. These plugins sit beside the threshold-based
+hazard and impact plugins, which are unchanged.
 
 ## Two products, two questions
 
-The plugins split into two families that answer different questions, and the
-distinction is worth keeping straight when building a dashboard:
-
-- **Hazard** (`impact_summary`, `hazard_layer`, `impact_layer`) works from four
+- **Hazard** (`hazard_layer`, `impact_summary`, `impact_layer`) works from four
   EF5 **exceedance-probability** rasters. Each hazard level has its own
   probability gate, and a feature takes the level of the deepest flood threshold
   it clears. It answers *"what are the odds of at least 30 cm here"*.
-- **Storm** (`storm_card`, `storm_impact_summary`, `storm_impact_layer`) samples
-  **depth** from one storm of a 200-member RainyDay ensemble. It answers
-  *"in storm 150, how deep is the water on this building"*. Depth is a physical
-  quantity, so the bands need no reference to a threshold.
+- **Storm** (`storm_card`, `storm_impact_summary`, `storm_impact_layer`)
+  answers *"how deep is the water likely to get on this building"*. For every
+  country TITO runs, it reads the live cycle: a feature's likely depth is the
+  deepest of 10 / 30 / 70 / 100 cm it reaches with at least the chosen
+  probability (`min_probability` / `probabilidad_minima` /
+  `probabilite_minimale`, default 0.5), and the card adds the trigger status,
+  forecast rainfall, the area likely to flood and the *expected* people and
+  buildings with at least 0.3 m (each feature counted by its probability).
+  TITO's live flood-map libraries are not published -- the copies in the S3
+  bucket do not reproduce its forecasts -- so the depth of the storm a member
+  matched cannot be shown. Barbados, which TITO does not run, keeps the
+  training version: depth sampled from one storm of a 200-storm library,
+  chosen by `index`.
 
-The two datasets sit on exactly the same grid — EPSG:3857, 424×319, 5 m cells,
-identical origin — so no reprojection or resampling happens anywhere.
+## Adding a country
+
+Everything that differs between countries lives in
+[`countries.py`](tgf_wmo_plugins/countries.py), one `Country` record each:
+
+- `receptors`: where the buildings and roads are, what their probability and
+  measure columns are called, and any per-layer renames;
+- `prob_urls`: the four exceedance rasters, if the hazard family applies;
+- `storms`: the Zarr flood-map library, if the storm family applies;
+- `units`: the admin unit the products are published by, if any. This adds a
+  dropdown argument to every plugin and scopes the receptors, rasters, store
+  and population share to the chosen unit;
+- `live`: the country's TITO slug, grid, raster variants and how its plugin
+  scope maps onto TITO site names, if TITO runs there. This adds the live
+  arguments above and a `uffis_cycle_times_<key>` input.
+
+Then add a subclass per supported family, which only sets `country`:
+
+```python
+class HazardLayerNewCountry(BaseHazardLayer):
+    country = NEW_COUNTRY
+```
+
+Finally, add the matching `uffis_<family>_<key>` entry points to
+`pyproject.toml` and reinstall. `tests/test_countries.py` fails if an entry
+point is missing for a family the data supports, or present for one it
+doesn't. A new language also needs its strings in `strings.py`.
 
 ## Dashboards
 
-`dashboards/` holds the ready-to-import dashboards for the training, one folder
-per country. Each is the finished solution to one of the three hands-on
-exercises, whose step-by-step guides live in `docs/<country>/`.
+`dashboards/<country>/` holds the ready-to-import solution to each of the three
+hands-on exercises, whose guides live in `docs/<country>/`. Import them from the
+landing page once the plugins are installed and the server has restarted.
+Exercise 1 uses no plugins, exercise 2 uses the storm family and exercise 3 the
+hazard family.
 
-| file | dashboard | guide |
-|---|---|---|
-| `Guatemala/Guatemala_Hands_On_1_English.json` | Guatemala Hands On 1 (English) | `docs/Guatemala/exercise_1_en.rst` |
-| `Guatemala/Guatemala_Hands_On_1_Espanol.json` | Guatemala Práctica 1 (Español) | `docs/Guatemala/exercise_1_es.rst` |
-| `Guatemala/Guatemala_Hands_On_2_English.json` | Guatemala Hands On 2 (English) | `docs/Guatemala/exercise_2_en.rst` |
-| `Guatemala/Guatemala_Hands_On_2_Espanol.json` | Guatemala Práctica 2 (Español) | `docs/Guatemala/exercise_2_es.rst` |
-| `Guatemala/Guatemala_Hands_On_3_English.json` | Guatemala Hands On 3 (English) | `docs/Guatemala/exercise_3_en.rst` |
-| `Guatemala/Guatemala_Hands_On_3_Espanol.json` | Guatemala Práctica 3 (Español) | `docs/Guatemala/exercise_3_es.rst` |
-| `Antigua_Barbuda/Antigua_Barbuda_Hands_On_1.json` | Antigua and Barbuda Hands On 1 | `docs/Antigua_Barbuda/exercise_1.rst` |
-| `Antigua_Barbuda/Antigua_Barbuda_Hands_On_2.json` | Antigua and Barbuda Hands On 2 | `docs/Antigua_Barbuda/exercise_2.rst` |
-| `Antigua_Barbuda/Antigua_Barbuda_Hands_On_3.json` | Antigua and Barbuda Hands On 3 | `docs/Antigua_Barbuda/exercise_3.rst` |
-| `Antigua_Barbuda/Antigua_Barbuda_Hands_On_3_Depth.json` | Antigua and Barbuda Hands On 3 with Depth | `docs/Antigua_Barbuda/exercise_3.rst`, step 10 |
+Each TITO country also has a live dashboard, with a cycle dropdown driving
+every panel:
 
-Import them from the landing page once the plugins are installed and the server
-has restarted. Exercise 1 uses no plugins at all; exercise 2 uses the storm
-family (Guatemala only); exercise 3 uses the hazard family.
+| file | language |
+|---|---|
+| `Guatemala/Guatemala_Hands_On_2_English.json` | English (plugin text in Spanish) |
+| `Haiti/Haiti_Live.json` | French, with a La Quinte / Gris site selector |
+| `Antigua_Barbuda/Antigua_Barbuda_Live.json` | English |
+| `Comoros/Comoros_Live.json` | French, with a commune selector |
 
-The Antigua and Barbuda set follows the same three exercises on the Tropical
-Storm Jerry data. Exercise 1 shows the four `depth_prob` rasters with the GADM
-parish boundaries, plus flood depth for one storm read straight out of the
-Saint John's flood-map library (`AnB_IBF/AG04_SaintJohnS_v1.zarr`, 200 storms)
-through a Zarr layer with a fixed `index`; there is no standalone depth GeoTIFF
-for Antigua and Barbuda. Exercise 2 binds that `index` to a `Storm` number
-input; no storm plugin exists for these libraries yet, so there is no table or
-card.
-Exercise 3 binds the three `uffis_*_antigua_barbuda` plugins to four threshold
-inputs, preset to the plugin defaults.
+The first tab has rainfall, hazard and likely flood depth on the map, the
+forecast card and the depth and hazard tables (and the discharge forecast
+where there are gauges); the second has the SFFS/FGS warnings. Antigua's gauge
+is a placeholder and Comoros has none, so neither shows discharge, and TITO
+publishes no Comoros buildings, so its impact panels stay empty.
 
-`Hands On 3 with Depth` is exercise 3 with exercise 2's depth layer added: a
-`Storm` number input drives a Zarr layer on the Saint John's flood-map library under
-the parish outlines and the buildings and roads at risk, so one dashboard shows
-how deep the water gets in one storm next to which features the probability
-gates classify. The hazard classification polygons are opaque and would cover
-the depth, so they start hidden; turn them on from the layer control. The map
-opens on Saint John's because the depth library covers only that parish.
+Antigua and Barbuda has no storm plugins, so its exercise 2 binds a `Storm`
+number input straight to a Zarr layer on the Saint John's flood-map library.
+`Antigua_Barbuda_Hands_On_3_Depth.json` is exercise 3 with that depth layer
+added beneath the buildings and roads at risk.
 
-A dashboard is bound to the plugins of its own language, and not only through
-the `source` names. A variable input that draws its options from a plugin
-argument stores the string `"<group>: <label> - <Arg>"`, which embeds the
-plugin's translated group and label — so the English and Spanish copies of
-exercise 2 reference different option sources for the same Storm slider. Renaming
-a plugin's `label` or `group` breaks that binding silently; regenerate the
-dashboards rather than editing the strings by hand.
+A dashboard binds to its plugins by more than the `source` name. A variable
+input that draws its options from a plugin argument stores the string
+`"<group>: <label> - <Arg>"`, which embeds the plugin's translated group and
+label. Renaming a plugin's `label`, `group` or arguments therefore breaks saved
+dashboards silently; `tests/plugin_metadata.json` pins them all.
 
 ## Installing
 
 ```bash
 pip install -e .
+pytest
 ```
 
 Then restart the Tethys server; TethysDash discovers plugins through the
@@ -130,51 +231,29 @@ Then restart the Tethys server; TethysDash discovers plugins through the
 ## Adding or changing text
 
 All user-facing text lives in `strings.py`, keyed by language. Hazard levels and
-depth bands are keyed by their numeric class value — the value the raster and the
-feature attributes actually carry — so a translation can never change a
-classification.
-
-`check_parity()` runs at import and raises if the two dictionaries have drifted,
-so a missing translation fails at install time rather than in front of a room of
-trainees.
+depth bands are keyed by their numeric class value, the value the raster and
+the feature attributes actually carry, so a translation can never change a
+classification. `check_parity()` runs at import and raises if the language
+dictionaries have drifted.
 
 ## Data
 
-Everything is read from a public S3 bucket; nothing is bundled.
+Everything is read from a public S3 bucket; nothing is bundled. The URLs are in
+`countries.py`.
 
-| dataset | what it is |
-|---|---|
-| `floodmaps_test/` | Zarr store, 200-storm RainyDay ensemble, `depth` in metres |
-| `floodmaps_test/ensemble_stats.csv` | Precomputed per-storm summary |
-| `Guatemala_IBF/impact_features.geojson` | Buildings and roads with sampled probabilities |
-| `Guatemala_IBF/impact_features.csv` | The same rows without geometry, for tables |
-| `PBI_Actividad_2/prob_*.tif` | The four exceedance-probability rasters, EPSG:3857 |
-| `PBI_Actividad_2/depth_m.tif` | Flood depth in metres, EPSG:3857, on the same grid |
+Caveats worth knowing when reading the output:
 
-Two caveats that matter when reading the output:
-
-- **The probability layer depths are mislabelled upstream.** The filenames say
+- **Guatemala's probability layers are mislabelled upstream.** The filenames say
   7.62 / 10 / 30 / 76 cm, but three of the four are actually 15.24 / 30.48 /
   60.96 cm. The ordering is correct either way, so the classification is
-  unaffected — but the labels are not what they claim.
-- **The 76 cm layer only ever contains 0 or 0.2.** Any gate above 0.2 therefore
+  unaffected.
+- **Guatemala's 76 cm layer only ever contains 0 or 0.2.** Any gate above 0.2
   makes the top hazard level unreachable, not merely rare.
-
-The dashboards deliberately use the `PBI_Actividad_2/` copies rather than the
-`Guatemala_IBF/` originals. The originals are EPSG:32615 (UTM 15N), and a UTM
-raster makes the map adopt that projection through the GeoTIFF auto-fit, which
-costs a reprojection on every tile. All five 3857 rasters share one grid exactly
-— 424×319, 5 m cells, identical origin — which is also the grid the RainyDay
-ensemble uses, so nothing is resampled at render time.
-
-`depth_m.tif` was resampled from the UTM original with nearest neighbour rather
-than bilinear: the layer is drawn with `mask_below: 0.01`, and averaging across
-the dry/wet boundary inflated the flooded footprint by 16% and clipped the peak
-depth. Nearest holds the footprint to 7,705 cells against the original's 7,710,
-the mean to 0.9281 m against 0.9289, and the maximum exactly.
-
-## Site
-
-Santa Inés Petapa, Guatemala. The model domain is 3.38 km² and covers 5,029 of
-the 5,147 features in the geopackage; the remaining 118 fall outside it and never
-appear as affected, whatever the storm.
+- **Guatemala's storm magnitudes are placeholders**, assigned to the storms by
+  rank of flooded area rather than measured.
+- **Haiti and Antigua and Barbuda's building layers misname their severe
+  probability `probability_30cm`**; their `Receptors.layers` renames it back.
+- **Comoros stores probabilities as percent**; `prob_scale` converts them to
+  fractions before the gates apply.
+- **Not every Comoros commune has a Zarr store yet.** A missing store surfaces
+  as an error naming its URL.

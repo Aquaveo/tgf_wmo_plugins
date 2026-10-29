@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "tgf-wmo-plugins"
 version = "0.2.1"
-description = "TethysDash visualizations for the WMO Guatemala flood training, in English and Spanish"
+description = "TethysDash visualizations for the WMO impact-based flood forecasting trainings"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { file = "LICENSE" }
@@ -16,7 +16,6 @@ dependencies = [
     "rasterio",
     "geopandas",
     "shapely",
-    "zarr",
     "fsspec",
     "aiohttp",
     "pyogrio",
@@ -25,31 +24,82 @@ dependencies = [
 ]
 
 [project.entry-points."intake.drivers"]
-uffis_impact_summary_barbados = "tgf_wmo_plugins.impact_summary:ImpactSummaryBarbados"
-uffis_impact_layer_barbados = "tgf_wmo_plugins.impact_layer:ImpactLayerBarbados"
-uffis_hazard_layer_barbados = "tgf_wmo_plugins.hazard_layer:HazardLayerBarbados"
-uffis_impact_summary_guatemala = "tgf_wmo_plugins.impact_summary:ImpactSummaryGuatemala"
-uffis_impact_summary_haiti = "tgf_wmo_plugins.impact_summary:ImpactSummaryHaiti"
-uffis_impact_summary_antigua_barbuda = "tgf_wmo_plugins.impact_summary:ImpactSummaryAntiguaBarbuda"
-uffis_impact_layer_guatemala = "tgf_wmo_plugins.impact_layer:ImpactLayerGuatemala"
-uffis_impact_layer_haiti = "tgf_wmo_plugins.impact_layer:ImpactLayerHaiti"
-uffis_impact_layer_antigua_barbuda = "tgf_wmo_plugins.impact_layer:ImpactLayerAntiguaBarbuda"
+# One block per country: a family is listed only where the country's data
+# supports it, which tests/test_countries.py checks against countries.py.
+# guatemala
 uffis_hazard_layer_guatemala = "tgf_wmo_plugins.hazard_layer:HazardLayerGuatemala"
-uffis_hazard_layer_antigua_barbuda = "tgf_wmo_plugins.hazard_layer:HazardLayerAntiguaBarbuda"
-uffis_impact_summary_comoros = "tgf_wmo_plugins.impact_summary:ImpactSummaryComoros"
-uffis_impact_layer_comoros = "tgf_wmo_plugins.impact_layer:ImpactLayerComoros"
-uffis_hazard_layer_comoros = "tgf_wmo_plugins.hazard_layer:HazardLayerComoros"
-uffis_storm_card_comoros = "tgf_wmo_plugins.storm_card:StormCardComoros"
-uffis_storm_impact_layer_comoros = "tgf_wmo_plugins.storm_impact_layer:StormImpactLayerComoros"
-uffis_storm_impact_summary_comoros = "tgf_wmo_plugins.storm_impact_summary:StormImpactSummaryComoros"
+uffis_impact_summary_guatemala = "tgf_wmo_plugins.impact_summary:ImpactSummaryGuatemala"
+uffis_impact_layer_guatemala = "tgf_wmo_plugins.impact_layer:ImpactLayerGuatemala"
 uffis_storm_card_guatemala = "tgf_wmo_plugins.storm_card:StormCardGuatemala"
 uffis_storm_impact_layer_guatemala = "tgf_wmo_plugins.storm_impact_layer:StormImpactLayerGuatemala"
 uffis_storm_impact_summary_guatemala = "tgf_wmo_plugins.storm_impact_summary:StormImpactSummaryGuatemala"
+# haiti
+uffis_hazard_layer_haiti = "tgf_wmo_plugins.hazard_layer:HazardLayerHaiti"
+uffis_impact_summary_haiti = "tgf_wmo_plugins.impact_summary:ImpactSummaryHaiti"
+uffis_impact_layer_haiti = "tgf_wmo_plugins.impact_layer:ImpactLayerHaiti"
+uffis_storm_card_haiti = "tgf_wmo_plugins.storm_card:StormCardHaiti"
+uffis_storm_impact_layer_haiti = "tgf_wmo_plugins.storm_impact_layer:StormImpactLayerHaiti"
+uffis_storm_impact_summary_haiti = "tgf_wmo_plugins.storm_impact_summary:StormImpactSummaryHaiti"
+# antigua_barbuda
+uffis_hazard_layer_antigua_barbuda = "tgf_wmo_plugins.hazard_layer:HazardLayerAntiguaBarbuda"
+uffis_impact_summary_antigua_barbuda = "tgf_wmo_plugins.impact_summary:ImpactSummaryAntiguaBarbuda"
+uffis_impact_layer_antigua_barbuda = "tgf_wmo_plugins.impact_layer:ImpactLayerAntiguaBarbuda"
+uffis_storm_card_antigua_barbuda = "tgf_wmo_plugins.storm_card:StormCardAntiguaBarbuda"
+uffis_storm_impact_layer_antigua_barbuda = "tgf_wmo_plugins.storm_impact_layer:StormImpactLayerAntiguaBarbuda"
+uffis_storm_impact_summary_antigua_barbuda = "tgf_wmo_plugins.storm_impact_summary:StormImpactSummaryAntiguaBarbuda"
+# barbados
+uffis_hazard_layer_barbados = "tgf_wmo_plugins.hazard_layer:HazardLayerBarbados"
+uffis_impact_summary_barbados = "tgf_wmo_plugins.impact_summary:ImpactSummaryBarbados"
+uffis_impact_layer_barbados = "tgf_wmo_plugins.impact_layer:ImpactLayerBarbados"
 uffis_storm_card_barbados = "tgf_wmo_plugins.storm_card:StormCardBarbados"
 uffis_storm_impact_layer_barbados = "tgf_wmo_plugins.storm_impact_layer:StormImpactLayerBarbados"
 uffis_storm_impact_summary_barbados = "tgf_wmo_plugins.storm_impact_summary:StormImpactSummaryBarbados"
+# comoros
+uffis_hazard_layer_comoros = "tgf_wmo_plugins.hazard_layer:HazardLayerComoros"
+uffis_impact_summary_comoros = "tgf_wmo_plugins.impact_summary:ImpactSummaryComoros"
+uffis_impact_layer_comoros = "tgf_wmo_plugins.impact_layer:ImpactLayerComoros"
+uffis_storm_card_comoros = "tgf_wmo_plugins.storm_card:StormCardComoros"
+uffis_storm_impact_layer_comoros = "tgf_wmo_plugins.storm_impact_layer:StormImpactLayerComoros"
+uffis_storm_impact_summary_comoros = "tgf_wmo_plugins.storm_impact_summary:StormImpactSummaryComoros"
+# live TITO inputs and products
+uffis_flood_map_layer_guatemala = "tgf_wmo_plugins.flood_map_layer:FloodMapLayerGuatemala"
+uffis_flood_map_layer_haiti = "tgf_wmo_plugins.flood_map_layer:FloodMapLayerHaiti"
+uffis_flood_map_layer_antigua_barbuda = "tgf_wmo_plugins.flood_map_layer:FloodMapLayerAntiguaBarbuda"
+uffis_flood_map_layer_comoros = "tgf_wmo_plugins.flood_map_layer:FloodMapLayerComoros"
+uffis_risk_matrix_guatemala = "tgf_wmo_plugins.ibf:RiskMatrixGuatemala"
+uffis_risk_filter_guatemala = "tgf_wmo_plugins.ibf:RiskFilterGuatemala"
+uffis_risk_layer_guatemala = "tgf_wmo_plugins.ibf:RiskLayerGuatemala"
+uffis_event_summary_guatemala = "tgf_wmo_plugins.ibf:EventSummaryGuatemala"
+uffis_risk_matrix_haiti = "tgf_wmo_plugins.ibf:RiskMatrixHaiti"
+uffis_risk_filter_haiti = "tgf_wmo_plugins.ibf:RiskFilterHaiti"
+uffis_risk_layer_haiti = "tgf_wmo_plugins.ibf:RiskLayerHaiti"
+uffis_event_summary_haiti = "tgf_wmo_plugins.ibf:EventSummaryHaiti"
+uffis_risk_matrix_antigua_barbuda = "tgf_wmo_plugins.ibf:RiskMatrixAntiguaBarbuda"
+uffis_risk_filter_antigua_barbuda = "tgf_wmo_plugins.ibf:RiskFilterAntiguaBarbuda"
+uffis_risk_layer_antigua_barbuda = "tgf_wmo_plugins.ibf:RiskLayerAntiguaBarbuda"
+uffis_event_summary_antigua_barbuda = "tgf_wmo_plugins.ibf:EventSummaryAntiguaBarbuda"
+uffis_risk_matrix_comoros = "tgf_wmo_plugins.ibf:RiskMatrixComoros"
+uffis_risk_filter_comoros = "tgf_wmo_plugins.ibf:RiskFilterComoros"
+uffis_risk_layer_comoros = "tgf_wmo_plugins.ibf:RiskLayerComoros"
+uffis_event_summary_comoros = "tgf_wmo_plugins.ibf:EventSummaryComoros"
+uffis_discharge_guatemala = "tgf_wmo_plugins.discharge:DischargeGuatemala"
+uffis_discharge_haiti = "tgf_wmo_plugins.discharge:DischargeHaiti"
+uffis_cycle_times_guatemala = "tgf_wmo_plugins.cycle_times:CycleTimesGuatemala"
+uffis_cycle_times_haiti = "tgf_wmo_plugins.cycle_times:CycleTimesHaiti"
+uffis_cycle_times_antigua_barbuda = "tgf_wmo_plugins.cycle_times:CycleTimesAntiguaBarbuda"
+uffis_cycle_times_comoros = "tgf_wmo_plugins.cycle_times:CycleTimesComoros"
 uffis_precip_layer_guatemala = "tgf_wmo_plugins.precip_layer:PrecipLayerGuatemala"
-uffis_cycle_times_guatemala = "tgf_wmo_plugins.precip_layer:CycleTimesGuatemala"
+uffis_precip_layer_haiti = "tgf_wmo_plugins.precip_layer:PrecipLayerHaiti"
+uffis_precip_layer_antigua_barbuda = "tgf_wmo_plugins.precip_layer:PrecipLayerAntiguaBarbuda"
+uffis_precip_layer_comoros = "tgf_wmo_plugins.precip_layer:PrecipLayerComoros"
+uffis_soil_moisture_layer_guatemala = "tgf_wmo_plugins.precip_layer:SoilMoistureLayerGuatemala"
+uffis_soil_moisture_layer_haiti = "tgf_wmo_plugins.precip_layer:SoilMoistureLayerHaiti"
+uffis_soil_moisture_layer_antigua_barbuda = "tgf_wmo_plugins.precip_layer:SoilMoistureLayerAntiguaBarbuda"
+uffis_soil_moisture_layer_comoros = "tgf_wmo_plugins.precip_layer:SoilMoistureLayerComoros"
+uffis_unit_streamflow_layer_guatemala = "tgf_wmo_plugins.precip_layer:UnitStreamflowLayerGuatemala"
+uffis_unit_streamflow_layer_haiti = "tgf_wmo_plugins.precip_layer:UnitStreamflowLayerHaiti"
+uffis_unit_streamflow_layer_antigua_barbuda = "tgf_wmo_plugins.precip_layer:UnitStreamflowLayerAntiguaBarbuda"
+uffis_unit_streamflow_layer_comoros = "tgf_wmo_plugins.precip_layer:UnitStreamflowLayerComoros"
 
 [tool.setuptools.packages.find]
 include = ["tgf_wmo_plugins*"]
