@@ -323,7 +323,7 @@
           "args_string": {
             "variable_name": "Parish",
             "show_label": true,
-            "variable_options_source": "UFFIS: Barbados: Barbados: Storm Impact Summary - Parish",
+            "variable_options_source": "Flood Maps (English): Storm Impact Summary (Barbados) - Parish",
             "initial_value": "BB08_SaintMichael"
           },
           "metadata_string": {
@@ -340,7 +340,7 @@
           "args_string": {
             "variable_name": "Storm",
             "show_label": true,
-            "variable_options_source": "UFFIS: Barbados: Barbados: Storm Impact Summary - Index",
+            "variable_options_source": "Flood Maps (English): Storm Impact Summary (Barbados) - Index",
             "variable_options_source.metadata": {
               "min": 1,
               "max": 199,

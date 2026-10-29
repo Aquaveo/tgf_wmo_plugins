@@ -1,207 +1,222 @@
-"""TITO's ensemble summary rasters -- rainfall, soil saturation and unit
-streamflow -- as dynamic map layers.
+"""Rainfall accumulation for Guatemala from the live TITO workflow, as a map layer.
 
-Each sits at <grid>/summary/<product>_<period>_<statistic>.<cycle>.tif; see
-tito.py for how cycles are published and how long they are kept. The colour
-classes are the tito.uffis.org viewer's.
+TITO runs hourly and publishes each cycle under
+https://tito.uffis.org/outputs/guatemala/<cycle>/, where <cycle> is the start time
+as YYYYMMDD.HHMMSS in UTC. The ensemble summary rasters sit at
+<grid>/summary/qpeaccum_<period>_<statistic>.<cycle>.tif. Only recent cycles are
+kept -- the bucket expires them within two days -- so a date much older than
+that has nothing to show.
 """
 
-from dataclasses import dataclass
+import json
+import urllib.error
+import urllib.request
+from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime, timedelta
 
-from tethysapp.tethysdash.plugin_helpers import LayerConfigurationBuilder, geotiff_source
-
-from tgf_wmo_plugins.base import CountryPlugin, LiveData
-from tgf_wmo_plugins.countries import ANTIGUA_BARBUDA, COMOROS, GUATEMALA, HAITI
-from tgf_wmo_plugins.strings import LIVE_ARGS, STRINGS
-from tgf_wmo_plugins.tito import cycle_files, cycle_label, file_url, stamp
-
-STATISTICS = ["median", "min", "max"]
-PERIODS = ["forecast", "nowcast"]
-
-
-@dataclass(frozen=True)
-class Legend:
-    """Class i covers breaks[i] to breaks[i + 1]; the last runs open-ended, and
-    values under breaks[0] -- the -9999 nodata included -- are not drawn."""
-
-    breaks: tuple
-    colors: tuple
-    open_ended: bool  # label the last class "<break> or more"
-
-
-RAINFALL = Legend(
-    breaks=(1, 5, 10, 25, 50, 75, 100, 150, 250),
-    colors=("#d9f0a3", "#addd8e", "#41ab5d", "#ffffb2", "#fdae61",
-            "#f46d43", "#d73027", "#a50026", "#6a3d9a"),
-    open_ended=True,
-)
-SOIL_SATURATION = Legend(
-    breaks=(10, 30, 50, 70, 85, 95, 100),
-    colors=("#f6e8c3", "#dfc27d", "#80cdc1", "#35978f", "#01665e", "#003c30"),
-    open_ended=False,
-)
-UNIT_STREAMFLOW = Legend(
-    breaks=(0.1, 1, 2, 4, 6, 10, 20),
-    colors=("#bdbdbd", "#d9ef8b", "#fdae61", "#d73027", "#c51b7d", "#2c7bb6", "#08306b"),
-    open_ended=True,
+from tethysapp.tethysdash.plugin_helpers import (
+    LayerConfigurationBuilder,
+    TethysDashPlugin,
 )
 
+OUTPUTS = "https://tito.uffis.org/outputs/guatemala"
 
-def _choice(value, values):
-    """`value` when it is one of `values`, else the first.
+GRIDS = [
+    {"value": "guatemala_900m", "label": "900 m (national)"},
+    {"value": "guatemala_90m", "label": "90 m (flood sites)"},
+]
+STATISTICS = [
+    {"value": "median", "label": "Median"},
+    {"value": "min", "label": "Minimum"},
+    {"value": "max", "label": "Maximum"},
+]
+PERIODS = [
+    {"value": "forecast", "label": "Forecast"},
+    {"value": "nowcast", "label": "Nowcast"},
+]
+
+# The tito.uffis.org legend for rainfall: class i covers breaks[i] <= mm <
+# breaks[i + 1], the last runs open-ended, and anything under 1 mm -- the -9999
+# nodata included -- is left transparent.
+BREAKS_MM = [1, 5, 10, 25, 50, 75, 100, 150, 250]
+COLORS = [
+    "#d9f0a3",
+    "#addd8e",
+    "#41ab5d",
+    "#ffffb2",
+    "#fdae61",
+    "#f46d43",
+    "#d73027",
+    "#a50026",
+    "#6a3d9a",
+]
+
+
+def _get(url):
+    with urllib.request.urlopen(url, timeout=30) as response:
+        return response.read()
+
+
+def latest_cycle():
+    """The newest published cycle, e.g. '20261001.190000'."""
+    return json.loads(_get(f"{OUTPUTS}/latest.json"))["cycle"]
+
+
+CYCLE_FORMAT = "%Y%m%d.%H%M%S"
+# The bucket deletes a cycle about two days after it is written, so nothing
+# older than this is worth asking for.
+LOOKBACK_HOURS = 54
+
+
+def available_cycles():
+    """Every cycle still published, newest first.
+
+    latest.json names only the newest cycle and the bucket cannot be listed, so
+    each hour back from it is probed for its index.json. Cycles are hourly but
+    an hour is sometimes skipped, which is why every hour is checked rather than
+    counting back.
+    """
+    newest = datetime.strptime(latest_cycle(), CYCLE_FORMAT)
+    candidates = [
+        (newest - timedelta(hours=h)).strftime(CYCLE_FORMAT)
+        for h in range(LOOKBACK_HOURS)
+    ]
+    with ThreadPoolExecutor(max_workers=16) as pool:
+        found = pool.map(lambda c: exists(f"{OUTPUTS}/{c}/index.json"), candidates)
+    return [cycle for cycle, ok in zip(candidates, found) if ok]
+
+
+def exists(url):
+    request = urllib.request.Request(url, method="HEAD")
+    try:
+        with urllib.request.urlopen(request, timeout=30):
+            return True
+    except urllib.error.HTTPError:
+        return False
+
+
+def _choice(value, options):
+    """`value` when it is one of `options`, else the first option.
 
     An unset arg arrives as None, and an unbound variable as its literal
     "${...}" text, so neither can be trusted to be a valid choice.
     """
+    values = [o["value"] for o in options]
     return value if value in values else values[0]
 
 
-class BaseSummaryLayer(LiveData, CountryPlugin):
-    """Set `product`, `legend`, `family`, `strings_key` and `legend_key`; a
-    country subclass then sets only `country`."""
-
-    product = None
-    legend = None
-    legend_key = None
+class PrecipLayerGuatemala(TethysDashPlugin):
+    name = "uffis_precip_layer_guatemala"
+    group = "UFFIS Live"
+    label = "Rainfall Accumulation (Guatemala)"
     type = "map_layer"
+    tags = ["uffis", "tito", "rainfall", "guatemala"]
+    description = (
+        "Ensemble rainfall accumulation from one hourly TITO cycle for "
+        "Guatemala. Set the date to 'latest' for the newest cycle."
+    )
+    args = {
+        "date": "date",
+        "grid": GRIDS,
+        "statistic": STATISTICS,
+        "period": PERIODS,
+    }
     dynamic_map_layer = True
-    dynamic_map_layer_source = "GeoTIFF"
-
-    @classmethod
-    def has_training(cls, country):
-        return False
-
-    @classmethod
-    def country_args(cls, country):
-        s, names = STRINGS[country.lang], LIVE_ARGS[country.lang]
-        # `cycle` takes the stamp an Available Cycles input carries; it is not a
-        # "date" arg, which would parse the stamp as a datetime.
-        return {
-            names["cycle"]: cls.live_args(country)[names["cycle"]],
-            names["grid"]: [
-                {"value": grid, "label": f"{res} ({s['rain_grid_kinds'][kind]})" if kind else res}
-                for grid, res, kind in country.live.rain_grids
-            ],
-            names["statistic"]: [{"value": v, "label": s["rain_statistics"][v]} for v in STATISTICS],
-            names["period"]: [{"value": v, "label": s["rain_periods"][v]} for v in PERIODS],
-        }
 
     def run(self):
-        """Configure-time scaffold: the binding, the class colours and legend."""
-        s, legend = self.strings, self.legend
-        labels = self._labels()
-        builder = LayerConfigurationBuilder(s[f"{self.strings_key}_name"], "GeoTIFF")
-        builder.set_plugin_source(self.name, self.received_args)
-        builder.set_raster_classes(
-            "ranges",
-            [
-                {"value": upper, "color": color, "label": label}
-                for upper, color, label in zip(legend.breaks[1:], legend.colors, labels)
-            ],
-            fallback_color=legend.colors[-1],
+        grid = _choice(self.get_arg("grid"), GRIDS)
+        statistic = _choice(self.get_arg("statistic"), STATISTICS)
+        period = _choice(self.get_arg("period"), PERIODS)
+        cycle = self.cycle()
+
+        url = (
+            f"{OUTPUTS}/{cycle}/{grid}/summary/"
+            f"qpeaccum_{period}_{statistic}.{cycle}.tif"
         )
+        if not exists(url):
+            raise ValueError(
+                f"no rainfall raster for cycle {cycle} ({grid}, {period}, "
+                f"{statistic}); the newest cycle is {latest_cycle()}, and "
+                "cycles more than about two days old are deleted"
+            )
+
+        builder = LayerConfigurationBuilder(
+            f"Rainfall {period} {statistic}, {cycle} UTC", "GeoTIFF"
+        )
+        # Raw millimetres rather than OpenLayers' normalised bytes, so the
+        # breaks below compare against real values, and no interpolation,
+        # which would blend colours across class edges.
+        builder.set_source_properties(url=url, normalize=False, interpolate=False)
+        builder.set_style({"color": self._color()})
         builder.set_legend(
             {
-                "title": s[self.legend_key],
+                "title": "Rainfall accumulation (mm)",
                 "items": [
                     {"label": label, "color": color, "symbol": "square"}
-                    for label, color in zip(labels, legend.colors)
+                    for label, color in zip(self._labels(), COLORS)
                 ],
             }
         )
         return builder.build()
 
-    def fetch_source(self):
-        """Runtime source: the cycle's raster, re-fetched when a binding changes."""
-        s, names, live = self.strings, LIVE_ARGS[self.country.lang], self.country.live
-        grid = _choice(self.get_arg(names["grid"]), [g for g, _res, _kind in live.rain_grids])
-        statistic = _choice(self.get_arg(names["statistic"]), STATISTICS)
-        period = _choice(self.get_arg(names["period"]), PERIODS)
-        cycle = self.selected_cycle()
+    def cycle(self):
+        """The cycle the date names: the newest one for "latest", otherwise
+        the cycle that starts in the same UTC hour as the date."""
+        date = self.get_arg("date")
+        if date in (None, "", "latest"):
+            return latest_cycle()
+        return date.strftime("%Y%m%d.%H0000")
 
-        path = f"{grid}/summary/{self.product}_{period}_{statistic}.{stamp(cycle)}.tif"
-        if path not in cycle_files(live.slug, cycle):
-            raise ValueError(s["msg_no_summary"].format(
-                cycle=cycle_label(cycle, s["sample_tag"]), period=s["rain_periods"][period],
-                statistic=s["rain_statistics"][statistic],
-                product=s["summary_products"][self.product], grid=grid))
-        return geotiff_source(file_url(live.slug, cycle, path), mask_below=self.legend.breaks[0])
+    @staticmethod
+    def _color():
+        expression = ["case", ["<", ["band", 1], BREAKS_MM[0]], [0, 0, 0, 0]]
+        for upper, color in zip(BREAKS_MM[1:], COLORS):
+            expression += [["<", ["band", 1], upper], color]
+        return expression + [COLORS[-1]]
 
-    def _labels(self):
-        breaks = self.legend.breaks
-        labels = [f"{lo:g} - {hi:g}" for lo, hi in zip(breaks, breaks[1:])]
-        if self.legend.open_ended:
-            labels.append(self.strings["or_more"].format(value=f"{breaks[-1]:g}"))
-        return labels
+    @staticmethod
+    def _labels():
+        pairs = zip(BREAKS_MM, BREAKS_MM[1:])
+        return [f"{lo} - {hi}" for lo, hi in pairs] + [f"{BREAKS_MM[-1]} or more"]
 
 
-class BasePrecipLayer(BaseSummaryLayer):
-    family = "precip_layer"
-    strings_key = "precip_layer"
-    legend_key = "precip_legend"
-    product = "qpeaccum"
-    legend = RAINFALL
+class CycleTimesGuatemala(TethysDashPlugin):
+    """A dropdown of every Guatemala cycle still published, newest first.
 
+    Each value is the cycle stamp exactly as the URLs spell it, e.g.
+    '20261001.200000', so a layer can name its file with the variable alone:
 
-class BaseSoilMoistureLayer(BaseSummaryLayer):
-    family = "soil_moisture_layer"
-    strings_key = "soil_layer"
-    legend_key = "soil_legend"
-    product = "maxsm"
-    legend = SOIL_SATURATION
+        .../outputs/guatemala/${Date}/guatemala_900m/summary/
+        qpeaccum_forecast_median.${Date}.tif
 
+    Every product in a cycle -- the ensemble summaries, the flood maps, the
+    impact files -- carries that same stamp, so one list serves them all. There
+    is no "latest" entry because no URL can spell it; the newest cycle is the
+    first choice and the initial value instead.
+    """
 
-class BaseUnitStreamflowLayer(BaseSummaryLayer):
-    family = "unit_streamflow_layer"
-    strings_key = "unitq_layer"
-    legend_key = "unitq_legend"
-    product = "maxunitq"
-    legend = UNIT_STREAMFLOW
+    name = "uffis_cycle_times_guatemala"
+    group = "UFFIS Live"
+    label = "Available Cycles (Guatemala)"
+    type = "variable_input"
+    tags = ["uffis", "tito", "guatemala", "date"]
+    description = (
+        "Every hourly TITO cycle still published for Guatemala, newest first, "
+        "valued as the cycle stamp the file URLs use."
+    )
 
-
-class PrecipLayerGuatemala(BasePrecipLayer):
-    country = GUATEMALA
-
-
-class PrecipLayerHaiti(BasePrecipLayer):
-    country = HAITI
-
-
-class PrecipLayerAntiguaBarbuda(BasePrecipLayer):
-    country = ANTIGUA_BARBUDA
-
-
-class PrecipLayerComoros(BasePrecipLayer):
-    country = COMOROS
-
-
-class SoilMoistureLayerGuatemala(BaseSoilMoistureLayer):
-    country = GUATEMALA
-
-
-class SoilMoistureLayerHaiti(BaseSoilMoistureLayer):
-    country = HAITI
-
-
-class SoilMoistureLayerAntiguaBarbuda(BaseSoilMoistureLayer):
-    country = ANTIGUA_BARBUDA
-
-
-class SoilMoistureLayerComoros(BaseSoilMoistureLayer):
-    country = COMOROS
-
-
-class UnitStreamflowLayerGuatemala(BaseUnitStreamflowLayer):
-    country = GUATEMALA
-
-
-class UnitStreamflowLayerHaiti(BaseUnitStreamflowLayer):
-    country = HAITI
-
-
-class UnitStreamflowLayerAntiguaBarbuda(BaseUnitStreamflowLayer):
-    country = ANTIGUA_BARBUDA
-
-
-class UnitStreamflowLayerComoros(BaseUnitStreamflowLayer):
-    country = COMOROS
+    def run(self):
+        cycles = available_cycles()
+        choices = [
+            {
+                "label": f"{datetime.strptime(c, CYCLE_FORMAT):%Y-%m-%d %H:%M} UTC",
+                "value": c,
+            }
+            for c in cycles
+        ]
+        return {
+            "variable_name": "Date",
+            "initial_value": cycles[0],
+            "variable_options_source": "dropdown",
+            "metadata": {"choices": choices},
+        }

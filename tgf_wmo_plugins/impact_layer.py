@@ -1,94 +1,177 @@
 """Classified buildings and roads as a dynamic map layer.
 
-The feature counterpart to `hazard_layer`. Only features that land in a hazard
-level are returned: Normal is the large majority and adds nothing a basemap does
-not show, and dropping it is what keeps the payload tractable.
+The feature counterpart to `hazard_layer`, which draws the raster classification.
+Each building and road already carries the four exceedance probabilities -- taken
+as the maximum over its own footprint -- so the escalating gates classify a
+feature directly, no rasterising involved.
+
+Only features that land in a hazard level are returned. Normal is the large
+majority and adds nothing a basemap does not already show, so dropping it is
+what keeps the response tractable -- for Barbados, 28,000 features out of
+227,000, and 11 MB rather than the ~90 MB the whole stock would serialise to.
 """
 
 import json
 from functools import lru_cache
 
-from tethysapp.tethysdash.plugin_helpers import LayerConfigurationBuilder
-
-from tgf_wmo_plugins.base import CountryPlugin, LiveData
-from tgf_wmo_plugins.classification import LEVELS, ThresholdGates, classify_receptors
-from tgf_wmo_plugins.countries import (
-    ANTIGUA_BARBUDA,
-    BARBADOS,
-    COMOROS,
-    GUATEMALA,
-    HAITI,
+import geopandas as gpd
+import pandas as pd
+import pyogrio
+from shapely import set_precision
+from tethysapp.tethysdash.plugin_helpers import (
+    LayerConfigurationBuilder,
+    TethysDashPlugin,
 )
-from tgf_wmo_plugins.receptors import OUTPUT_CRS, for_display, load_receptors
-from tgf_wmo_plugins.tito import TRAINING
+
+from tgf_wmo_plugins.classification import (
+    LEVELS,
+    BarbadosParish,
+    ComorosUnit,
+    ThresholdGates,
+    UnitScoped,
+)
+from tgf_wmo_plugins.common import (
+    ANTIGUA_BARBUDA_FEATURES_CSV_URL,
+    BARBADOS_FEATURES_URL,
+    BARBADOS_PARISH_OPTIONS,
+    COMOROS_FEATURES_URL,
+    COMOROS_UNIT_OPTIONS,
+    FEATURES_URL,
+    GPKG_LAYERS,
+    HAITI_FEATURES_CSV_URL,
+    PROB_FIELDS,
+    TYPE_FIELD,
+    cached_download,
+    comoros_receptors_url,
+    gpkg_where,
+    scale_probabilities,
+)
+from tgf_wmo_plugins.strings import STRINGS, threshold_args
+
+# The frontend does not bundle proj4, so OpenLayers only resolves EPSG:4326 and
+# EPSG:3857. Anything else -- the source data is UTM 15N -- would be read as raw
+# map units and land nowhere near Guatemala.
+OUTPUT_CRS = "EPSG:4326"
+# ~0.1 m at this latitude. Enough to trim digits off metre-scale footprints
+# without visibly moving them.
+PRECISION_DEG = 1e-6
+
+# Geometry source per country. Guatemala ships one GeoJSON; Haiti and Antigua
+# and Barbuda ship a geopackage whose buildings and roads are separate layers.
+FEATURES_URLS = {
+    "guatemala": FEATURES_URL,
+    "haiti": HAITI_FEATURES_CSV_URL,
+    "antigua_barbuda": ANTIGUA_BARBUDA_FEATURES_CSV_URL,
+    "comoros": COMOROS_FEATURES_URL,
+    "barbados": BARBADOS_FEATURES_URL,
+}
+
+# Measures the popup shows, per country. A geopackage layer only carries the
+# ones that apply to it -- a road has no population, a building no length -- so
+# the reader fills the rest with zero and every row reads the same way.
+MEASURES = {
+    "guatemala": ["poblacion", "area_m2", "longitud_m"],
+    "haiti": ["population", "surface_m2", "longueur_m"],
+    "antigua_barbuda": [
+        "population_per_building",
+        "building_area_m2",
+        "road_length_m",
+    ],
+    # The Comoros geopackage happens to spell these exactly as Antigua and
+    # Barbuda's does, so the popup needs no renames on top of the probabilities.
+    "comoros": [
+        "population_per_building",
+        "building_area_m2",
+        "road_length_m",
+    ],
+    "barbados": [
+        "population_per_building",
+        "building_area_m2",
+        "road_length_m",
+    ],
+}
+
+def feature_columns(country, s):
+    """Attributes carried through to the GeoJSON, per country and language.
+
+    The hazard-class attribute drives the styling rules and the level attribute
+    is its translated label, so both are always present. Both names come from
+    the language table: they are column headers in the attribute popup, so a
+    French plugin should not be emitting Spanish ones.
+    """
+    return [TYPE_FIELD[country], s["attr_level"], s["attr_hazard"], *MEASURES[country]]
+
+
+def _read_geopackage(url, country, unit=None):
+    """Both geopackage layers, stacked, with the probability fields aligned.
+
+    The buildings layers store their severe extraction under `probability_30cm`,
+    misnamed upstream, so the renames put it back before the gates are applied.
+    Only the fields the plugin uses are read; the rest of the layer stays on
+    disk.
+    """
+    path = cached_download(url)
+    parts = []
+    for type_, (layer, renames) in GPKG_LAYERS[country].items():
+        # Fields already carrying their final name, plus the ones to rename,
+        # plus whichever measures this layer actually has.
+        available = set(pyogrio.read_info(path, layer=layer)["fields"])
+        wanted = [f for f in PROB_FIELDS[country] if f not in renames.values()]
+        wanted += list(renames) + MEASURES[country]
+        part = pyogrio.read_dataframe(
+            path,
+            layer=layer,
+            columns=[f for f in wanted if f in available],
+            # Only Comoros sets one: its file is per island, so the commune is
+            # selected in the driver rather than after 130,000 geometries have
+            # been built. `where` is evaluated on the layer, so the column it
+            # names does not have to be among `columns`.
+            where=gpkg_where(country, unit),
+            read_geometry=True,
+            use_arrow=True,
+        )
+        part = part.rename(columns=renames)
+        part["type"] = type_
+        parts.append(part)
+
+    stacked = gpd.GeoDataFrame(pd.concat(parts, ignore_index=True), crs=parts[0].crs)
+    for col in MEASURES[country]:
+        stacked[col] = stacked[col].fillna(0.0) if col in stacked else 0.0
+    return scale_probabilities(stacked, country)
 
 
 @lru_cache(maxsize=8)
-def _load(key, scope, cycle):
-    """Receptors in the output CRS, or None. Cached: only the gates change
-    between requests, and the reprojection is wasted work to repeat."""
-    gdf = load_receptors(key, scope, True, cycle)
-    return None if gdf is None else for_display(gdf)
+def _load(country, unit=None):
+    """Source features for `country`, already in the output CRS.
 
-
-def feature_style(s, attr, labels, colors):
-    """Rule-based styling on a class attribute, for polygon buildings and
-    linestring roads. See hazard_layer._style for why the rules look like this."""
-    rules = []
-    for value, color in colors:
-        condition = {
-            "conditionField": s[attr],
-            "conditionType": "=",
-            "conditionValue": str(value),
-        }
-        rules.append(
-            {
-                "name": f"{labels[value]} ({s['buildings']})",
-                "geometryType": "polygon",
-                "strokeWidth": "1",
-                **condition,
-                "fill": color,
-                "stroke": color,
-            }
-        )
-        rules.append(
-            {
-                "name": f"{labels[value]} ({s['roads']})",
-                "geometryType": "linestring",
-                **condition,
-                "stroke": color,
-                "strokeWidth": "3",
-            }
-        )
-    return {
-        "default": {
-            "polygon": {"fill": "#9e9e9e", "stroke": "#9e9e9e", "strokeWidth": "0"},
-            "linestring": {"stroke": "#9e9e9e", "strokeWidth": "1"},
-        },
-        "rules": rules,
-    }
-
-
-def feature_collection(gdf, columns):
-    if gdf is None:
-        collection = {"type": "FeatureCollection", "features": []}
+    Cached: only the gates change between requests, and both the download and
+    the reprojection are wasted work to repeat. `unit` is part of the key because
+    a Comoros commune is a different set of features out of the same island file
+    -- without it the first commune read would be served to every other.
+    """
+    # Comoros splits its receptors into one file per island, so the unit selects
+    # the file; every other country has one file and the unit selects rows in it.
+    url = comoros_receptors_url(unit) if country == "comoros" else FEATURES_URLS[country]
+    if country in GPKG_LAYERS:
+        gdf = _read_geopackage(url, country, unit)
     else:
-        collection = json.loads(gdf[columns + ["geometry"]].to_json())
-    collection["crs"] = {"type": "name", "properties": {"name": OUTPUT_CRS}}
-    return collection
+        gdf = gpd.read_file(url)
+    gdf = gdf.to_crs(OUTPUT_CRS)
+    gdf["geometry"] = set_precision(gdf.geometry.values, PRECISION_DEG)
+    return gdf[~gdf.geometry.is_empty]
 
 
-class BaseImpactLayer(ThresholdGates, LiveData, CountryPlugin):
-    family = "impact_layer"
-    strings_key = "impact_layer"
+class BaseImpactLayer(ThresholdGates, TethysDashPlugin):
+    LANG = None
+    country = None
     type = "map_layer"
     dynamic_map_layer = True
 
     def run(self):
-        s = self.strings
+        s = STRINGS[self.LANG]
         builder = LayerConfigurationBuilder(s["impact_layer_name"], "GeoJSON")
         builder.set_plugin_source(self.name, self.received_args)
-        builder.set_style(feature_style(s, "attr_hazard", s["levels"], LEVELS))
+        builder.set_style(self._style(s))
         builder.set_legend(
             {
                 "title": s["hazard_legend"],
@@ -101,47 +184,126 @@ class BaseImpactLayer(ThresholdGates, LiveData, CountryPlugin):
         return builder.build()
 
     def fetch_features(self):
-        s = self.strings
-        cycle = self.selected_cycle()
-        rec = self.country.receptors if cycle == TRAINING else self.country.live.receptors
+        s = STRINGS[self.LANG]
+        country = self.country
+        gates = self.gates()
 
         self.send_update(s["msg_loading_features"], percentage_complete=20)
-        gdf = _load(self.country.key, self.scope(), cycle)
-        if gdf is None:
-            message = s["msg_no_receptors"].format(site=self.scope_label(), cycle=cycle)
-            self.send_update(message, percentage_complete=100)
-            return feature_collection(None, [])
+        unit = self.unit() if isinstance(self, UnitScoped) else None
+        gdf = _load(country, unit).copy()
 
         self.send_update(s["msg_classifying"], percentage_complete=60)
-        hazard = classify_receptors(gdf, rec.probabilities, self.gates())
-        exposed = gdf[hazard > 0].copy()
-        exposed[s["attr_hazard"]] = hazard[hazard > 0]
-        exposed[s["attr_level"]] = exposed[s["attr_hazard"]].map(s["levels"])
+        hazard, level = s["attr_hazard"], s["attr_level"]
+        gdf[hazard] = 0
+        for field, (value, _color) in zip(PROB_FIELDS[country], LEVELS):
+            gdf.loc[gdf[field] >= gates[value], hazard] = value
+
+        exposed = gdf[gdf[hazard] > 0].copy()
+        exposed[level] = exposed[hazard].map(s["levels"])
 
         self.send_update(
             s["msg_at_risk"].format(count=len(exposed)), percentage_complete=100
         )
-        cols = rec.columns
-        return feature_collection(
-            exposed, [cols.type, s["attr_level"], s["attr_hazard"], *cols.measures]
-        )
+        columns = feature_columns(country, s)
+        collection = json.loads(exposed[columns + ["geometry"]].to_json())
+        collection["crs"] = {"type": "name", "properties": {"name": OUTPUT_CRS}}
+        return collection
+
+    @staticmethod
+    def _style(s):
+        """Rule-based styling on the hazard-class attribute, polygons and lines.
+
+        See hazard_layer._style for why the rule shape is what it is.
+        """
+        rules = []
+        for value, color in LEVELS:
+            condition = {
+                "conditionField": s["attr_hazard"],
+                "conditionType": "=",
+                "conditionValue": str(value),
+            }
+            rules.append(
+                {
+                    "name": f"{s['levels'][value]} ({s['buildings']})",
+                    "geometryType": "polygon",
+                    "strokeWidth": "1",
+                    **condition,
+                    "fill": color,
+                    "stroke": color,
+                }
+            )
+            rules.append(
+                {
+                    "name": f"{s['levels'][value]} ({s['roads']})",
+                    "geometryType": "linestring",
+                    **condition,
+                    "stroke": color,
+                    "strokeWidth": "3",
+                }
+            )
+        return {
+            "default": {
+                "polygon": {"fill": "#9e9e9e", "stroke": "#9e9e9e", "strokeWidth": "0"},
+                "linestring": {"stroke": "#9e9e9e", "strokeWidth": "1"},
+            },
+            "rules": rules,
+        }
 
 
 class ImpactLayerGuatemala(BaseImpactLayer):
-    country = GUATEMALA
+    LANG = "es"
+    country = "guatemala"
+    args = threshold_args(LANG)
+    name = "uffis_impact_layer_guatemala"
+    label = f"{STRINGS[LANG]['impact_layer_label']} (Guatemala)"
+    group = STRINGS[LANG]["group"]
+    tags = ["inundación", "impacto", "IBF", "map_layer", "dinámico", "español"]
+    description = STRINGS[LANG]["impact_layer_desc"]
 
 
 class ImpactLayerHaiti(BaseImpactLayer):
-    country = HAITI
+    LANG = "fr"
+    country = "haiti"
+    args = threshold_args(LANG)
+    name = "uffis_impact_layer_haiti"
+    label = f"{STRINGS[LANG]['impact_layer_label']} (Haiti)"
+    group = STRINGS[LANG]["group"]
+    tags = ["inondation", "impact", "IBF", "map_layer", "dynamique", "français"]
+    description = STRINGS[LANG]["impact_layer_desc"]
 
 
 class ImpactLayerAntiguaBarbuda(BaseImpactLayer):
-    country = ANTIGUA_BARBUDA
+    LANG = "en"
+    country = "antigua_barbuda"
+    args = threshold_args(LANG)
+    name = "uffis_impact_layer_antigua_barbuda"
+    label = f"{STRINGS[LANG]['impact_layer_label']} (Antigua and Barbuda)"
+    group = STRINGS[LANG]["group"]
+    tags = ["flood", "impact", "IBF", "map_layer", "dynamic", "english"]
+    description = STRINGS[LANG]["impact_layer_desc"]
 
 
-class ImpactLayerBarbados(BaseImpactLayer):
-    country = BARBADOS
+class ImpactLayerBarbados(BarbadosParish, BaseImpactLayer):
+    LANG = "en"
+    country = "barbados"
+    # The four gates plus the parish: the receptor file is the whole island, so
+    # which parish to cut out of it is a request-time choice.
+    args = {**threshold_args(LANG), "parish": BARBADOS_PARISH_OPTIONS}
+    name = "uffis_impact_layer_barbados"
+    label = f"{STRINGS[LANG]['impact_layer_label']} (Barbados)"
+    group = STRINGS[LANG]["group"]
+    tags = ["flood", "impact", "IBF", "map_layer", "dynamic", "english"]
+    description = STRINGS[LANG]["impact_layer_desc"]
 
 
-class ImpactLayerComoros(BaseImpactLayer):
-    country = COMOROS
+class ImpactLayerComoros(ComorosUnit, BaseImpactLayer):
+    LANG = "fr"
+    country = "comoros"
+    # The four gates plus the commune: the receptor geopackage covers a whole
+    # island, so which commune to cut out of it is a request-time choice.
+    args = {**threshold_args(LANG), "commune": COMOROS_UNIT_OPTIONS}
+    name = "uffis_impact_layer_comoros"
+    label = f"{STRINGS[LANG]['impact_layer_label']} (Comores)"
+    group = STRINGS[LANG]["group"]
+    tags = ["inondation", "impact", "IBF", "map_layer", "dynamique", "français"]
+    description = STRINGS[LANG]["impact_layer_desc"]
